@@ -12,6 +12,13 @@ export { guardPlugin } from "./official/guard.plugin"
 export { analyticsPlugin } from "./official/analytics.plugin"
 export { syncPlugin } from "./official/sync.plugin"
 export { debugPlugin } from "./official/debug.plugin"
+export { indexedDBPlugin } from "./official/indexeddb.plugin"
+export {
+  cloudSyncPlugin,
+  createMongoAdapter,
+  createFirestoreAdapter,
+  createSqlRestAdapter
+} from "./official/cloud-sync.plugin"
 
 import type { PluginContext, IPlugin } from "../core/types"
 
