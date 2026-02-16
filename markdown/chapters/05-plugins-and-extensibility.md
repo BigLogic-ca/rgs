@@ -4,12 +4,14 @@ RGS is not a closed box. It's a modular engine that you can extend to cover ever
 
 ## 🔌 Available Plugins
 
-RGS includes 8 official plugins:
+RGS includes 11 official plugins:
 
 | Plugin | Purpose | Import |
 |--------|---------|--------|
 | `devToolsPlugin` | Redux DevTools integration | `rgs` |
 | `debugPlugin` | Console debug access (DEV only) | `rgs` |
+| `indexedDBPlugin` | GB-scale Local Storage | `rgs/advanced` |
+| `cloudSyncPlugin` | Remote Cloud Backup/Sync | `rgs/advanced` |
 | `syncPlugin` | Cross-tab synchronization | `rgs/advanced` |
 | `immerPlugin` | Immer for mutable-style updates | `rgs` |
 | `snapshotPlugin` | Save/restore state snapshots | `rgs` |
