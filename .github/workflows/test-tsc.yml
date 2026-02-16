@@ -1,0 +1,27 @@
+name: TSC check
+
+on:
+ push:
+  branches: [main, master]
+ pull_request:
+  branches: [main, master]
+
+jobs:
+ build-and-check:
+  runs-on: ubuntu-latest
+
+  steps:
+   - name: Checkout code
+     uses: actions/checkout@v4 # Use the latest checkout action
+
+   - name: Setup Node.js
+     uses: actions/setup-node@v4
+     with:
+      node-version: 22 # Specify your required Node.js version
+
+   - name: Install dependencies
+     run: npm install # Or yarn install, depending on your package manager
+
+   - name: Run TypeScript compiler (tsc)
+     # This runs `tsc` using the command in your package.json, e.g., "tsc": "tsc --noEmit"
+     run: npm run tsc # Or yarn tsc, to execute your defined script
