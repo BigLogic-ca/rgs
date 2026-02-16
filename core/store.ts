@@ -325,8 +325,34 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  */
   const _flushDisk = async () => {
     if (!_storage) return
+
+    // Save entire state under namespace key for simpler loading
+    try {
+      const stateObj: Record<string, unknown> = {}
+      _store.forEach((v, k) => { stateObj[k] = v })
+
+      let dataValue: unknown = stateObj
+      const isEncoded = config?.encoded
+      if (isEncoded) {
+        dataValue = btoa(JSON.stringify(stateObj))
+      } else {
+        dataValue = JSON.stringify(stateObj)
+      }
+
+      _storage.setItem(_getPrefix().replace('_', ''), JSON.stringify({
+        v: 1, t: Date.now(), e: null,
+        d: dataValue, _sys_v: _currentVersion, _b64: isEncoded ? true : undefined
+      }))
+      _audit('set', 'FULL_STATE', true)
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error(String(e))
+      if (_onError) _onError(error, { operation: 'persist', key: 'FULL_STATE' })
+      else if (!_silent) console.error(`[gState] Persist failed:`, error)
+    }
+
     const queue = Array.from(_diskQueue.entries()); _diskQueue.clear()
     for (const [key, data] of queue) {
+      // Old individual key persistence (kept for backward compatibility)
       try {
         let dataValue: unknown = data.value
         const isEncoded = data.options.encoded || data.options.secure
@@ -434,9 +460,10 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
-        const shouldPersist = !!(options.persist || config?.persistByDefault || config?.persistence || options.encrypted || options.encoded || options.secure || options.ttl)
+        // Only persist if explicitly requested via options.persist
+        const shouldPersist = options.persist === true
         if (shouldPersist) {
-          _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
+          _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist, encoded: options.encoded || config?.encoded } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
         }
         _runHook('onSet', { key, value: frozen, store: instance, version: _versions.get(key) })
         _audit('set', key, true)
