@@ -19,7 +19,7 @@ A plugin is a module that:
 Every plugin implements the `IPlugin` interface:
 
 ```typescript
-import type { IPlugin, PluginContext } from 'argis'
+import type { IPlugin, PluginContext } from '@biglogic/rgs'
 
 interface IPlugin {
   name: string
@@ -44,7 +44,7 @@ interface IPlugin {
 ### Example: A Simple Logger Plugin
 
 ```typescript
-import type { IPlugin, PluginContext } from 'argis'
+import type { IPlugin, PluginContext } from '@biglogic/rgs'
 
 export const loggerPlugin = (): IPlugin => {
   return {
@@ -74,7 +74,7 @@ store._addPlugin(loggerPlugin())
 Plugins can expose methods accessible via `store.plugins.pluginName.methodName()`:
 
 ```typescript
-import type { IPlugin, PluginContext } from 'argis'
+import type { IPlugin, PluginContext } from '@biglogic/rgs'
 
 export const counterPlugin = (): IPlugin => {
   let _count = 0
@@ -205,7 +205,7 @@ export const auditPlugin = (): IPlugin => {
 Here's a complete plugin that auto-saves to a custom backend:
 
 ```typescript
-import type { IPlugin, PluginContext } from 'argis'
+import type { IPlugin, PluginContext } from '@biglogic/rgs'
 
 interface AutoSaveConfig {
   endpoint: string

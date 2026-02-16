@@ -58,7 +58,7 @@ const decoded = JSON.parse(atob(encoded)) // { secret: 'password123' }
 #### Example: Custom Error Logging
 
 ```typescript
-import { initState } from 'argis'
+import { initState } from '@biglogic/rgs'
 
 const store = initState({
   namespace: 'myapp',
@@ -98,7 +98,7 @@ interface ErrorContext {
 #### Example: Custom Size Limit
 
 ```typescript
-import { createStore } from 'argis'
+import { createStore } from '@biglogic/rgs'
 
 const store = createStore({
   maxObjectSize: 10 * 1024 * 1024, // 10MB limit
@@ -134,7 +134,7 @@ In previous versions, security rules were shared globally. Now, each store insta
 #### ❌ Deprecated Global Methods
 
 ```typescript
-import { addAccessRule, recordConsent } from 'argis'
+import { addAccessRule, recordConsent } from '@biglogic/rgs'
 
 // ⚠️ DEPRECATED: These affect the 'default' store only and are less isolated
 addAccessRule('user_*', ['read', 'write'])

@@ -99,7 +99,7 @@ graph TB
 Best for modern applications. Clean imports, zero global pollution.
 
 ```tsx
-import { gstate } from 'argis'
+import { gstate } from '@biglogic/rgs'
 
 // Create store and hook in one line
 const useCounter = gstate({ count: 0 })
@@ -114,7 +114,7 @@ Best for shared state across the entire application.
 
 ```tsx
 // 1. Initialize once
-import { initState } from 'argis'
+import { initState } from '@biglogic/rgs'
 initState({ namespace: 'app' })
 
 // 2. Use anywhere
@@ -204,7 +204,7 @@ Extend the core functionality dynamically with specialized modules.
 10. **GuardPlugin**: Data transformation layer.
 
 ```typescript
-import { createStore, PersistencePlugin, undoRedoPlugin } from 'argis'
+import { createStore, PersistencePlugin, undoRedoPlugin } from '@biglogic/rgs'
 
 const store = createStore()
 store._addPlugin(PersistencePlugin({ storage: 'localStorage' }))
