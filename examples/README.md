@@ -14,6 +14,7 @@ This folder contains functional and reusable examples of **React Globo State (RG
 | **[RBAC Dashboard](./rbac-dashboard)** | **BE / Admin FE** | Permission-based UI, Secure Admin panels. |
 | **[Async Data Fetch](./async-data-fetch)** | **FE Only** | API integration, Data hydration. |
 | **[Security Practices](./security-best-practices)** | **BE / Core FE** | Encryption, Audit logs, GDPR compliance. |
+| **[Big Data (IndexedDB)](./big-data-indexeddb)** | **FE Specific** | High-volume storage (GBs), Large payloads. |
 | **[Stress Tests](./stress-tests)** | **Validation** | Performance benchmarking & profiling. |
 
 ---
@@ -31,6 +32,9 @@ RGS will use the Web Crypto API (or Node Crypto) to perform **AES-256-GCM** encr
 
 ### 3. XSS Defense
 Enable `validateInput: true` in your store configuration to automatically sanitize strings. This is vital for any user-generated content displayed in the DOM.
+
+### 4. High-Volume Storage (IndexedDB)
+If your application needs to store more than 10MB (the typical localStorage limit), use the **IndexedDB Plugin**. It allows storing Gigabytes of data asynchronously without blocking the main UI thread.
 
 ## 🛠️ Testing Environment
 All examples are validated using Jest in a `jsdom` environment.
