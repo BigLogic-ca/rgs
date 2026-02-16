@@ -12,7 +12,7 @@ jobs:
 
   steps:
    - name: Checkout code
-     uses: actions/checkout@v4 # Use the latest checkout action
+     uses: actions/checkout@v6 # Use the latest checkout action
 
    - name: Setup Node.js
      uses: actions/setup-node@v4
