@@ -1,14 +1,14 @@
 {
-  "name": "argis",
-  "version": "2.7.0",
+  "name": "rgs",
+  "version": "2.8.5",
   "app": {
     "folder": "/",
     "port": 3000,
-    "code": "examplepage",
+    "code": "rgs",
     "type": "alpha",
     "host": {
       "dev": "http://localhost",
-      "prod": "https://examplepage.picla.net"
+      "prod": "https://picla.net/rgs"
     },
     "socket": {
       "url": {
