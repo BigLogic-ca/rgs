@@ -32,7 +32,7 @@ export const gstate = <S extends Record<string, unknown>>(initialState: S, confi
         // Decode from base64
         stateToUse = JSON.parse(atob(saved)) as S
       }
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors, use initialState
     }
   }
@@ -64,7 +64,7 @@ export const gstate = <S extends Record<string, unknown>>(initialState: S, confi
         })
         // Encode to base64 for security
         localStorage.setItem(namespace, btoa(JSON.stringify(state)))
-      } catch (e) {
+      } catch (_e) {
         // Ignore save errors
       }
     })
@@ -82,6 +82,7 @@ export {
   useStore,
   useIsStoreReady,
   initState,
+  getStore,
   destroyState,
   useStore as useGState,
   useStore as useSimpleState
