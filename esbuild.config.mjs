@@ -36,6 +36,7 @@ const common = {
   write: true,
   color: true,
   format: "esm",
+  external: ['react', 'react-dom'],
 }
 
 // Build Main Entry
