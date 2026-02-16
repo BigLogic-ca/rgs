@@ -1,0 +1,69 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [2.7.0] - 2026-02-15
+
+### Added
+
+- **Multiple Stores**: Support for multiple independent stores via namespaces.
+- **Global Type Declarations**: TypeScript global types for `gState`, `gstate`, `useStore`, `initState`, `destroyState`.
+- **README**: Comprehensive documentation with comparison table (gState vs useState).
+- **Architecture Diagram**: ASCII diagram showing system components.
+- **Quick Examples**: Common use cases (persistence, encryption, undo/redo, sync, computed).
+- **CI/CD**: GitHub Actions workflow for automated testing and publishing.
+- **CONTRIBUTING.md**: Contribution guidelines.
+
+### Fixed
+
+- **Type Safety**: Replaced all `any` types with proper generics.
+- **ESLint**: Fixed unused variable warnings.
+- **Plugin Types**: Fixed type casting in immer, snapshot, undo-redo plugins.
+- **Regex Validation**: Added secure regex validation in security module.
+- **Plugin Exports**: Added missing exports for `analyticsPlugin` and `syncPlugin`.
+- **FAQ**: Corrected "outside React" answer (only `createStore` works without React).
+
+### Changed
+
+- **API Alignment**: useStore is now the primary export (useGState/useSimpleState are deprecated aliases).
+- **Documentation**: All docs now in English.
+- **Keywords**: Cleaned up package.json keywords.
+- **Magnatar → Magnetar**: Fixed naming throughout documentation.
+
+## [2.6.0] - 2026-02-14
+
+### Added
+
+- **Magnetar Wrapper**: Introduced `gstate()` for one-liner store and hook creation.
+- **Async Store Engine**: Added `createAsyncStore` for atomic data/loading/error lifecycle management.
+- **Worker Store Engine**: Added `createWorkerStore` for off-main-thread state proxying.
+- **Deep Proxy Guard**: Implemented recursive Proxy protection with `Forbidden Mutation` errors to ensure absolute immutability.
+- **Micro-Kernel Plugin System**: New hook-based architecture (`onInit`, `onSet`, `onGet`, `onRemove`, etc.).
+- **Official Plugin Ecosystem**: Added 10 official modules (Immer, Undo/Redo, Sync, Schema, Persistence, DevTools, TTL, Analytics, Snapshot, Guard).
+- **Circular Reference Safety**: Robust `_deepClone` implementation using `WeakMap`.
+
+### Changed
+
+- **Architecture Refinement**: Transitioned to a "Zen" modular core, moving key files to root for a leaner structure.
+- **Core Optimization**: Enhanced Proxy caching for O(n) equality check performance.
+- **Build System**: Refined `esbuild` and `tsc` configuration for optimized enterprise distribution.
+
+### Fixed
+
+- **Proxy Invariants**: Resolved conflicts between standard JS Proxy invariants and Immer's frozen objects.
+- **Circular Dependencies**: Zero-dependency architecture verified across all core modules.
+
+## [2.1.0] - 2026-02-14
+
+### Changed
+
+- **Strict Typing**: Enforced `strict: true` and `noImplicitAny` across the entire codebase.
+- **Code Standards**: Modernized ESLint flat configuration.
+- **Internal Cleanup**: Removed app-specific technical noise and legacy dev-proxy overhead.
+
+## [2.0.0] - 2026-02-14
+
+### Changed
+
+- **The Magnetar Transformation**: Major shift toward high-performance kernel architecture.
+- **Immer Core**: Native integration of Immer for handled immutability.

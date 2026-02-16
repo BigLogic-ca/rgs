@@ -1,0 +1,35 @@
+{
+  "name": "argis",
+  "version": "2.7.0",
+  "app": {
+    "folder": "/",
+    "port": 3000,
+    "code": "examplepage",
+    "type": "alpha",
+    "host": {
+      "dev": "http://localhost",
+      "prod": "https://examplepage.picla.net"
+    },
+    "socket": {
+      "url": {
+        "tst": "http://localhost:5000/",
+        "dev": "http://localhost:5000/",
+        "pro": "wss://ws.a51.dev/"
+      }
+    },
+    "events": {
+      "url": {
+        "tst": "http://localhost:5002/",
+        "dev": "http://localhost:5002/",
+        "pro": "wss://ws.a51.dev/"
+      }
+    },
+    "proxy": {
+      "api": {
+        "tst": "http://localhost:5003/",
+        "dev": "http://localhost:5003/",
+        "pro": "https://api.a51.dev/"
+      }
+    }
+  }
+}

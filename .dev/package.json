@@ -1,0 +1,9 @@
+{
+  "name": "tools",
+  "scripts": {
+    "backup": "cd backup && backup.bat",
+    "update": "cd node && node npmUpdate.js",
+    "clear": "cd .. && rm -rf node_modules & npm run update",
+    "format": "npx sort-package-json"
+  }
+}

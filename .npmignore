@@ -1,0 +1,35 @@
+# Ignore build artifacts and temporary files
+dist/
+tmp/
+*.log
+*.dev
+
+
+# Ignore development-related files and directories
+node_modules/
+src/
+test/
+tests/
+types/
+
+coverage/
+.eslintrc.js
+.prettierrc.js
+.backup
+.continue
+.project
+.editorconfig
+.private
+.dev
+.sandworm
+
+# Ignore documentation and examples (if not intended for package users)
+.github/
+.vscode/
+.cache/
+docs/
+examples/
+/index.tsx
+
+# Include specific files that are otherwise ignored by a broader rule
+!dist/index.js

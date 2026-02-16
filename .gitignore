@@ -1,0 +1,49 @@
+# temp folder
+.__mf__temp
+
+# node folder
+node_modules
+/node_modules
+**/*/node_modules
+
+# dependencies
+/.pnp
+.pnp.js
+
+**/*OLD/*
+**/*old/*
+
+# custom
+*.backup/*
+*.obsidian/*
+*.njsproj
+*.cache
+.private
+.profile
+.backup
+
+# testing
+/tests/**/reports
+/tests/**/results
+/tests/**/screenshot
+coverage
+.auth
+
+# production
+/build
+/dist
+/out
+/www
+/release-builds
+
+# misc
+.webpack
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,19 @@
+{
+  "name": "rgs-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "cd .. && eslint --config tests/eslint/eslint.config.mjs .",
+    "lint:fix": "cd .. && eslint --config tests/eslint/eslint.config.mjs . --fix",
+    "jest": "cd .. && jest --config tests/jest/jest.config.ts",
+    "pw": "cd .. && playwright test --config tests/playwright/playwright.config.ts",
+    "tsc": "cd .. && tsc -b tsconfig.json",
+    "type-check": "tsc --noEmit",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./tests/jest/jest.config.ts",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./tests/jest/jest.config.ts --watch",
+    "test:e2e": "playwright test --config ./tests/playwright/playwright.config.ts",
+    "test:all": "npm run lint && npm run jest && npm run pw",
+    "pw:report": "cd .. && playwright show-report tests/playwright/reports",
+    "pw:ui": "cd .. && playwright test --config tests/playwright/playwright.config.ts --ui"
+  }
+}
