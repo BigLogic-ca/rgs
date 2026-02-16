@@ -397,8 +397,9 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
-        if (options.persist || options.encrypted || options.encoded || options.secure || options.ttl) {
-          _diskQueue.set(key, { value: frozen, options }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
+        const shouldPersist = !!(options.persist || config?.persistByDefault || config?.persistence || options.encrypted || options.encoded || options.secure || options.ttl)
+        if (shouldPersist) {
+          _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
         }
         _runHook('onSet', { key, value: frozen, store: instance, version: _versions.get(key) })
         _audit('set', key, true)
