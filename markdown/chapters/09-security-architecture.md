@@ -26,7 +26,15 @@ RGS supports fine-grained access rules:
 - **Fail-Closed Design**: Access is denied by default if any rules are defined.
 - **Regex Caching**: Store instances cache compiled regular expressions for ultra-fast permission checks.
 
+## 5. Security Best Practices
+For real-world implementations, refer to the `examples/security-best-practices` directory, which covers:
+- **Encryption Key Management**: Using `generateEncryptionKey()` for secure key generation.
+- **Audit Logging**: Tracking all store modifications for compliance.
+- **GDPR Compliance**: Managing user consent and data export/deletion.
+
 ## Summary of 2.9.5 Enhancements
 - Robust regex patterns for `sanitizeValue`.
 - Recursive sanitization for plain objects.
 - `Map` and `Set` support in `deepClone`.
+- **Exposed Metadata**: Store instances now expose read-only `namespace` and `userId`.
+- **Direct Store Access**: Added `getStore()` utility for non-React contexts.
