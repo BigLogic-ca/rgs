@@ -12,11 +12,18 @@ Let's create a User Profile module.
 import { gstate } from '@biglogic/rgs';
 
 // 1. Define the state and create everything in ONE shot
+// Pass a string namespace to enable automatic persistence to localStorage
 export const useUser = gstate({
   name: 'Guest',
   isLogged: false,
   preferences: { theme: 'dark', lang: 'en' }
-}, 'user_module'); // Optional namespace for persistence
+}, 'user_module'); // Auto-persists to localStorage (excludes sensitive fields)
+
+// Or use an object config for more control:
+export const useUserNoPersist = gstate({
+  name: 'Guest',
+  isLogged: false
+}, { namespace: 'user_module', autoPersist: false }); // No persistence
 
 // 2. Use it anywhere
 function ProfileHeader() {
@@ -30,8 +37,8 @@ function ProfileHeader() {
 ## 💎 Why Magnetar Rocks
 
 1. **Inferred Types**: No need to define `<string>`. TypeScript looks at the initial value you passed to `gstate` and figures it out.
-2. **Auto-Namespace**: If you enable persistence, Magnetar uses the name you gave it (`user_module`) to isolate data in the local database.
-3. **Store Methods Included**: The object returned by `gstate` is not just a hook. It's the store itself!
+2. **Auto-Persistence**: When you pass a string namespace, RGS automatically persists to localStorage (excluding sensitive fields like tokens, passwords, secrets).
+3. **Security**: Sensitive fields (containing 'token', 'password', 'secret', 'key') are automatically excluded from persistence.
 
 ```typescript
 // You can access the store OUTSIDE components!
