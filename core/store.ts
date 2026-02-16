@@ -48,26 +48,63 @@ export const StorageAdapters = {
  * @param obj - Object to clone
  * @returns Deep cloned object
  */
+/**
+ * Deep clone using structuredClone (native) with fallback.
+ * Handles circular references safely and preserves common types.
+ * @param obj - Object to clone
+ * @returns Deep cloned object
+ */
 const deepClone = <T>(obj: T): T => {
   if (obj === null || typeof obj !== 'object') return obj
+
+  // Optimization: use native structuredClone if available
   if (typeof structuredClone === 'function') {
-    try { return structuredClone(obj) } catch (_e) { /* proceed to manual */ }
+    try {
+      return structuredClone(obj)
+    } catch (_e) {
+      // Fallback for non-serializable objects (functions, prototypes, etc.)
+    }
   }
+
   const seen = new WeakMap<object, unknown>()
+
   const clone = <V>(value: V): V => {
     if (value === null || typeof value !== 'object') return value
+    if (typeof value === 'function') return value as unknown as V // Functions cannot be deep cloned easily
+
+    // Check for circular references
     if (seen.has(value as object)) return seen.get(value as object) as V
+
     if (value instanceof Date) return new Date(value.getTime()) as unknown as V
     if (value instanceof RegExp) return new RegExp(value.source, value.flags) as unknown as V
-    const result = Array.isArray(value) ? [] as unknown as V : Object.create(Object.getPrototypeOf(value)) as V
-    seen.set(value as object, result)
-    if (Array.isArray(value)) {
-      for (let i = 0; i < value.length; i++) (result as unknown[])[i] = clone(value[i])
-    } else {
-      for (const key of Object.keys(value as object)) (result as Record<string, unknown>)[key] = clone((value as Record<string, unknown>)[key])
+    if (value instanceof Map) {
+      const result = new Map()
+      seen.set(value as object, result)
+      value.forEach((v, k) => result.set(clone(k), clone(v)))
+      return result as unknown as V
     }
-    return result
+    if (value instanceof Set) {
+      const result = new Set()
+      seen.set(value as object, result)
+      value.forEach((v) => result.add(clone(v)))
+      return result as unknown as V
+    }
+
+    // Handle Plain Objects and Arrays
+    const result: any = Array.isArray(value)
+      ? []
+      : Object.create(Object.getPrototypeOf(value))
+
+    seen.set(value as object, result)
+
+    const keys = [...Object.keys(value as object), ...Object.getOwnPropertySymbols(value as object)]
+    for (const key of keys) {
+      result[key] = clone((value as any)[key])
+    }
+
+    return result as V
   }
+
   return clone(obj)
 }
 
