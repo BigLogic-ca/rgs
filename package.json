@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "2.9.3",
+  "version": "2.9.5",
   "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
   "deprecated": false,
   "preferGlobal": true,
@@ -39,6 +39,7 @@
   },
   "scripts": {
     "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
+    "test": "jest --config tests/jest/jest.config.ts",
     "npm: pack": "npm run build && cd dist && npm pack",
     "npm: publish": "npm run build && cd dist && npm publish --access=public"
   },
