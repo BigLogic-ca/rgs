@@ -23,7 +23,7 @@ RGS includes 8 official plugins:
 Import the official plugin and you'll see every state change, transaction, and execution time in the console or dev tools (Redux DevTools support included!).
 
 ```typescript
-import { devToolsPlugin } from 'argis';
+import { devToolsPlugin } from '@biglogic/rgs';
 
 store._addPlugin(devToolsPlugin({ name: 'My Store' }));
 ```
@@ -35,7 +35,7 @@ store._addPlugin(devToolsPlugin({ name: 'My Store' }));
 Access your store directly from the browser console:
 
 ```typescript
-import { debugPlugin } from 'argis';
+import { debugPlugin } from '@biglogic/rgs';
 
 // Always wrap in dev check
 if (process.env.NODE_ENV === 'development') {
@@ -76,7 +76,7 @@ store.set('session_token', tokenValue, {
 ## 🎲 4. Undo/Redo: History Management
 
 ```typescript
-import { undoRedoPlugin } from 'argis';
+import { undoRedoPlugin } from '@biglogic/rgs';
 
 store._addPlugin(undoRedoPlugin({ limit: 50 }));
 
@@ -90,7 +90,7 @@ store.canRedo(); // boolean
 ## 📸 5. Snapshots: Save & Restore State
 
 ```typescript
-import { snapshotPlugin } from 'argis';
+import { snapshotPlugin } from '@biglogic/rgs';
 
 store._addPlugin(snapshotPlugin());
 
@@ -113,7 +113,7 @@ store.clearSnapshots();
 Transform values before they hit the store:
 
 ```typescript
-import { guardPlugin } from 'argis';
+import { guardPlugin } from '@biglogic/rgs';
 
 store._addPlugin(guardPlugin({
   'user_input': (val) => val.trim().toLowerCase()
@@ -125,7 +125,7 @@ store._addPlugin(guardPlugin({
 Validate values before setting:
 
 ```typescript
-import { schemaPlugin } from 'argis';
+import { schemaPlugin } from '@biglogic/rgs';
 
 store._addPlugin(schemaPlugin({
   'email': (val) => {
@@ -138,7 +138,7 @@ store._addPlugin(schemaPlugin({
 ## 📊 8. Analytics: Track Changes
 
 ```typescript
-import { analyticsPlugin } from 'argis';
+import { analyticsPlugin } from '@biglogic/rgs';
 
 store._addPlugin(analyticsPlugin({
   provider: (event) => {
@@ -152,7 +152,7 @@ store._addPlugin(analyticsPlugin({
 ## 🔄 9. Immer Integration
 
 ```typescript
-import { immerPlugin } from 'argis';
+import { immerPlugin } from '@biglogic/rgs';
 
 store._addPlugin(immerPlugin());
 
