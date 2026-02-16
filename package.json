@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "2.9.0",
+  "version": "2.9.2",
   "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
   "deprecated": false,
   "preferGlobal": true,
@@ -32,8 +32,8 @@
       "email": "valeriacalascaglitta@gmail.com"
     }
   ],
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "scripts": {
     "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
     "npm: pack": "npm run build && cd dist && npm pack",
