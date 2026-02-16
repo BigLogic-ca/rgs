@@ -24,25 +24,25 @@ We took the simplicity of **React Globo State (RGS)** and fused it with the arch
 
 | Feature | useState | gState |
 |---------|----------|--------|
-| **State globale tra componenti** | ❌ Servono Context/props | ✅ Condivisione automatica |
-| **Provider wrapper** | ❌ Necessario | ✅ Non serve |
-| **Persistenza (localStorage)** | ❌ Manuale | ✅ Built-in |
-| **Crittografia dati** | ❌ | ✅ AES-256-GCM |
-| **Namespace/stores multipli** | ❌ | ✅ |
-| **Plugin (Immer, Undo/Redo)** | ❌ | ✅ |
+| **Global state across components** | ❌ Need Context/props | ✅ Automatic sharing |
+| **Provider wrapper** | ❌ Required | ✅ Not needed |
+| **Persistence (localStorage)** | ❌ Manual | ✅ Built-in |
+| **Data encryption** | ❌ | ✅ AES-256-GCM |
+| **Multiple namespaces/stores** | ❌ | ✅ |
+| **Plugins (Immer, Undo/Redo)** | ❌ | ✅ |
 | **Audit logging** | ❌ | ✅ |
 | **RBAC/GDPR consent** | ❌ | ✅ |
-| **SSR/Hydration** | ❌ Manuale | ✅ Automatico |
+| **SSR/Hydration** | ❌ Manual | ✅ Automatic |
 | **Computed values** | ❌ | ✅ |
 
-### Quando usare cosa?
+### When to use what?
 
-- **useState**: UI locale, un componente, state temporaneo
+- **useState**: Local UI, single component, temporary state
 - **gState**:
-  - State condiviso tra più componenti
-  - Dati persistenti (preferenze, carrello, autenticazione)
-  - Dati sensibili (crittografia)
-  - Feature advanced (undo/redo, snapshots)
+  - Shared state across multiple components
+  - Persistent data (preferences, cart, authentication)
+  - Sensitive data (encryption)
+  - Advanced features (undo/redo, snapshots)
   - Enterprise (audit, RBAC, GDPR)
 
 ---
