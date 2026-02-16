@@ -101,7 +101,7 @@ Best for modern applications. Clean imports, zero global pollution.
 ```tsx
 import { gstate } from '@biglogic/rgs'
 
-// gstate CREA un hook personalizzato - NON si importa!
+// gstate CREATES a custom hook - it is NOT imported!
 const useCounter = gstate({ count: 0 })
 
 // In your component
