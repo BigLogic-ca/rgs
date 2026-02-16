@@ -28,7 +28,6 @@ export const debugPlugin = (): IPlugin => {
       onInstall: ({ store }) => {
         // Expose store to global window object for console access
         if (typeof window !== 'undefined') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (window as unknown as Record<string, unknown>).gstate = {
             /** Get all state */
             list: () => {
