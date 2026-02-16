@@ -26,7 +26,7 @@ function copyGithubFiles() {
 }
 
 const common = {
-  bundle: false,
+  bundle: true,
   legalComments: 'none',
   allowOverwrite: true,
   treeShaking: true,
