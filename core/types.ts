@@ -230,6 +230,10 @@ export interface StoreConfig<S extends Record<string, unknown> = Record<string, 
   storage?: CustomStorage | Storage
   /** Migration function called when the saved version is lower than the current version. */
   migrate?: (oldState: Record<string, unknown>, oldVersion: number) => S
+  /** Persist all keys to storage by default (default: false). Can be overridden per-key. */
+  persistByDefault?: boolean
+  /** Alias for persistByDefault for backwards compatibility. */
+  persistence?: boolean
   /** Callback for error handling (hydration failures, plugin crashes, etc.). */
   onError?: (error: Error, context: { operation: string; key?: string }) => void
   /** Warn if object size exceeds this limit (in bytes, default: 5MB). 0 to disable. */
