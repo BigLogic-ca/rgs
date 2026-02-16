@@ -186,6 +186,10 @@ export interface IStore<S extends Record<string, unknown> = Record<string, unkno
 
   /** True if the store has finished hydration from storage. */
   readonly isReady: boolean
+  /** Unique namespace for this store. */
+  readonly namespace: string
+  /** Current user ID for audit and RBAC logs. */
+  readonly userId?: string
   /** Returns a promise that resolves when hydration is complete. */
   whenReady(): Promise<void>
   /**
