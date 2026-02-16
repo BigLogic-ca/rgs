@@ -27,5 +27,15 @@ const sessionStorageMock = createStorageMock()
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock })
 Object.defineProperty(globalThis, 'sessionStorage', { value: sessionStorageMock })
 
+// Polyfill Web Crypto API for Node environment
+import { webcrypto } from 'node:crypto'
+if (!globalThis.crypto || !globalThis.crypto.subtle) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    writable: true,
+    configurable: true
+  })
+}
+
 // Mock createStore globally for tests
 // Tests will use createStore() to create their own instances
