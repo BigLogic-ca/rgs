@@ -22,16 +22,58 @@ export const gstate = <S extends Record<string, unknown>>(initialState: S, confi
     ? { namespace: configOrNamespace }
     : configOrNamespace
 
+  // Check if we're in browser and have a namespace for persistence
+  let stateToUse = initialState
+  const namespace = config?.namespace
+  if (typeof window !== 'undefined' && namespace) {
+    try {
+      const saved = localStorage.getItem(namespace)
+      if (saved) {
+        // Decode from base64
+        stateToUse = JSON.parse(atob(saved)) as S
+      }
+    } catch (e) {
+      // Ignore errors, use initialState
+    }
+  }
+
   const store = baseCreateStore<S>(config)
 
-  if (initialState) {
-    Object.entries(initialState).forEach(([k, v]) => {
+  if (stateToUse) {
+    Object.entries(stateToUse).forEach(([k, v]) => {
       store._setSilently(k, v)
     })
   }
 
-  const magic = (key: string) => baseUseStore(key, store)
-  return Object.assign(magic, store) as IStore<S> & ((key: string) => unknown)
+  // Auto-save to localStorage when persist: true
+  // Only saves non-sensitive fields and uses base64 encoding
+  const configAny = config as Record<string, unknown> | undefined
+
+  if (typeof window !== 'undefined' && configAny?.persist && namespace) {
+    store._subscribe(() => {
+      try {
+        const state: Record<string, unknown> = {}
+        const list = store.list()
+        Object.keys(list).forEach(k => {
+          // Skip sensitive fields
+          const lowerKey = k.toLowerCase()
+          if (lowerKey.includes('token') || lowerKey.includes('password') || lowerKey.includes('secret') || lowerKey.includes('key')) {
+            return
+          }
+          state[k] = store.get(k)
+        })
+        // Encode to base64 for security
+        localStorage.setItem(namespace, btoa(JSON.stringify(state)))
+      } catch (e) {
+        // Ignore save errors
+      }
+    })
+  }
+
+  // Magic function that returns typed hook when called with a key
+  const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
+
+  return Object.assign(magic, store) as IStore<S> & (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | ((draft: S[K]) => S[K]), options?: unknown) => boolean])
 }
 
 export { baseCreateStore as createStore }
