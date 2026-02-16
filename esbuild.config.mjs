@@ -49,7 +49,8 @@ const buildMain = async () => {
       copy({
         assets: [
           { from: './package.json', to: './package.json' },
-          { from: './markdown/**/*', to: './markdown' }
+          { from: './markdown/**/*', to: './markdown' },
+          { from: './examples/**/*', to: './examples' }
         ]
       })
     ]
