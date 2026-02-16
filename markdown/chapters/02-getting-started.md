@@ -15,7 +15,7 @@ npm install rgs
 In your main entry file (e.g., `main.tsx` or `App.tsx`), wake up the engine once.
 
 ```typescript
-import { initState } from 'argis';
+import { initState } from '@biglogic/rgs';
 
 // Initialize with optional settings
 initState({
@@ -29,7 +29,7 @@ initState({
 Use the `useStore` hook. No providers, no wrappers. Just raw, atomic power.
 
 ```tsx
-import { useStore } from 'argis';
+import { useStore } from '@biglogic/rgs';
 
 function Counter() {
   // If 'count' doesn't exist yet, it defaults to undefined. Easy.
@@ -57,7 +57,7 @@ function Counter() {
 Need to access state outside of React components? Simple.
 
 ```typescript
-import { getStore } from 'argis';
+import { getStore } from '@biglogic/rgs';
 
 const value = getStore()?.get('count');
 getStore()?.set('count', 9001);
