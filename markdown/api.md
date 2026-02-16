@@ -63,6 +63,18 @@ function createStore<S extends Record<string, unknown>>(
 
 ---
 
+### `getStore`
+
+Retrieves the currently active default store instance. Useful for accessing the store outside of React components or in utility functions.
+
+```typescript
+function getStore(): IStore<Record<string, unknown>> | null
+```
+
+**Returns:** The active `IStore` or `null` if no store was initialized via `initState`.
+
+---
+
 ## Store Interface (`IStore`)
 
 ### State Operations
@@ -110,6 +122,26 @@ store.list(): Record<string, unknown>
 
 ---
 
+### Metadata Properties
+
+#### `namespace`
+
+The unique namespace of the store (read-only).
+
+```typescript
+store.namespace: string
+```
+
+#### `userId`
+
+The current user ID associated with the store for RBAC and audit logs (read-only).
+
+```typescript
+store.userId?: string
+```
+
+---
+
 ### Computed Values
 
 #### `compute`
@@ -128,6 +160,8 @@ const fullName = store.compute('fullName', (get) => {
   return `${first} ${last}`
 })
 ```
+
+> **Note:** RGS supports **nested computed dependencies**. A computed value can reactively depend on other computed values in the same store.
 
 ---
 
@@ -218,6 +252,8 @@ Access plugin methods via `store.plugins`:
 store.plugins.undoRedo.undo()
 store.plugins.undoRedo.redo()
 store.plugins.counter.increment()
+store.plugins.cloudSync.sync()
+store.plugins.cloudSync.getStats()
 ```
 
 ---
