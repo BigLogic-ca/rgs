@@ -9,7 +9,7 @@ It's a single function that creates the store and the hook simultaneously. **Zer
 Let's create a User Profile module.
 
 ```typescript
-import { gstate } from 'argis';
+import { gstate } from '@biglogic/rgs';
 
 // 1. Define the state and create everything in ONE shot
 export const useUser = gstate({
