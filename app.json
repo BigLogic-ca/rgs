@@ -1,6 +1,4 @@
 {
-  "name": "rgs",
-  "version": "2.8.5",
   "app": {
     "folder": "/",
     "port": 3000,
