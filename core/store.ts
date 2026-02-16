@@ -298,7 +298,12 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
   const _updateComputed = (key: string) => {
     const comp = _computed.get(key), depsFound = new Set<string>()
     if (!comp) return
-    const getter = <V>(k: string): V | null => { depsFound.add(k); return instance.get(k) as V | null }
+    const getter = <V>(k: string): V | null => {
+      depsFound.add(k)
+      // Support computed dependencies: if the key is a computed value, retrieve its last calculated value
+      if (_computed.has(k)) return _computed.get(k)!.lastValue as V
+      return instance.get(k) as V | null
+    }
     const newValue = comp.selector(getter)
     comp.deps.forEach(d => {
       if (!depsFound.has(d)) {
@@ -662,6 +667,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  */
     get plugins() { return _methodNamespace as unknown as GStatePlugins },
     get isReady() { return _isReady },
+    get namespace() { return _namespace },
+    get userId() { return _userId },
     whenReady: () => _readyPromise
   }
 
