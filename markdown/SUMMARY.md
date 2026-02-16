@@ -41,6 +41,10 @@ This documentation is written for everyone: from **easy setup** for those who ju
   - Upgrading to latest version (Enterprise Isolation)
   - Upgrading to previous version (`secure` → `encoded`)
 
+- **[Security Architecture & Hardening](chapters/09-security-architecture.md)**
+  - Advanced XSS prevention and deep cloning reliability.
+  - AES-256-GCM and RBAC.
+
 ---
 
 ## Reference
