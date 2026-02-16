@@ -38,7 +38,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     // Completeness
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
   },
   "typeRoots": [
     "node_modules/@types",
