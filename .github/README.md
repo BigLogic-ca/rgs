@@ -101,7 +101,7 @@ Best for modern applications. Clean imports, zero global pollution.
 ```tsx
 import { gstate } from '@biglogic/rgs'
 
-// Create store and hook in one line
+// gstate CREA un hook personalizzato - NON si importa!
 const useCounter = gstate({ count: 0 })
 
 // In your component
@@ -114,7 +114,7 @@ Best for shared state across the entire application.
 
 ```tsx
 // 1. Initialize once
-import { initState } from '@biglogic/rgs'
+import { initState, useStore } from '@biglogic/rgs'
 initState({ namespace: 'app' })
 
 // 2. Use anywhere
