@@ -1,0 +1,12 @@
+# .github/dependabot.yml
+version: 2
+updates:
+ - package-ecosystem: "npm" # Example for Node.js
+   directory: "/"
+   schedule:
+    interval: "daily"
+   # Optional: Add labels, reviewers, etc.
+ - package-ecosystem: "github-actions" # Example for GitHub Actions
+   directory: "/"
+   schedule:
+    interval: "daily"

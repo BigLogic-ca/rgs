@@ -1,7 +1,10 @@
 {
   "name": "@biglogic/rgs",
-  "version": "2.7.0",
+  "version": "2.8.5",
   "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
+  "deprecated": false,
+  "preferGlobal": true,
+  "type": "module",
   "keywords": [
     "rgs",
     "gstate",
@@ -18,23 +21,41 @@
   ],
   "license": "MIT",
   "author": "Dario Passariello",
-  "type": "module",
+  "contributors": [
+    {
+      "name": "Dario Passariello",
+      "email": "dariopassariello@gmail.com",
+      "url": "https://dario.passariello.ca/"
+    },
+    {
+      "name": "Valeria Cala Scaglitta",
+      "email": "valeriacalascaglitta@gmail.com"
+    }
+  ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./index.d.ts",
+      "default": "./index.js"
     },
     "./advanced": {
-      "types": "./dist/advanced.d.ts",
-      "default": "./dist/advanced.js"
+      "types": "./advanced.d.ts",
+      "default": "./advanced.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./*": "./*"
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
+  "types": "./index.d.ts",
+  "typings": "./types/*",
+  "npmFileMap": [
+    {
+      "basePath": "./dist/",
+      "files": [
+        "*.js"
+      ]
+    }
   ],
+  "npmName": "rgs",
   "scripts": {
     "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./tests/jest/jest.config.ts",
