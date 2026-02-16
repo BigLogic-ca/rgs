@@ -40,13 +40,22 @@
     // Completeness
     "skipLibCheck": true
   },
+  "typeRoots": [
+    "node_modules/@types",
+    "./types/*"
+  ],
   "include": [
     "./**/*.ts",
     "./**/*.tsx"
   ],
   "exclude": [
     "node_modules",
+    ".private",
+    "archive",
+    "*backup",
     "dist",
+    "*old*",
+    "*OLD*",
     "tests/**/*"
   ]
 }
