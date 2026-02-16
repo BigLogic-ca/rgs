@@ -8,8 +8,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Copy .github files to dist root (except workflow)
 const githubFiles = [
-  { from: '.github/CODEOWNERS', to: 'CODEOWNERS' },
-  { from: '.github/CONTRIBUTING.md', to: 'CONTRIBUTING.md' },
   { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
   { from: '.github/LICENSE', to: 'LICENSE' },
   { from: '.github/README.md', to: 'README.md' },
