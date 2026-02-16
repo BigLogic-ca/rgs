@@ -58,7 +58,7 @@ store.set('user', (draft) => {
 Never trust data coming back from the server or saved in the browser 6 months ago. Use the **schemaPlugin**.
 
 ```typescript
-import { schemaPlugin } from 'argis';
+import { schemaPlugin } from '@biglogic/rgs';
 import { z } from 'zod'; // Recommended!
 
 const store = initState();
