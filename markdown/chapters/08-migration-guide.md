@@ -58,7 +58,7 @@ const decoded = JSON.parse(atob(encoded)) // { secret: 'password123' }
 #### Example: Custom Error Logging
 
 ```typescript
-import { initState } from '@biglogic/rgs'
+import { initState, useStore } from '@biglogic/rgs'
 
 const store = initState({
   namespace: 'myapp',
