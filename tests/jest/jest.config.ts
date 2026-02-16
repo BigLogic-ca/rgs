@@ -15,7 +15,9 @@ const config: Config = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
-  }
+  },
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/']
 }
 
 export default config
