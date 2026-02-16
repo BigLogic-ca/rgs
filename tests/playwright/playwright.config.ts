@@ -27,7 +27,7 @@ export default defineConfig(
 
       // An object containing additional HTTP headers to be sent with every request.
       extraHTTPHeaders: {
-        'X-App-Name': pk.name
+        'X-App-Name': pk.app.code
       },
 
       // Whether to ignore HTTPS errors during navigation.
