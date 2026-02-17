@@ -47,8 +47,8 @@ export const gstate = <S extends Record<string, unknown>>(
 
   // Expose as global for debugging purposes in dev environments
   if (typeof window !== 'undefined') {
-    (window as any).gState = store;
-    (window as any).rgs = store
+    (window as unknown as Record<string, unknown>).gState = store;
+    (window as unknown as Record<string, unknown>).rgs = store
   }
 
   return Object.assign(magic, store) as IStore<S> & (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | ((draft: S[K]) => S[K]), options?: unknown) => boolean])
