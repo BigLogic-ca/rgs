@@ -2,7 +2,7 @@
   "name": "rgs-highlighter",
   "displayName": "RGS Highlighter",
   "description": "Highlights rgs and gState in magenta bold - code only, no comments",
-  "version": "2.9.5",
+  "version": "1.0.0",
   "publisher": "biglogic",
   "repository": {
     "type": "git",
@@ -12,8 +12,8 @@
     "vscode": "^1.75.0"
   },
   "scripts": {
-    "create": "vsce package",
-    "install": "code --install-extension ./build/rgs-highlighter-2.9.5.vsix"
+    "create": "vsce package -o rgs-extension.vsix",
+    "install": "code --install-extension ./build/rgs-highlighter.vsix"
   },
   "categories": [
     "Other",

@@ -14,8 +14,8 @@ node_modules
 **/*old/*
 
 # custom
-*.backup/*
-*.obsidian/*
+*.backup
+*.obsidian
 *.njsproj
 *.cache
 .private
