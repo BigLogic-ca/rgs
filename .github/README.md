@@ -101,7 +101,7 @@ Best for modern applications. Clean imports, zero global pollution.
 ```tsx
 import { gstate } from '@biglogic/rgs'
 
-// Create store and hook in one line
+// gstate CREATES a custom hook - it is NOT imported!
 const useCounter = gstate({ count: 0 })
 
 // In your component
@@ -114,7 +114,7 @@ Best for shared state across the entire application.
 
 ```tsx
 // 1. Initialize once
-import { initState } from '@biglogic/rgs'
+import { initState, useStore } from '@biglogic/rgs'
 initState({ namespace: 'app' })
 
 // 2. Use anywhere
@@ -162,6 +162,32 @@ store.compute('fullName', ['firstName', 'lastName'],
   (s) => `${s.firstName} ${s.lastName}`)
 
 const [fullName] = store('fullName') // "John Doe"
+```
+
+### Error Handling with onError
+
+Handle errors gracefully with the `onError` callback - perfect for production apps:
+
+```tsx
+const store = gstate({ data: null }, {
+  onError: (error, context) => {
+    console.error(`Error in ${context.operation}:`, error.message)
+    // Send to error tracking service (Sentry, etc.)
+  }
+})
+```
+
+### Size Limits (maxObjectSize & maxTotalSize)
+
+Protect your app from memory issues with automatic size warnings:
+
+```tsx
+const store = gstate({ data: {} }, {
+  // Warn if single value exceeds 5MB (default)
+  maxObjectSize: 5 * 1024 * 1024,
+  // Warn if total store exceeds 50MB (default)
+  maxTotalSize: 50 * 1024 * 1024
+})
 ```
 
 ---

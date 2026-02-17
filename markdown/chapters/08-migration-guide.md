@@ -58,7 +58,7 @@ const decoded = JSON.parse(atob(encoded)) // { secret: 'password123' }
 #### Example: Custom Error Logging
 
 ```typescript
-import { initState } from '@biglogic/rgs'
+import { initState, useStore } from '@biglogic/rgs'
 
 const store = initState({
   namespace: 'myapp',
@@ -172,6 +172,53 @@ store.recordConsent('user123', 'marketing', true)
 
 ---
 
+## v2.9.5: The Architecture & Safety Update (2026-02-16)
+
+This release focuses on improving developer ergonomics, security visibility, and complex dependency handling.
+
+### 1. Nested Computed Dependencies
+**NEW:** Computed values can now re-trigger based on other computed values.
+
+```typescript
+store.compute('tax', (get) => (get<number>('subtotal') || 0) * 0.2)
+store.compute('total', (get) => (get<number>('subtotal') || 0) + (get<number>('tax') || 0))
+```
+
+### 2. Direct Store Access: `getStore()`
+**NEW:** A top-level utility to retrieve the default store without React hooks.
+
+```typescript
+import { getStore } from '@biglogic/rgs'
+
+export const toggleTheme = () => {
+  const store = getStore()
+  if (store) store.set('mode', 'dark')
+}
+```
+
+### 3. Exposed Metadata: `namespace` and `userId`
+**NEW:** Store instances now expose their identifying properties as read-only getters.
+
+```typescript
+const store = createStore({ namespace: 'auth-vault', userId: 'user-001' })
+console.log(store.namespace) // 'auth-vault'
+console.log(store.userId)    // 'user-001'
+```
+
+### 4. High-Volume & Hybrid Sync (Plugins)
+**NEW:** Support for GB-scale storage and Remote Cloud Backups.
+
+- **IndexedDB Plugin**: Replaces localStorage for massive browser datasets.
+- **Cloud Sync Plugin**: Differential synchronization to MongoDB, Firebase, or any SQL backend.
+
+```typescript
+// Example: Manual Cloud Sync
+const result = await store.plugins.cloudSync.sync()
+console.log('Stats:', store.plugins.cloudSync.getStats())
+```
+
+---
+
 ## Breaking Changes
 
 ### 🔒 Security Isolation
@@ -203,4 +250,4 @@ If you relied on `addAccessRule()` from the global export to affect a `createSto
 
 ---
 
-## Last updated: 2026-02-15
+## Last updated: 2026-02-16

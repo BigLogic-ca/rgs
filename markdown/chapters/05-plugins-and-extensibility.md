@@ -4,12 +4,14 @@ RGS is not a closed box. It's a modular engine that you can extend to cover ever
 
 ## 🔌 Available Plugins
 
-RGS includes 8 official plugins:
+RGS includes 11 official plugins:
 
 | Plugin | Purpose | Import |
 |--------|---------|--------|
 | `devToolsPlugin` | Redux DevTools integration | `rgs` |
 | `debugPlugin` | Console debug access (DEV only) | `rgs` |
+| `indexedDBPlugin` | GB-scale Local Storage | `rgs/advanced` |
+| `cloudSyncPlugin` | Remote Cloud Backup/Sync | `rgs/advanced` |
 | `syncPlugin` | Cross-tab synchronization | `rgs/advanced` |
 | `immerPlugin` | Immer for mutable-style updates | `rgs` |
 | `snapshotPlugin` | Save/restore state snapshots | `rgs` |
@@ -62,7 +64,21 @@ import { syncPlugin } from 'rgs/advanced';
 store._addPlugin(syncPlugin({ channelName: 'my_app_sync' }));
 ```
 
-## 🕐 3. TTL (Time To Live): Expiring Data
+## 🔐 3. Encode Option: Base64 Encoding
+
+Use the `encoded` option for simple base64 encoding (not encryption, just obfuscation):
+
+```typescript
+// Per-value encoding
+store.set('token', 'secret-value', { persist: true, encoded: true })
+
+// Or global encoding for all persisted values
+const store = initState({ encoded: true })
+```
+
+> **Note:** Use `encryptionKey` with AES-256-GCM for real security. The `encoded` option is just simple obfuscation.
+
+## 🕐 4. TTL (Time To Live): Expiring Data
 
 Use the `ttl` option in persist to make data expire automatically:
 
@@ -73,7 +89,7 @@ store.set('session_token', tokenValue, {
 });
 ```
 
-## 🎲 4. Undo/Redo: History Management
+## 🎲 5. Undo/Redo: History Management
 
 ```typescript
 import { undoRedoPlugin } from '@biglogic/rgs';
@@ -87,7 +103,7 @@ store.canUndo(); // boolean
 store.canRedo(); // boolean
 ```
 
-## 📸 5. Snapshots: Save & Restore State
+## 📸 6. Snapshots: Save & Restore State
 
 ```typescript
 import { snapshotPlugin } from '@biglogic/rgs';
@@ -108,7 +124,7 @@ store.deleteSnapshot('backup_1');
 store.clearSnapshots();
 ```
 
-## 🛡️ 6. Guard: Pre-Set Transformation
+## 🛡️ 7. Guard: Pre-Set Transformation
 
 Transform values before they hit the store:
 
@@ -120,7 +136,7 @@ store._addPlugin(guardPlugin({
 }));
 ```
 
-## ✅ 7. Schema: Validation
+## ✅ 8. Schema: Validation
 
 Validate values before setting:
 
@@ -135,7 +151,7 @@ store._addPlugin(schemaPlugin({
 }));
 ```
 
-## 📊 8. Analytics: Track Changes
+## 📊 9. Analytics: Track Changes
 
 ```typescript
 import { analyticsPlugin } from '@biglogic/rgs';
@@ -149,7 +165,7 @@ store._addPlugin(analyticsPlugin({
 }));
 ```
 
-## 🔄 9. Immer Integration
+## 🔄 10. Immer Integration
 
 ```typescript
 import { immerPlugin } from '@biglogic/rgs';

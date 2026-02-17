@@ -29,5 +29,19 @@
         "pro": "https://api.a51.dev/"
       }
     }
+  },
+  "expo": {
+    "ios": {
+      "requireFullScreen": true
+    },
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "PORTRAIT_UP"
+        }
+      ],
+      "expo-web-browser"
+    ]
   }
 }

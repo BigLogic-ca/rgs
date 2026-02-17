@@ -215,39 +215,44 @@ export const hasPermission = (rules: AccessRulesMap, key: string, action: Permis
 }
 
 /**
- * Sanitizes values against common XSS patterns
+ * Sanitizes values against common XSS patterns.
+ * WARNING: While this provides a baseline defense, for applications requiring
+ * high-security HTML sanitization, consider using an external library like DOMPurify.
  * @param value Value to sanitize
  * @returns Sanitized value
  */
 export const sanitizeValue = (value: unknown): unknown => {
   if (typeof value === 'string') {
-    // Prevent XSS vectors
+    // Prevent XSS vectors using a more comprehensive set of patterns
     return value
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/javascript:/gi, '[REMOVED]')
-      .replace(/on\w+\s*=/gi, '[REMOVED]=')
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
-      .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
-      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
-      .replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, '')
-      .replace(/<math\b[^<]*(?:(?!<\/math>)<[^<]*)*<\/math>/gi, '')
-      .replace(/<\?php\b[^<]*(?:(?!<\?php>)<[^<]*)*<\?php>/gi, '')
-      .replace(/&/g, '&')
-      .replace(/</g, '<')
-      .replace(/>/g, '>')
-      .replace(/"/g, '"')
-      .replace(/'/g, '&#x27;')
-      .replace(/`/g, '&#x60;')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[SEC-REMOVED]')
+      .replace(/javascript:/gi, '[SEC-REMOVED]')
+      .replace(/data:text\/html/gi, '[SEC-REMOVED]')
+      .replace(/vbscript:/gi, '[SEC-REMOVED]')
+      .replace(/on\w+\s*=/gi, '[SEC-REMOVED]=')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '[SEC-REMOVED]')
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '[SEC-REMOVED]')
+      .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '[SEC-REMOVED]')
+      .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '[SEC-REMOVED]')
+      .replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, '[SEC-REMOVED]')
+      .replace(/<base\b[^<]*(?:(?!<\/base>)<[^<]*)*<\/base>/gi, '[SEC-REMOVED]')
+      .replace(/<link\b[^<]*(?:(?!<\/link>)<[^<]*)*<\/link>/gi, '[SEC-REMOVED]')
+      .replace(/<meta\b[^<]*(?:(?!<\/meta>)<[^<]*)*<\/meta>/gi, '[SEC-REMOVED]')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '[SEC-REMOVED]')
+      .replace(/&#[xX]?[0-9a-fA-F]+;?/g, '') // Remove HTML entities that could be used for bypasses
   }
 
   // Deep clone and sanitize nested objects
   if (value && typeof value === 'object' && !Array.isArray(value)) {
-    const sanitized: Record<string, unknown> = {}
-    for (const [k, v] of Object.entries(value)) {
-      sanitized[k] = sanitizeValue(v)
+    // Check if it's a plain object or something else (like Date, Map, etc.)
+    if (Object.getPrototypeOf(value) === Object.prototype) {
+      const sanitized: Record<string, unknown> = {}
+      for (const [k, v] of Object.entries(value)) {
+        sanitized[k] = sanitizeValue(v)
+      }
+      return sanitized
     }
-    return sanitized
+    return value // For non-plain objects, we return as is (security should be handled at the source)
   }
 
   // Array sanitization

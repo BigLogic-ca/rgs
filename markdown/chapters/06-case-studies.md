@@ -1,4 +1,4 @@
-# 🛒 Chapter 6: Case Studies - Real Strategies for Real People
+# 🛒 Chapter 6: Case Studies - Real Strategies
 
 In this chapter, we put theory aside and see how RGS solves the problems that keep you up at night (or at least frustrated in the office).
 

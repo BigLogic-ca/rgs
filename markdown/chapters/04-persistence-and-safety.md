@@ -9,9 +9,32 @@ When you initialize RGS or a Magnetar, you can enable persistence. But it's not 
 ```typescript
 initState({
   persist: true,
-  storage: 'local' // or 'session' or a custom adapter
+  storage: 'local' // or 'session', or a custom adapter
 });
 ```
+
+### Advanced Storage: Beyond 5MB
+
+For applications that need to store massive amounts of data (Gigabytes), standard `localStorage` is not enough. RGS provides official plugins for advanced scenarios:
+
+| Technology | Capacity | Purpose | Plugin |
+| :--- | :--- | :--- | :--- |
+| **LocalStorage** | ~5MB | Basic UI settings, small profiles. | Core (Native) |
+| **IndexedDB** | GBs | Offline-first apps, large datasets, logs. | `indexedDBPlugin` |
+| **Cloud Sync** | Unlimited | Remote backup, cross-device sync. | `cloudSyncPlugin` |
+
+---
+
+## ☁️ Hybrid Persistence: The "Cloud-Cloud" Strategy
+
+RGS allows you to combine local power with cloud safety. You can store your active data in **IndexedDB** for speed and capacity, while automatically backing it up to a remote database (MongoDB, Firebase, SQL) using the **Cloud Sync Plugin**.
+
+### Why use Cloud Sync?
+- **Differential Updates**: Safely sends only what was changed since the last sync.
+- **Scheduled or On-Demand**: Sync every 5 minutes automatically, or triggered by a "Save to Cloud" button.
+- **Diagnostics**: Track how much data you are syncing and detect errors before they reach the user.
+
+---
 
 ### What happens under the hood?
 
@@ -72,13 +95,31 @@ If anyone tries to `set('price', -50)`, RGS will block the operation and warn yo
 
 ---
 
+## ⚠️ Size Limits: maxObjectSize & maxTotalSize
+
+Protect your app from memory issues with automatic size warnings:
+
+```typescript
+const store = initState({
+  // Warn if single value exceeds 5MB (default: 5MB)
+  maxObjectSize: 5 * 1024 * 1024,
+  // Warn if total store exceeds 50MB (default: 50MB)
+  maxTotalSize: 50 * 1024 * 1024
+});
+
+// Setting a value that exceeds the limit will trigger a warning
+store.set('largeData', bigObject); // Warns if > maxObjectSize
+```
+
+---
+
 ## 💡 Case Study: The Cart that Never Lost an Item
 
-**Challenge**: User adds products, closes the browser, comes back after two days. The cart must still be there.
+**Challenge**: User adds products, closes the browser, comes back after two days. The cart must still be there, and synced with their account on other devices.
 **RGS Solution**:
 
-1. Enable `persist: true` in the cart store.
-2. Use `createAsyncStore` (Chapter 5) to sync local data with the remote database as soon as a connection is available.
-3. Result? 5-star UX.
+1. Enable `indexedDBPlugin` for robust local storage (handles thousands of items).
+2. Use `cloudSyncPlugin` to bridge the local state with your company's MongoDB Atlas or Firebase.
+3. Result? 5-star UX with full data durability and cross-device sync.
 
 **Next step:** [Ecosystem and Plugins: Extending the Power](05-plugins-and-extensibility.md)

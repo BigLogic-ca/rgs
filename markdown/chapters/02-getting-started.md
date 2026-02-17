@@ -15,7 +15,7 @@ npm install rgs
 In your main entry file (e.g., `main.tsx` or `App.tsx`), wake up the engine once.
 
 ```typescript
-import { initState } from '@biglogic/rgs';
+import { initState, useStore } from '@biglogic/rgs';
 
 // Initialize with optional settings
 initState({

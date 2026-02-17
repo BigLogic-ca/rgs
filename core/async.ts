@@ -1,5 +1,5 @@
-import { createStore } from "../core/store"
-import type { IStore, AsyncState } from "../core/types"
+import { createStore } from "./store"
+import type { IStore, AsyncState } from "./types"
 
 /**
  * Creates an async store that automatically manages the data/loading/error lifecycle.

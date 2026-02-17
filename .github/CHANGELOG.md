@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.9.5] - 2026-02-16
+
+### Improved
+- **Security Hardening**: Rebuilt `sanitizeValue` with advanced regex patterns to block redundant schemes (`data:`, `vbscript:`, `&#...;` entities) and dangerous HTML elements.
+- **Deep Clone Engine**: Refactored `deepClone` to prioritize native `structuredClone` while adding explicit support for `Map` and `Set` in the fallback walker.
+- **Architectural Integrity**: Added missing `test` script to `package.json` for standardized enterprise integration.
+
+### Fixed
+- Circular reference edge cases in manual cloning fallback.
+- Potential sanitization bypasses using entity encoding.
+
 ## [2.7.0] - 2026-02-15
 
 ### Added

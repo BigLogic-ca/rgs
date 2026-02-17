@@ -186,6 +186,10 @@ export interface IStore<S extends Record<string, unknown> = Record<string, unkno
 
   /** True if the store has finished hydration from storage. */
   readonly isReady: boolean
+  /** Unique namespace for this store. */
+  readonly namespace: string
+  /** Current user ID for audit and RBAC logs. */
+  readonly userId?: string
   /** Returns a promise that resolves when hydration is complete. */
   whenReady(): Promise<void>
   /**
@@ -230,6 +234,12 @@ export interface StoreConfig<S extends Record<string, unknown> = Record<string, 
   storage?: CustomStorage | Storage
   /** Migration function called when the saved version is lower than the current version. */
   migrate?: (oldState: Record<string, unknown>, oldVersion: number) => S
+  /** Persist all keys to storage by default (default: false). Can be overridden per-key. */
+  persistByDefault?: boolean
+  /** Alias for persistByDefault for backwards compatibility. */
+  persistence?: boolean
+  /** @deprecated Use persistByDefault instead. */
+  persist?: boolean
   /** Callback for error handling (hydration failures, plugin crashes, etc.). */
   onError?: (error: Error, context: { operation: string; key?: string }) => void
   /** Warn if object size exceeds this limit (in bytes, default: 5MB). 0 to disable. */
@@ -244,6 +254,8 @@ export interface StoreConfig<S extends Record<string, unknown> = Record<string, 
   userId?: string
   /** Enterprise: Enable strict input validation for keys and values (XSS prevention). */
   validateInput?: boolean
+  /** Base64 encode all persisted values by default. Can be overridden per-key. */
+  encoded?: boolean
   /** Enterprise: Access control rules patterns. Can be regex strings or dynamic functions. */
   accessRules?: Array<{ pattern: string | ((key: string, userId?: string) => boolean); permissions: Permission[] }>
   /** Enable Immer for immutable updates (default: true). Set to false for better performance with frequent updates. */

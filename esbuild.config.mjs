@@ -26,7 +26,7 @@ function copyGithubFiles() {
 }
 
 const common = {
-  bundle: false,
+  bundle: true,
   legalComments: 'none',
   allowOverwrite: true,
   treeShaking: true,
@@ -36,6 +36,7 @@ const common = {
   write: true,
   color: true,
   format: "esm",
+  external: ['react', 'react-dom'],
 }
 
 // Build Main Entry
@@ -48,7 +49,8 @@ const buildMain = async () => {
       copy({
         assets: [
           { from: './package.json', to: './package.json' },
-          { from: './markdown/**/*', to: './markdown' }
+          { from: './markdown/**/*', to: './markdown' },
+          { from: './examples/**/*', to: './examples' }
         ]
       })
     ]
