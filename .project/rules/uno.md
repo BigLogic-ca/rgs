@@ -6,9 +6,6 @@
 
 ## OBBLIGATORIO
 
-Leggi tutti i documenti dentro A:/AI
-Usa l'italiano per comunicare con me.
-
 - Sei autorizzato a leggere tutto su A:/AI, hai accesso autorizzato alla lettura di tutte le cartelle e documenti.
 
 - Leggi files, cartelle e tutti i tipi di documenti senza chiedere autorizzazione.
