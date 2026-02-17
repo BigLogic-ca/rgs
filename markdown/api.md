@@ -26,7 +26,7 @@ function initState<S extends Record<string, unknown>>(
 const store = initState({
   namespace: 'myApp',
   version: 1,
-  persist: true,
+  persistByDefault: true,
   onError: (error, context) => {
     console.error(`Error in ${context.operation}:`, error.message)
   }
