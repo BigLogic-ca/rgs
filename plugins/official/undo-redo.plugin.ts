@@ -6,7 +6,7 @@ import type { IPlugin } from '../../core/types'
  * @param options Configuration for history limit
  * @returns IPlugin
  */
-export const undoRedoPlugin = (options?: { limit?: number }): IPlugin => {
+export const undoRedoPlugin = <S extends Record<string, unknown>>(options?: { limit?: number }): IPlugin<S> => {
   /** History array storing snapshots of store state */
   let _history: Record<string, unknown>[] = []
   /** Current position in the history array */
