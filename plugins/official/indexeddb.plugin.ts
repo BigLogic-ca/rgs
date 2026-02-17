@@ -12,7 +12,7 @@ export interface IndexedDBOptions {
   version?: number
 }
 
-export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> => {
+export const indexedDBPlugin = <S extends Record<string, unknown>>(options: IndexedDBOptions = {}): IPlugin<S> => {
   const dbName = options.dbName || 'rgs-db'
   const storeName = options.storeName || 'states'
   const dbVersion = options.version || 1
@@ -27,8 +27,8 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
         db = request.result
         resolve(db)
       }
-      request.onupgradeneeded = (event: any) => {
-        const database = event.target.result
+      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+        const database = (event.target as IDBOpenDBRequest).result
         if (!database.objectStoreNames.contains(storeName)) {
           database.createObjectStore(storeName)
         }
@@ -36,7 +36,7 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
     })
   }
 
-  const save = async (key: string, value: any) => {
+  const save = async (key: string, value: unknown) => {
     const database = await getDB()
     return new Promise<void>((resolve, reject) => {
       const tx = database.transaction(storeName, 'readwrite')
@@ -47,7 +47,7 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
     })
   }
 
-  const load = async (key: string): Promise<any> => {
+  const load = async (key: string): Promise<unknown> => {
     const database = await getDB()
     return new Promise((resolve, reject) => {
       const tx = database.transaction(storeName, 'readonly')
@@ -91,7 +91,7 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
 
         request.onsuccess = async () => {
           const keys = request.result as string[]
-          const prefix = (store as any).namespace + '_'
+          const prefix = (store as import('../../core/types').IStore<S>).namespace + '_'
 
           for (const key of keys) {
             if (key.startsWith(prefix)) {
@@ -99,7 +99,7 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
               if (val) {
                 const storeKey = key.substring(prefix.length);
                 // Use a silent set to avoid re-triggering persistence during hydration
-                (store as any)._setSilently(storeKey, val.d)
+                (store as import('../../core/types').IStore<S>)._setSilently(storeKey, (val as { d: unknown }).d)
               }
             }
           }
@@ -108,19 +108,19 @@ export const indexedDBPlugin = (options: IndexedDBOptions = {}): IPlugin<any> =>
 
       onSet: async ({ key, value, store }) => {
         if (!key) return
-        const prefix = (store as any).namespace + '_'
+        const prefix = (store as import('../../core/types').IStore<S>).namespace + '_'
         // We wrap the value in a structure similar to what RGS does for storage
         const data = {
           d: value,
           t: Date.now(),
-          v: (store as any)._getVersion?.(key) || 1
+          v: (store as import('../../core/types').IStore<S>)._getVersion?.(key) || 1
         }
         await save(`${prefix}${key}`, data)
       },
 
       onRemove: async ({ key, store }) => {
         if (!key) return
-        const prefix = (store as any).namespace + '_'
+        const prefix = (store as import('../../core/types').IStore<S>).namespace + '_'
         await remove(`${prefix}${key}`)
       }
     }
