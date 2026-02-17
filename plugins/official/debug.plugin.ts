@@ -59,8 +59,7 @@ export const debugPlugin = (): IPlugin => {
             /** Get store info */
             info: () => {
               const info = {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                namespace: (store as Record<string, any>)._namespace,
+                namespace: store.namespace,
                 isReady: store.isReady,
                 keys: Object.keys(store.list()),
                 size: Object.keys(store.list()).length

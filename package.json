@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "2.9.6",
+  "version": "3.0.0",
   "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -17,8 +17,12 @@
     "react-globo-state",
     "argis"
   ],
+  "homepage": "https://https://github.com/BigLogic-ca/rgs",
+  "bugs": {
+    "url": "https://github.com/BigLogic-ca/rgs/issues"
+  },
   "license": "MIT",
-  "author": "Dario Passariello",
+  "author": "Dario Passariello <dariopassariello@gmail.com>",
   "contributors": [
     {
       "name": "Dario Passariello",

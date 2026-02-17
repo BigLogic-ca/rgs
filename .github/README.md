@@ -125,10 +125,8 @@ const [user, setUser] = useStore('user')
 
 ## 📚 Quick Examples
 
-### Persistence
-
 ```tsx
-const store = gstate({ theme: 'dark' }, { persist: true })
+const store = gstate({ theme: 'dark' }, "my-app")
 ```
 
 ### Encryption
@@ -154,12 +152,9 @@ const store = gstate({ theme: 'light' })
 store._addPlugin(syncPlugin({ channelName: 'my-app' }))
 ```
 
-### Computed Values
-
 ```tsx
 const store = gstate({ firstName: 'John', lastName: 'Doe' })
-store.compute('fullName', ['firstName', 'lastName'],
-  (s) => `${s.firstName} ${s.lastName}`)
+store.compute('fullName', (get) => `${get('firstName')} ${get('lastName')}`)
 
 const [fullName] = store('fullName') // "John Doe"
 ```

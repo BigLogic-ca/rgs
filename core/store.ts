@@ -1,27 +1,10 @@
-// Lazy Immer loader - only loads when immer: true (default)
-// Initialize once at store creation if needed
-let _immerProduce: ((state: unknown, fn: (draft: unknown) => void) => unknown) | null = null
-let _immerFreeze: (<T>(value: T, deep?: boolean) => T) | null = null
-
-const _ensureImmer = () => {
-  if (!_immerProduce) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const immer = require('immer')
-      _immerProduce = immer.produce
-      _immerFreeze = immer.freeze
-    } catch (e) {
-      console.error('[gState] Immer not installed. Run: npm install immer')
-      throw e
-    }
-  }
-}
+import { produce as _immerProduce, freeze as _immerFreeze } from 'immer'
 
 import * as Security from "./security"
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
   ComputedSelector, WatcherCallback, IPlugin, PluginHookName,
-  PluginContext, Middleware, CustomStorage, GStatePlugins
+  PluginContext, Middleware, CustomStorage, GStatePlugins, StateUpdater
 } from './types'
 
 /**
@@ -42,95 +25,7 @@ export const StorageAdapters = {
   }
 }
 
-/**
- * Deep clone using structuredClone (native) with fallback.
- * Handles circular references safely.
- * @param obj - Object to clone
- * @returns Deep cloned object
- */
-/**
- * Deep clone using structuredClone (native) with fallback.
- * Handles circular references safely and preserves common types.
- * @param obj - Object to clone
- * @returns Deep cloned object
- */
-const deepClone = <T>(obj: T): T => {
-  if (obj === null || typeof obj !== 'object') return obj
-
-  // Optimization: use native structuredClone if available
-  if (typeof structuredClone === 'function') {
-    try {
-      return structuredClone(obj)
-    } catch (_e) {
-      // Fallback for non-serializable objects (functions, prototypes, etc.)
-    }
-  }
-
-  const seen = new WeakMap<object, unknown>()
-
-  const clone = <V>(value: V): V => {
-    if (value === null || typeof value !== 'object') return value
-    if (typeof value === 'function') return value as unknown as V // Functions cannot be deep cloned easily
-
-    // Check for circular references
-    if (seen.has(value as object)) return seen.get(value as object) as V
-
-    if (value instanceof Date) return new Date(value.getTime()) as unknown as V
-    if (value instanceof RegExp) return new RegExp(value.source, value.flags) as unknown as V
-    if (value instanceof Map) {
-      const result = new Map()
-      seen.set(value as object, result)
-      value.forEach((v, k) => result.set(clone(k), clone(v)))
-      return result as unknown as V
-    }
-    if (value instanceof Set) {
-      const result = new Set()
-      seen.set(value as object, result)
-      value.forEach((v) => result.add(clone(v)))
-      return result as unknown as V
-    }
-
-    // Handle Plain Objects and Arrays
-    const result: any = Array.isArray(value)
-      ? []
-      : Object.create(Object.getPrototypeOf(value))
-
-    seen.set(value as object, result)
-
-    const keys = [...Object.keys(value as object), ...Object.getOwnPropertySymbols(value as object)]
-    for (const key of keys) {
-      result[key] = clone((value as any)[key])
-    }
-
-    return result as V
-  }
-
-  return clone(obj)
-}
-
-/**
- * Compares two values for deep equality.
- * @param a - First value
- * @param b - Second value
- * @returns True if values are equal
- */
-const isEqual = (a: unknown, b: unknown): boolean => {
-  if (a === b) return true
-  if (a === null || b === null) return a === b
-  if (typeof a !== 'object' || typeof b !== 'object') return a === b
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false
-    for (let i = 0; i < a.length; i++) if (!isEqual(a[i], b[i])) return false
-    return true
-  }
-  const keysA = Object.keys(a), keysB = Object.keys(b)
-  if (keysA.length !== keysB.length) return false
-  for (const key of keysA) {
-    if (!keysB.includes(key)) return false
-    if (!isEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false
-  }
-  return true
-}
+import { deepClone, isEqual } from './utils'
 
 /**
  * Creates an enterprise-grade state management store.
@@ -166,12 +61,10 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     _validateInput = config?.validateInput ?? true,
     _auditEnabled = config?.auditEnabled ?? true,
     _userId = config?.userId,
-    _immer = config?.immer ?? true
+    _immer = config?.immer ?? true,
+    _persistByDefault = config?.persistByDefault ?? config?.persistence ?? config?.persist ?? false
 
-  // Pre-load Immer if enabled (avoids per-operation overhead)
-  if (_immer) {
-    _ensureImmer()
-  }
+  // Pre-load Immer if enabled is handled by static import
 
   if (config?.accessRules) {
     config.accessRules.forEach(rule => Security.addAccessRule(_accessRules, rule.pattern, rule.permissions))
@@ -192,6 +85,12 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
    */
   const _calculateSize = (val: unknown): number => {
     if (val === null || val === undefined) return 0
+    const type = typeof val
+    if (type === 'boolean') return 4
+    if (type === 'number') return 8
+    if (type === 'string') return (val as string).length * 2
+    if (type !== 'object') return 0
+
     let bytes = 0
     const stack: unknown[] = [val]
     const seen = new WeakSet<object>()
@@ -233,16 +132,18 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * @param context - Plugin context
  */
   const _runHook = (name: PluginHookName, context: PluginContext<S>) => {
-    _plugins.forEach(p => {
-      if (p.hooks?.[name]) {
-        try { p.hooks[name]!(context) }
+    if (_plugins.size === 0) return
+    for (const p of _plugins.values()) {
+      const hook = p.hooks?.[name]
+      if (hook) {
+        try { hook(context) }
         catch (e) {
           const error = e instanceof Error ? e : new Error(String(e))
           if (_onError) _onError(error, { operation: `plugin:${p.name}:${name}`, key: context.key })
           else if (!_silent) console.error(`[gState] Plugin "${p.name}" error:`, e)
         }
       }
-    })
+    }
   }
 
   /**
@@ -262,33 +163,45 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  */
   const _emit = (changedKey?: string) => {
     if (changedKey) {
-      _computedDeps.get(changedKey)?.forEach(compKey => _updateComputed(compKey))
-      _watchers.get(changedKey)?.forEach(w => {
-        try { w(instance.get(changedKey)) }
-        catch (e) {
-          const error = e instanceof Error ? e : new Error(String(e))
-          if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
-          else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+      const dependents = _computedDeps.get(changedKey)
+      if (dependents) {
+        for (const compKey of dependents) _updateComputed(compKey)
+      }
+
+      const watchers = _watchers.get(changedKey)
+      if (watchers) {
+        const val = instance.get(changedKey)
+        for (const w of watchers) {
+          try { w(val) }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
+            else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+          }
         }
-      })
-      _keyListeners.get(changedKey)?.forEach(l => {
-        try { l() }
-        catch (e) {
-          const error = e instanceof Error ? e : new Error(String(e))
-          if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
-          else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+      }
+
+      const keyListeners = _keyListeners.get(changedKey)
+      if (keyListeners) {
+        for (const l of keyListeners) {
+          try { l() }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
+            else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+          }
         }
-      })
+      }
     }
     if (_isTransaction) { _pendingEmit = true; return }
-    _listeners.forEach(l => {
+    for (const l of _listeners) {
       try { l() }
       catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'listener' })
-        else if (!_silent) console.error(`[gState] Global listener error:`, e)
+        else if (!_silent) console.error(`[gState] Global listener error: `, e)
       }
-    })
+    }
   }
 
   /**
@@ -352,7 +265,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e))
       if (_onError) _onError(error, { operation: 'persist', key: 'FULL_STATE' })
-      else if (!_silent) console.error(`[gState] Persist failed:`, error)
+      else if (!_silent) console.error(`[gState] Persist failed: `, error)
     }
 
     const queue = Array.from(_diskQueue.entries()); _diskQueue.clear()
@@ -370,7 +283,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           dataValue = JSON.stringify(data.value)
         }
 
-        _storage.setItem(`${_getPrefix()}${key}`, JSON.stringify({
+        _storage.setItem(`${_getPrefix()}${key} `, JSON.stringify({
           v: (_versions.get(key) || 1), t: Date.now(), e: data.options.ttl ? Date.now() + data.options.ttl : null,
           d: dataValue, _sys_v: _currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: isEncoded ? true : undefined
         }))
@@ -378,7 +291,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'persist', key })
-        else if (!_silent) console.error(`[gState] Persist failed:`, error)
+        else if (!_silent) console.error(`[gState] Persist failed: `, error)
       }
     }
   }
@@ -441,11 +354,12 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       const oldSize = _sizes.get(key) || 0
       _runHook('onBeforeSet', { key, value: sani, store: instance, version: _versions.get(key) || 0 })
 
-      const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze!(deepClone(sani), true) : sani
+      const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze(deepClone(sani), true) : sani
 
       if (!isEqual(oldVal, frozen)) {
-        // Only calculate size if limits are enabled to save traversals
-        const finalSize = (_maxObjectSize > 0 || _maxTotalSize > 0) ? _calculateSize(frozen) : 0
+        // Sentinel Optimization: Only calculate size if limits are enabled
+        const hasLimits = _maxObjectSize > 0 || _maxTotalSize > 0
+        const finalSize = hasLimits ? _calculateSize(frozen) : 0
 
         if (_maxObjectSize > 0 && finalSize > _maxObjectSize) {
           const error = new Error(`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`)
@@ -465,8 +379,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
-        // Only persist if explicitly requested via options.persist
-        const shouldPersist = options.persist === true
+        // Persist if requested in options or if persistByDefault is enabled
+        const shouldPersist = options.persist ?? _persistByDefault
         if (shouldPersist) {
           _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist, encoded: options.encoded || config?.encoded } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
         }
@@ -477,11 +391,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       }
       return false
     },
-    /**
- * Gets a value from the store.
- * @param key - Store key
- * @returns Value or null if not found
- */
     get: <T>(key: string): T | null => {
       if (!Security.hasPermission(_accessRules, key, 'read', _userId)) {
         _audit('get', key, false, 'RBAC Denied')
@@ -505,7 +414,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'compute', key })
-        else if (!_silent) console.error(`[gState] Compute error for "${key}":`, e)
+        else if (!_silent) console.error(`[gState] Compute error for "${key}": `, e)
         return null as unknown as T
       }
     },
@@ -537,7 +446,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _runHook('onRemove', { store: instance, key, value: old })
       }
       _versions.set(key, (_versions.get(key) || 0) + 1)
-      if (_storage) _storage.removeItem(`${_getPrefix()}${key}`)
+      if (_storage) _storage.removeItem(`${_getPrefix()}${key} `)
       _audit('delete', key, true)
       _emit(key); return deleted
     },
@@ -586,11 +495,17 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * Removes all listeners, watchers, and clears data.
  */
     destroy: () => {
+      // Cleanup timers and pending disk operations
+      if (_diskTimer) { clearTimeout(_diskTimer); _diskTimer = null }
+      _diskQueue.clear()
+
       if (typeof window !== 'undefined') window.removeEventListener('beforeunload', _unloadHandler)
       _runHook('onDestroy', { store: instance })
+
+      // Clear all internal state
       _listeners.clear(); _keyListeners.clear(); _watchers.clear(); _computed.clear()
       _computedDeps.clear(); _plugins.clear(); _store.clear(); _sizes.clear(); _totalSize = 0
-      _accessRules.clear(); _consents.clear()
+      _accessRules.clear(); _consents.clear(); _versions.clear(); _regexCache.clear(); _middlewares.clear()
     },
     /**
  * Adds a plugin to the store.
@@ -603,7 +518,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'plugin:install', key: p.name })
-        else if (!_silent) console.error(`[gState] Failed to install plugin "${p.name}":`, e)
+        else if (!_silent) console.error(`[gState] Failed to install plugin "${p.name}": `, e)
       }
     },
     /**
@@ -715,7 +630,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
             _audit('hydrate', k, false, String(err))
             const error = err instanceof Error ? err : new Error(String(err))
             if (_onError) _onError(error, { operation: 'hydration', key: k })
-            else if (!_silent) console.error(`[gState] Hydration failed for "${k}":`, err)
+            else if (!_silent) console.error(`[gState] Hydration failed for "${k}": `, err)
           }
         }
         const final = (savedV < _currentVersion && config?.migrate) ? config.migrate(persisted, savedV) : persisted
@@ -732,7 +647,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _isReady = true; _readyResolver()
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'hydration' })
-        else if (!_silent) console.error(`[gState] Hydration failed:`, error)
+        else if (!_silent) console.error(`[gState] Hydration failed: `, error)
       }
     }
     hydrate()

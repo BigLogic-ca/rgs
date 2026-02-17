@@ -25,19 +25,12 @@ export const useCart = gstate<CartState>({
 })
 
 export const addToCart = (product: Omit<CartItem, 'quantity'>) => {
-  useCart.transaction(() => {
-    const items = useCart.get('items') || []
-    const existingIndex = items.findIndex(item => item.id === product.id)
-
-    if (existingIndex > -1) {
-      const newItems = [...items]
-      const item = newItems[existingIndex]
-      if (item) {
-        newItems[existingIndex] = { ...item, quantity: item.quantity + 1 }
-        useCart.set('items', newItems)
-      }
+  useCart.set('items', (items) => {
+    const existing = items.find(item => item.id === product.id)
+    if (existing) {
+      existing.quantity++
     } else {
-      useCart.set('items', [...items, { ...product, quantity: 1 }])
+      items.push({ ...product, quantity: 1 })
     }
   })
 }

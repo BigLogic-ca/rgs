@@ -157,7 +157,7 @@ export interface IStore<S extends Record<string, unknown> = Record<string, unkno
   transaction(fn: () => void): void
   destroy(): void
 
-  // Public, Type-Safe Plugin Management
+  // Public Plugin Management
   _addPlugin(plugin: IPlugin<S>): void
   _removePlugin(name: string): void
 
@@ -214,8 +214,23 @@ export interface GStatePlugins {
     deleteUserData: (userId: string) => { success: boolean, deletedConsents: number }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: Record<string, (...args: any[]) => any>
+  undoRedo: {
+    undo: () => boolean
+    redo: () => boolean
+    canUndo: () => boolean
+    canRedo: () => boolean
+  }
+  immer: {
+    setWithProduce: <T>(key: string, updater: (draft: T) => void) => boolean
+  }
+  cloudSync: {
+    sync: () => Promise<{ status: string; stats: import('../plugins/official/cloud-sync.plugin').SyncStats }>
+    getStats: () => import('../plugins/official/cloud-sync.plugin').SyncStats
+  }
+  logger: Record<string, never>
+
+  // Placeholder for other plugins
+  [key: string]: unknown
 }
 
 /**
