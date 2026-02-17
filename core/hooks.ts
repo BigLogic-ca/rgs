@@ -92,50 +92,24 @@ export const useStore = <T = unknown, S extends Record<string, unknown> = Record
     [store]
   )
 
-  // Ghost store fallback - logs warnings instead of crashing
-  const ghostStore = useMemo(() => ({
-    set: () => { console.warn('[gState] Store not initialized. Call initState() or pass a store instance.'); return false },
-    get: () => null,
-    remove: () => false,
-    delete: () => false,
-    deleteAll: () => false,
-    list: () => ({}),
-    compute: () => null as unknown,
-    watch: () => () => { },
-    use: () => { },
-    transaction: () => { },
-    destroy: () => { },
-    _subscribe: () => () => { },
-    _setSilently: () => { },
-    _registerMethod: () => { },
-    _addPlugin: () => { },
-    _removePlugin: () => { },
-    _getVersion: () => 0,
-    get isReady() { return false },
-    whenReady: () => Promise.resolve(),
-    get plugins() {
-      return new Proxy({}, {
-        get: (_target, pluginName) => {
-          return new Proxy({}, {
-            get: (_target2, methodName) => (..._args: unknown[]) => {
-              console.warn(`[gState] Ghost store: Cannot call store.plugins.${String(pluginName)}.${String(methodName)}() - store not initialized. Call initState() first or pass a store instance to useStore().`)
-              return null
-            }
-          })
-        }
-      })
+  // Ghost store fallback - ultra-light silent safe defaults for SSR/Missing store
+  const ghostStore = useMemo(() => {
+    const noop = () => { }
+    const noopFalse = () => false
+    const noopNull = () => null
+    return {
+      set: noopFalse, get: noopNull, remove: noopFalse, delete: noopFalse,
+      deleteAll: noopFalse, list: () => ({}), compute: noopNull,
+      watch: () => () => { }, use: noop, transaction: noop, destroy: noop,
+      _subscribe: () => () => { }, _setSilently: noop, _registerMethod: noop,
+      _addPlugin: noop, _removePlugin: noop, _getVersion: () => 0,
+      get isReady() { return false }, whenReady: () => Promise.resolve(),
+      get plugins() { return {} }
     }
-  }), []) as unknown as IStore<Record<string, unknown>>
+  }, []) as unknown as IStore<Record<string, unknown>>
 
   // Use ghost store if no store is available
   const safeStore = targetStore || ghostStore
-
-  // Always call hooks - log warning if using ghost store
-  useMemo(() => {
-    if (!targetStore && !store) {
-      console.warn('[gState] Using ghost store - no store initialized. Call initState() or pass a store instance.')
-    }
-  }, [targetStore, store])
 
   // SSR-safe subscription
   const subscribe = useMemo(() =>
