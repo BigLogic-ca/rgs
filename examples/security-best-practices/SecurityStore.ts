@@ -58,11 +58,13 @@ setAuditLogger((entry) => {
   })
 })
 
+import type { IStore } from '../../index'
+
 /**
  * 4. GDPR "Right to be Forgotten"
  * RECOMMENDED FOR: Compliance
  */
-export const purgeUserData = (store: any, userId: string) => {
+export const purgeUserData = (store: IStore<Record<string, unknown>>, userId: string) => {
   // Wipe state and storage
   store.deleteAll()
 
