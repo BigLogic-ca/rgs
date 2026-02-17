@@ -95,6 +95,24 @@ If anyone tries to `set('price', -50)`, RGS will block the operation and warn yo
 
 ---
 
+## ⚠️ Size Limits: maxObjectSize & maxTotalSize
+
+Protect your app from memory issues with automatic size warnings:
+
+```typescript
+const store = initState({
+  // Warn if single value exceeds 5MB (default: 5MB)
+  maxObjectSize: 5 * 1024 * 1024,
+  // Warn if total store exceeds 50MB (default: 50MB)
+  maxTotalSize: 50 * 1024 * 1024
+});
+
+// Setting a value that exceeds the limit will trigger a warning
+store.set('largeData', bigObject); // Warns if > maxObjectSize
+```
+
+---
+
 ## 💡 Case Study: The Cart that Never Lost an Item
 
 **Challenge**: User adds products, closes the browser, comes back after two days. The cart must still be there, and synced with their account on other devices.
