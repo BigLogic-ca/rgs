@@ -336,7 +336,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       const stateObj: Record<string, unknown> = {}
       _store.forEach((v, k) => { stateObj[k] = v })
 
-      let dataValue: unknown = stateObj
+      let dataValue: unknown
       const isEncoded = config?.encoded
       if (isEncoded) {
         dataValue = btoa(JSON.stringify(stateObj))
