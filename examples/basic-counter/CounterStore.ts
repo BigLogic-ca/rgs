@@ -15,13 +15,11 @@ export const useCounter = gstate<CounterState>({
 })
 
 export const increment = () => {
-  const current = useCounter.get('count') || 0
-  useCounter.set('count', current + 1)
+  useCounter.set('count', (d) => d + 1)
   useCounter.set('lastUpdated', new Date().toISOString())
 }
 
 export const decrement = () => {
-  const current = useCounter.get('count') || 0
-  useCounter.set('count', current - 1)
+  useCounter.set('count', (d) => d - 1)
   useCounter.set('lastUpdated', new Date().toISOString())
 }
