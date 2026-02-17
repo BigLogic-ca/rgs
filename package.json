@@ -38,7 +38,8 @@
     ".": "./index.js"
   },
   "scripts": {
-    "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
+    "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs && npm run build:extension",
+    "build:extension": "cd vscode-extension && vsce package -o ../dist",
     "test": "jest --config tests/jest/jest.config.ts",
     "npm: pack": "npm run build && cd dist && npm pack",
     "npm: publish": "npm run build && cd dist && npm publish --access=public"
