@@ -164,6 +164,32 @@ store.compute('fullName', ['firstName', 'lastName'],
 const [fullName] = store('fullName') // "John Doe"
 ```
 
+### Error Handling with onError
+
+Handle errors gracefully with the `onError` callback - perfect for production apps:
+
+```tsx
+const store = gstate({ data: null }, {
+  onError: (error, context) => {
+    console.error(`Error in ${context.operation}:`, error.message)
+    // Send to error tracking service (Sentry, etc.)
+  }
+})
+```
+
+### Size Limits (maxObjectSize & maxTotalSize)
+
+Protect your app from memory issues with automatic size warnings:
+
+```tsx
+const store = gstate({ data: {} }, {
+  // Warn if single value exceeds 5MB (default)
+  maxObjectSize: 5 * 1024 * 1024,
+  // Warn if total store exceeds 50MB (default)
+  maxTotalSize: 50 * 1024 * 1024
+})
+```
+
 ---
 
 ## Multiple Stores
