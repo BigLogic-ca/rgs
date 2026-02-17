@@ -5,7 +5,7 @@ import type { IPlugin } from '../../core/types'
  * Leverages the core's native Immer support.
  * @returns IPlugin
  */
-export const immerPlugin = (): IPlugin => ({
+export const immerPlugin = <S extends Record<string, unknown>>(): IPlugin<S> => ({
   name: 'gstate-immer',
   hooks: {
     onInstall: ({ store }) => {
