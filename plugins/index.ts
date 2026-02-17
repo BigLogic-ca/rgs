@@ -27,10 +27,10 @@ import type { PluginContext, IPlugin } from "../core/types"
  * @param options Styling options for the logger
  * @returns IPlugin
  */
-export const loggerPlugin = (options?: { collapsed?: boolean }): IPlugin => ({
+export const loggerPlugin = <S extends Record<string, unknown>>(options?: { collapsed?: boolean }): IPlugin<S> => ({
   name: 'gstate-logger',
   hooks: {
-    onSet: ({ key, value, version }: PluginContext) => {
+    onSet: ({ key, value, version }: PluginContext<S>) => {
       const
         time = new Date().toLocaleTimeString(),
         groupLabel = `[gState] SET: ${key} (v${version}) @ ${time}`
