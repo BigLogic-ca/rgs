@@ -73,6 +73,12 @@ export const gstate = <S extends Record<string, unknown>>(initialState: S, confi
   // Magic function that returns typed hook when called with a key
   const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
 
+  // Set as global store
+  if (typeof window !== 'undefined') {
+    (window as unknown as { gState: IStore<S> }).gState = store
+      ; (window as unknown as { rgs: IStore<S> }).rgs = store
+  }
+
   return Object.assign(magic, store) as IStore<S> & (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | ((draft: S[K]) => S[K]), options?: unknown) => boolean])
 }
 
@@ -173,5 +179,6 @@ declare global {
   var initState: typeof import("./core/hooks").initState
   var destroyState: typeof import("./core/hooks").destroyState
   var gState: IStore<Record<string, unknown>>
+  var rgs: IStore<Record<string, unknown>>
   var useStore: typeof baseUseStore
 }
