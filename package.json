@@ -17,8 +17,12 @@
     "react-globo-state",
     "argis"
   ],
+  "homepage": "https://https://github.com/BigLogic-ca/rgs",
+  "bugs": {
+    "url": "https://github.com/BigLogic-ca/rgs/issues"
+  },
   "license": "MIT",
-  "author": "Dario Passariello",
+  "author": "Dario Passariello <dariopassariello@gmail.com>",
   "contributors": [
     {
       "name": "Dario Passariello",
