@@ -46,15 +46,15 @@ export const deepClone = <T>(obj: T): T => {
     }
 
     // Handle Plain Objects and Arrays
-    const result: any = Array.isArray(value)
+    const result = (Array.isArray(value)
       ? []
-      : Object.create(Object.getPrototypeOf(value))
+      : Object.create(Object.getPrototypeOf(value))) as Record<string | symbol, unknown>
 
     seen.set(value as object, result)
 
     const keys = [...Object.keys(value as object), ...Object.getOwnPropertySymbols(value as object)]
     for (const key of keys) {
-      result[key] = clone((value as any)[key])
+      result[key as string] = clone((value as Record<string | symbol, unknown>)[key])
     }
 
     return result as V
@@ -78,11 +78,13 @@ export const isEqual = (a: unknown, b: unknown): boolean => {
     for (let i = 0; i < a.length; i++) if (!isEqual(a[i], b[i])) return false
     return true
   }
-  const keysA = Object.keys(a), keysB = Object.keys(b)
+  const keysA = Object.keys(a as object)
+  const keysB = Object.keys(b as object)
   if (keysA.length !== keysB.length) return false
-  for (const key of keysA) {
-    if (!keysB.includes(key)) return false
-    if (!isEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false
+
+  for (let i = 0; i < keysA.length; i++) {
+    const key = keysA[i] as string
+    if (!(key in (b as object)) || !isEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false
   }
   return true
 }
