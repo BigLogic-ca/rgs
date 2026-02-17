@@ -22,7 +22,7 @@ export interface CloudSyncAdapter {
    * Save dirty keys to the remote database
    * @param data Object containing key-value pairs to sync
    */
-  save: (data: Record<string, any>) => Promise<boolean>
+  save: (data: Record<string, unknown>) => Promise<boolean>
 }
 
 export interface CloudSyncOptions {
@@ -36,7 +36,7 @@ export interface CloudSyncOptions {
  * Allows on-demand or scheduled synchronization of local state to a remote database.
  * Uses internal versioning to only sync modified data (Differential Sync).
  */
-export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
+export const cloudSyncPlugin = <S extends Record<string, unknown>>(options: CloudSyncOptions): IPlugin<S> => {
   const { adapter, autoSyncInterval } = options
 
   // Track last synced version for each key to perform differential sync
@@ -50,7 +50,7 @@ export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
     errors: 0
   }
 
-  let timer: any = null
+  let timer: ReturnType<typeof setInterval> | null = null
 
   return {
     name: 'cloudSync',
@@ -62,7 +62,7 @@ export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
          */
         store._registerMethod('cloudSync', 'sync', async () => {
           const startTime = performance.now()
-          const dirtyData: Record<string, any> = {}
+          const dirtyData: Record<string, unknown> = {}
           let bytesCount = 0
 
           try {
@@ -70,7 +70,7 @@ export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
             const keys = Object.keys(allData)
 
             for (const key of keys) {
-              const currentVersion = (store as any)._getVersion?.(key) || 0
+              const currentVersion = (store as import('../../core/types').IStore<S>)._getVersion?.(key) || 0
               const lastVersion = lastSyncedVersions.get(key) || 0
 
               if (currentVersion > lastVersion) {
@@ -111,7 +111,9 @@ export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
         // Start Auto-Sync Timer if configured
         if (autoSyncInterval && autoSyncInterval > 0) {
           timer = setInterval(() => {
-            (store as any).plugins.cloudSync.sync()
+            const plugins = (store as import('../../core/types').IStore<S>).plugins
+            const cs = plugins.cloudSync as unknown as { sync: () => Promise<unknown> }
+            if (cs) cs.sync()
           }, autoSyncInterval)
         }
       },
@@ -132,7 +134,7 @@ export const cloudSyncPlugin = (options: CloudSyncOptions): IPlugin<any> => {
  */
 export const createMongoAdapter = (apiUrl: string, apiKey: string): CloudSyncAdapter => ({
   name: 'MongoDB-Atlas',
-  save: async (data) => {
+  save: async (data: Record<string, unknown>) => {
     const response = await fetch(`${apiUrl}/action/updateOne`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'api-key': apiKey },
@@ -152,9 +154,9 @@ export const createMongoAdapter = (apiUrl: string, apiKey: string): CloudSyncAda
 /**
  * Template for Firebase Firestore
  */
-export const createFirestoreAdapter = (db: any, docPath: string): CloudSyncAdapter => ({
+export const createFirestoreAdapter = (db: unknown, docPath: string): CloudSyncAdapter => ({
   name: 'Firebase-Firestore',
-  save: async (data) => {
+  save: async (data: Record<string, unknown>) => {
     // Assuming Firebase SDK is already initialized
     try {
       // In a real scenario, you'd use updateDoc from firebase/firestore
@@ -172,7 +174,7 @@ export const createFirestoreAdapter = (db: any, docPath: string): CloudSyncAdapt
  */
 export const createSqlRestAdapter = (endpoint: string, authToken: string): CloudSyncAdapter => ({
   name: 'SQL-REST-API',
-  save: async (data) => {
+  save: async (data: Record<string, unknown>) => {
     const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
