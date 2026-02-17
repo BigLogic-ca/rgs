@@ -1,21 +1,4 @@
-// Lazy Immer loader - only loads when immer: true (default)
-// Initialize once at store creation if needed
-let _immerProduce: ((state: unknown, fn: (draft: unknown) => void) => unknown) | null = null
-let _immerFreeze: (<T>(value: T, deep?: boolean) => T) | null = null
-
-const _ensureImmer = () => {
-  if (!_immerProduce) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const immer = require('immer')
-      _immerProduce = immer.produce
-      _immerFreeze = immer.freeze
-    } catch (e) {
-      console.error('[gState] Immer not installed. Run: npm install immer')
-      throw e
-    }
-  }
-}
+import { produce as _immerProduce, freeze as _immerFreeze } from 'immer'
 
 import * as Security from "./security"
 import type {
@@ -42,95 +25,7 @@ export const StorageAdapters = {
   }
 }
 
-/**
- * Deep clone using structuredClone (native) with fallback.
- * Handles circular references safely.
- * @param obj - Object to clone
- * @returns Deep cloned object
- */
-/**
- * Deep clone using structuredClone (native) with fallback.
- * Handles circular references safely and preserves common types.
- * @param obj - Object to clone
- * @returns Deep cloned object
- */
-const deepClone = <T>(obj: T): T => {
-  if (obj === null || typeof obj !== 'object') return obj
-
-  // Optimization: use native structuredClone if available
-  if (typeof structuredClone === 'function') {
-    try {
-      return structuredClone(obj)
-    } catch (_e) {
-      // Fallback for non-serializable objects (functions, prototypes, etc.)
-    }
-  }
-
-  const seen = new WeakMap<object, unknown>()
-
-  const clone = <V>(value: V): V => {
-    if (value === null || typeof value !== 'object') return value
-    if (typeof value === 'function') return value as unknown as V // Functions cannot be deep cloned easily
-
-    // Check for circular references
-    if (seen.has(value as object)) return seen.get(value as object) as V
-
-    if (value instanceof Date) return new Date(value.getTime()) as unknown as V
-    if (value instanceof RegExp) return new RegExp(value.source, value.flags) as unknown as V
-    if (value instanceof Map) {
-      const result = new Map()
-      seen.set(value as object, result)
-      value.forEach((v, k) => result.set(clone(k), clone(v)))
-      return result as unknown as V
-    }
-    if (value instanceof Set) {
-      const result = new Set()
-      seen.set(value as object, result)
-      value.forEach((v) => result.add(clone(v)))
-      return result as unknown as V
-    }
-
-    // Handle Plain Objects and Arrays
-    const result: any = Array.isArray(value)
-      ? []
-      : Object.create(Object.getPrototypeOf(value))
-
-    seen.set(value as object, result)
-
-    const keys = [...Object.keys(value as object), ...Object.getOwnPropertySymbols(value as object)]
-    for (const key of keys) {
-      result[key] = clone((value as any)[key])
-    }
-
-    return result as V
-  }
-
-  return clone(obj)
-}
-
-/**
- * Compares two values for deep equality.
- * @param a - First value
- * @param b - Second value
- * @returns True if values are equal
- */
-const isEqual = (a: unknown, b: unknown): boolean => {
-  if (a === b) return true
-  if (a === null || b === null) return a === b
-  if (typeof a !== 'object' || typeof b !== 'object') return a === b
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false
-    for (let i = 0; i < a.length; i++) if (!isEqual(a[i], b[i])) return false
-    return true
-  }
-  const keysA = Object.keys(a), keysB = Object.keys(b)
-  if (keysA.length !== keysB.length) return false
-  for (const key of keysA) {
-    if (!keysB.includes(key)) return false
-    if (!isEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false
-  }
-  return true
-}
+import { deepClone, isEqual } from './utils'
 
 /**
  * Creates an enterprise-grade state management store.
@@ -166,12 +61,10 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     _validateInput = config?.validateInput ?? true,
     _auditEnabled = config?.auditEnabled ?? true,
     _userId = config?.userId,
-    _immer = config?.immer ?? true
+    _immer = config?.immer ?? true,
+    _persistByDefault = config?.persistByDefault ?? config?.persistence ?? config?.persist ?? false
 
-  // Pre-load Immer if enabled (avoids per-operation overhead)
-  if (_immer) {
-    _ensureImmer()
-  }
+  // Pre-load Immer if enabled is handled by static import
 
   if (config?.accessRules) {
     config.accessRules.forEach(rule => Security.addAccessRule(_accessRules, rule.pattern, rule.permissions))
@@ -441,11 +334,12 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       const oldSize = _sizes.get(key) || 0
       _runHook('onBeforeSet', { key, value: sani, store: instance, version: _versions.get(key) || 0 })
 
-      const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze!(deepClone(sani), true) : sani
+      const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze(deepClone(sani), true) : sani
 
       if (!isEqual(oldVal, frozen)) {
-        // Only calculate size if limits are enabled to save traversals
-        const finalSize = (_maxObjectSize > 0 || _maxTotalSize > 0) ? _calculateSize(frozen) : 0
+        // Sentinel Optimization: Only calculate size if limits are enabled
+        const hasLimits = _maxObjectSize > 0 || _maxTotalSize > 0
+        const finalSize = hasLimits ? _calculateSize(frozen) : 0
 
         if (_maxObjectSize > 0 && finalSize > _maxObjectSize) {
           const error = new Error(`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`)
@@ -465,8 +359,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
-        // Only persist if explicitly requested via options.persist
-        const shouldPersist = options.persist === true
+        // Persist if requested in options or if persistByDefault is enabled
+        const shouldPersist = options.persist ?? _persistByDefault
         if (shouldPersist) {
           _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist, encoded: options.encoded || config?.encoded } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
         }
@@ -586,11 +480,17 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * Removes all listeners, watchers, and clears data.
  */
     destroy: () => {
+      // Cleanup timers and pending disk operations
+      if (_diskTimer) { clearTimeout(_diskTimer); _diskTimer = null }
+      _diskQueue.clear()
+
       if (typeof window !== 'undefined') window.removeEventListener('beforeunload', _unloadHandler)
       _runHook('onDestroy', { store: instance })
+
+      // Clear all internal state
       _listeners.clear(); _keyListeners.clear(); _watchers.clear(); _computed.clear()
       _computedDeps.clear(); _plugins.clear(); _store.clear(); _sizes.clear(); _totalSize = 0
-      _accessRules.clear(); _consents.clear()
+      _accessRules.clear(); _consents.clear(); _versions.clear(); _regexCache.clear(); _middlewares.clear()
     },
     /**
  * Adds a plugin to the store.
