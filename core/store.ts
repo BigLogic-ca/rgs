@@ -4,7 +4,7 @@ import * as Security from "./security"
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
   ComputedSelector, WatcherCallback, IPlugin, PluginHookName,
-  PluginContext, Middleware, CustomStorage, GStatePlugins
+  PluginContext, Middleware, CustomStorage, GStatePlugins, StateUpdater
 } from './types'
 
 /**
@@ -85,6 +85,12 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
    */
   const _calculateSize = (val: unknown): number => {
     if (val === null || val === undefined) return 0
+    const type = typeof val
+    if (type === 'boolean') return 4
+    if (type === 'number') return 8
+    if (type === 'string') return (val as string).length * 2
+    if (type !== 'object') return 0
+
     let bytes = 0
     const stack: unknown[] = [val]
     const seen = new WeakSet<object>()
@@ -126,16 +132,18 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * @param context - Plugin context
  */
   const _runHook = (name: PluginHookName, context: PluginContext<S>) => {
-    _plugins.forEach(p => {
-      if (p.hooks?.[name]) {
-        try { p.hooks[name]!(context) }
+    if (_plugins.size === 0) return
+    for (const p of _plugins.values()) {
+      const hook = p.hooks?.[name]
+      if (hook) {
+        try { hook(context) }
         catch (e) {
           const error = e instanceof Error ? e : new Error(String(e))
           if (_onError) _onError(error, { operation: `plugin:${p.name}:${name}`, key: context.key })
           else if (!_silent) console.error(`[gState] Plugin "${p.name}" error:`, e)
         }
       }
-    })
+    }
   }
 
   /**
@@ -155,33 +163,45 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  */
   const _emit = (changedKey?: string) => {
     if (changedKey) {
-      _computedDeps.get(changedKey)?.forEach(compKey => _updateComputed(compKey))
-      _watchers.get(changedKey)?.forEach(w => {
-        try { w(instance.get(changedKey)) }
-        catch (e) {
-          const error = e instanceof Error ? e : new Error(String(e))
-          if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
-          else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+      const dependents = _computedDeps.get(changedKey)
+      if (dependents) {
+        for (const compKey of dependents) _updateComputed(compKey)
+      }
+
+      const watchers = _watchers.get(changedKey)
+      if (watchers) {
+        const val = instance.get(changedKey)
+        for (const w of watchers) {
+          try { w(val) }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
+            else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+          }
         }
-      })
-      _keyListeners.get(changedKey)?.forEach(l => {
-        try { l() }
-        catch (e) {
-          const error = e instanceof Error ? e : new Error(String(e))
-          if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
-          else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+      }
+
+      const keyListeners = _keyListeners.get(changedKey)
+      if (keyListeners) {
+        for (const l of keyListeners) {
+          try { l() }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
+            else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+          }
         }
-      })
+      }
     }
     if (_isTransaction) { _pendingEmit = true; return }
-    _listeners.forEach(l => {
+    for (const l of _listeners) {
       try { l() }
       catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'listener' })
-        else if (!_silent) console.error(`[gState] Global listener error:`, e)
+        else if (!_silent) console.error(`[gState] Global listener error: `, e)
       }
-    })
+    }
   }
 
   /**
@@ -245,7 +265,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     } catch (e) {
       const error = e instanceof Error ? e : new Error(String(e))
       if (_onError) _onError(error, { operation: 'persist', key: 'FULL_STATE' })
-      else if (!_silent) console.error(`[gState] Persist failed:`, error)
+      else if (!_silent) console.error(`[gState] Persist failed: `, error)
     }
 
     const queue = Array.from(_diskQueue.entries()); _diskQueue.clear()
@@ -263,7 +283,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           dataValue = JSON.stringify(data.value)
         }
 
-        _storage.setItem(`${_getPrefix()}${key}`, JSON.stringify({
+        _storage.setItem(`${_getPrefix()}${key} `, JSON.stringify({
           v: (_versions.get(key) || 1), t: Date.now(), e: data.options.ttl ? Date.now() + data.options.ttl : null,
           d: dataValue, _sys_v: _currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: isEncoded ? true : undefined
         }))
@@ -271,7 +291,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'persist', key })
-        else if (!_silent) console.error(`[gState] Persist failed:`, error)
+        else if (!_silent) console.error(`[gState] Persist failed: `, error)
       }
     }
   }
@@ -371,11 +391,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       }
       return false
     },
-    /**
- * Gets a value from the store.
- * @param key - Store key
- * @returns Value or null if not found
- */
     get: <T>(key: string): T | null => {
       if (!Security.hasPermission(_accessRules, key, 'read', _userId)) {
         _audit('get', key, false, 'RBAC Denied')
@@ -399,7 +414,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'compute', key })
-        else if (!_silent) console.error(`[gState] Compute error for "${key}":`, e)
+        else if (!_silent) console.error(`[gState] Compute error for "${key}": `, e)
         return null as unknown as T
       }
     },
@@ -431,7 +446,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _runHook('onRemove', { store: instance, key, value: old })
       }
       _versions.set(key, (_versions.get(key) || 0) + 1)
-      if (_storage) _storage.removeItem(`${_getPrefix()}${key}`)
+      if (_storage) _storage.removeItem(`${_getPrefix()}${key} `)
       _audit('delete', key, true)
       _emit(key); return deleted
     },
@@ -503,7 +518,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'plugin:install', key: p.name })
-        else if (!_silent) console.error(`[gState] Failed to install plugin "${p.name}":`, e)
+        else if (!_silent) console.error(`[gState] Failed to install plugin "${p.name}": `, e)
       }
     },
     /**
@@ -615,7 +630,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
             _audit('hydrate', k, false, String(err))
             const error = err instanceof Error ? err : new Error(String(err))
             if (_onError) _onError(error, { operation: 'hydration', key: k })
-            else if (!_silent) console.error(`[gState] Hydration failed for "${k}":`, err)
+            else if (!_silent) console.error(`[gState] Hydration failed for "${k}": `, err)
           }
         }
         const final = (savedV < _currentVersion && config?.migrate) ? config.migrate(persisted, savedV) : persisted
@@ -632,7 +647,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _isReady = true; _readyResolver()
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'hydration' })
-        else if (!_silent) console.error(`[gState] Hydration failed:`, error)
+        else if (!_silent) console.error(`[gState] Hydration failed: `, error)
       }
     }
     hydrate()
