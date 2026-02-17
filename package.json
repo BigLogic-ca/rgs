@@ -44,7 +44,7 @@
     "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
     "test": "jest --config tests/jest/jest.config.ts",
     "npm: pack": "npm run build && cd dist && npm pack",
-    "npm: publish": "npm run build && build:extension cd dist && npm publish --access=public"
+    "npm: publish": "npm run build && cd dist && npm publish --access=public"
   },
   "dependencies": {
     "immer": "^11.1.4"
