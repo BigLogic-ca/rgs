@@ -223,35 +223,12 @@ export const hasPermission = (rules: AccessRulesMap, key: string, action: Permis
  */
 export const sanitizeValue = (value: unknown): unknown => {
   if (typeof value === 'string') {
-    // First, decode HTML entities to catch encoded schemes like &#106;avascript:
-    // This must happen BEFORE scheme checks to catch encoded attacks
-    let decoded = value.replace(/&#[xX]?[0-9a-fA-F]+;?/g, (match) => {
-      // Decode HTML entity to character
-      const hexMatch = match.match(/&amp;#x([0-9a-fA-F]+);?/i)
-      if (hexMatch && hexMatch[1]) {
-        return String.fromCharCode(parseInt(hexMatch[1], 16))
-      }
-      const decMatch = match.match(/&amp;#([0-9]+);?/)
-      if (decMatch && decMatch[1]) {
-        return String.fromCharCode(parseInt(decMatch[1], 10))
-      }
-      return ''
-    })
-
-    // Also decode URL-encoded characters to catch %6Aavascript: style bypasses
-    try {
-      decoded = decodeURIComponent(decoded)
-    } catch {
-      // Invalid URL encoding, continue with original
-    }
-
-    // Now check for dangerous URL schemes with word boundary (\b) to prevent partial matches
-    // The scheme must be at word boundary to avoid matching "somejavascript:" incorrectly
-    const schemeCheck = decoded.replace(/\b(javascript|vbscript|data:text\/html|about:blank|chrome:)/gi, '[SEC-REMOVED]')
-
-    // Prevent XSS vectors using a more robust script tag pattern
-    return schemeCheck
+    // Prevent XSS vectors using a more comprehensive set of patterns
+    return value
       .replace(/<script\b[^>]*>[\s\S]*?<\s*\/\s*script\b[^>]*>/gi, '[SEC-REMOVED]')
+      .replace(/javascript:/gi, '[SEC-REMOVED]')
+      .replace(/data:/gi, '[SEC-REMOVED]')
+      .replace(/vbscript:/gi, '[SEC-REMOVED]')
       .replace(/on\w+\s*=/gi, '[SEC-REMOVED]=')
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '[SEC-REMOVED]')
       .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '[SEC-REMOVED]')
@@ -262,6 +239,7 @@ export const sanitizeValue = (value: unknown): unknown => {
       .replace(/<link\b[^<]*(?:(?!<\/link>)<[^<]*)*<\/link>/gi, '[SEC-REMOVED]')
       .replace(/<meta\b[^<]*(?:(?!<\/meta>)<[^<]*)*<\/meta>/gi, '[SEC-REMOVED]')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '[SEC-REMOVED]')
+      .replace(/&#[xX]?[0-9a-fA-F]+;?/g, '') // Remove HTML entities that could be used for bypasses
   }
 
   // Deep clone and sanitize nested objects

@@ -322,21 +322,27 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * @param fn - Method function
  */
     _registerMethod: (pluginNameOrName: string, methodNameOrFn: string | ((...args: unknown[]) => unknown), fn?: (...args: unknown[]) => unknown) => {
+      const isUnsafeKey = (key: string): boolean =>
+        key === '__proto__' || key === 'constructor' || key === 'prototype'
+
       // PRO-MODE: Formal signature (pluginName, methodName, fn)
       if (fn !== undefined) {
         const pluginName = pluginNameOrName
         const methodName = methodNameOrFn as string
-        // Prevent prototype pollution - reject dangerous property names
-        if (pluginName === '__proto__' || pluginName === 'constructor' || pluginName === 'prototype') {
-          console.warn('[gState] Invalid plugin name: prototype pollution attempt detected')
+
+        if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
+          console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
           return
         }
-        if (methodName === '__proto__' || methodName === 'constructor' || methodName === 'prototype') {
-          console.warn('[gState] Invalid method name: prototype pollution attempt detected')
-          return
-        }
+
         if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
         _methodNamespace[pluginName]![methodName] = fn
+        return
+      }
+
+
+      if (isUnsafeKey(name)) {
+        console.warn('[gState] Refusing to register legacy method with unsafe key:', name)
         return
       }
 
@@ -344,11 +350,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       console.warn('[gState] _registerMethod(name, fn) is deprecated. Use _registerMethod(pluginName, methodName, fn) instead.')
       const name = pluginNameOrName
       const methodFn = methodNameOrFn as (...args: unknown[]) => unknown
-      // Prevent prototype pollution - reject dangerous property names
-      if (name === '__proto__' || name === 'constructor' || name === 'prototype') {
-        console.warn('[gState] Invalid method name: prototype pollution attempt detected')
-        return
-      }
       if (!_methodNamespace['core']) _methodNamespace['core'] = {}
       _methodNamespace['core']![name] = methodFn
     },
