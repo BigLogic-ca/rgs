@@ -11,7 +11,8 @@ const githubFiles = [
   { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
   { from: '.github/LICENSE', to: 'LICENSE' },
   { from: '.github/README.md', to: 'README.md' },
-  { from: '.github/SECURITY.md', to: 'SECURITY.md' }
+  { from: '.github/SECURITY.md', to: 'SECURITY.md' },
+  { from: '.github/FUNDING.md', to: 'FUNDING.md' }
 ]
 
 function copyGithubFiles() {
@@ -49,8 +50,8 @@ const buildMain = async () => {
       copy({
         assets: [
           { from: './package.json', to: './package.json' },
-          { from: './markdown/**/*', to: './markdown' },
-          { from: './examples/**/*', to: './examples' }
+          // { from: './markdown/**/*', to: './markdown' },
+          // { from: './examples/**/*', to: './examples' }
         ]
       })
     ]
