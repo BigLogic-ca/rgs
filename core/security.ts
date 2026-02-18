@@ -225,7 +225,7 @@ export const sanitizeValue = (value: unknown): unknown => {
   if (typeof value === 'string') {
     // Prevent XSS vectors using a more comprehensive set of patterns
     return value
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[SEC-REMOVED]')
+      .replace(/<script\b[^>]*>[\s\S]*?<\s*\/\s*script\b[^>]*>/gi, '[SEC-REMOVED]')
       .replace(/javascript:/gi, '[SEC-REMOVED]')
       .replace(/data:text\/html/gi, '[SEC-REMOVED]')
       .replace(/vbscript:/gi, '[SEC-REMOVED]')
