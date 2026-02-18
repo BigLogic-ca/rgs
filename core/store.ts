@@ -326,6 +326,15 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       if (fn !== undefined) {
         const pluginName = pluginNameOrName
         const methodName = methodNameOrFn as string
+        // Prevent prototype pollution - reject dangerous property names
+        if (pluginName === '__proto__' || pluginName === 'constructor' || pluginName === 'prototype') {
+          console.warn('[gState] Invalid plugin name: prototype pollution attempt detected')
+          return
+        }
+        if (methodName === '__proto__' || methodName === 'constructor' || methodName === 'prototype') {
+          console.warn('[gState] Invalid method name: prototype pollution attempt detected')
+          return
+        }
         if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
         _methodNamespace[pluginName]![methodName] = fn
         return
@@ -335,6 +344,11 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       console.warn('[gState] _registerMethod(name, fn) is deprecated. Use _registerMethod(pluginName, methodName, fn) instead.')
       const name = pluginNameOrName
       const methodFn = methodNameOrFn as (...args: unknown[]) => unknown
+      // Prevent prototype pollution - reject dangerous property names
+      if (name === '__proto__' || name === 'constructor' || name === 'prototype') {
+        console.warn('[gState] Invalid method name: prototype pollution attempt detected')
+        return
+      }
       if (!_methodNamespace['core']) _methodNamespace['core'] = {}
       _methodNamespace['core']![name] = methodFn
     },
