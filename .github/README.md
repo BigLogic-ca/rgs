@@ -47,6 +47,20 @@ We took the simplicity of **React Globo State (RGS)** and fused it with the arch
 
 ---
 
+### Installation?
+
+```shell
+npm install @biglogic/rgs
+```
+
+---
+
+### Examples and guide
+
+**[github.com/BigLogic-ca/rgs](https://github.com/BigLogic-ca/rgs)**
+
+---
+
 ## 🏗️ Architecture
 
 ```mermaid
