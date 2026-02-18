@@ -22,6 +22,12 @@ export const debugPlugin = (): IPlugin => {
     return { name: 'gstate-debug-noop', hooks: {} }
   }
 
+  const isDev = process.env.NODE_ENV !== 'production'
+
+  const debugLog = (...args: unknown[]) => {
+    if (isDev) console.debug(...args)
+  }
+
   return {
     name: 'gstate-debug',
     hooks: {
@@ -31,29 +37,24 @@ export const debugPlugin = (): IPlugin => {
           (window as unknown as Record<string, unknown>).gstate = {
             /** Get all state */
             list: () => {
-              // eslint-disable-next-line no-console
-              console.log('[gState] Current state:', store.list())
               return store.list()
             },
             /** Get a specific key */
             get: (key: string) => {
               const val = store.get(key)
-              // eslint-disable-next-line no-console
-              console.log(`[gState] get('${key}'):`, val)
+              debugLog(`[gState] get('${key}'):`, val)
               return val
             },
             /** Set a value */
             set: (key: string, value: unknown) => {
               const result = store.set(key, value)
-              // eslint-disable-next-line no-console
-              console.log(`[gState] set('${key}', ${JSON.stringify(value)}):`, result)
+              debugLog(`[gState] set('${key}', ${JSON.stringify(value)}):`, result)
               return result
             },
             /** Watch a key */
             watch: (key: string, callback: (val: unknown) => void) => {
               const unwatch = store.watch(key, callback)
-              // eslint-disable-next-line no-console
-              console.log(`[gState] watching '${key}'`)
+              debugLog(`[gState] watching '${key}'`)
               return unwatch
             },
             /** Get store info */
@@ -64,14 +65,12 @@ export const debugPlugin = (): IPlugin => {
                 keys: Object.keys(store.list()),
                 size: Object.keys(store.list()).length
               }
-              // eslint-disable-next-line no-console
-              console.log('[gState] Store Info:', info)
+              debugLog('[gState] Store Info:', info)
               return info
             },
             /** Clear console and show banner */
             banner: () => {
-              // eslint-disable-next-line no-console
-              console.log(`
+              debugLog(`
 ╔═══════════════════════════════════════╗
 ║         🧲 gState Debug            ║
 ║   Type: gstate.list()              ║
@@ -84,8 +83,7 @@ export const debugPlugin = (): IPlugin => {
           }
 
           // Auto-show banner on install
-          // eslint-disable-next-line no-console
-          console.log('[gState] Debug plugin installed. Type gstate.banner() for help.')
+          debugLog('[gState] Debug plugin installed. Type gstate.banner() for help.')
         }
       },
       onDestroy: () => {
