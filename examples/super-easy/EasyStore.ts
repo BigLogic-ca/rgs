@@ -16,6 +16,10 @@ const initialState = {
 // 2. Create the store (The "Magnetar" way)
 export const useEasyStore = gstate(initialState)
 
+// Conditional debug logging
+const isDev = process.env.NODE_ENV !== 'production'
+const debugLog = (...args: unknown[]) => { if (isDev) console.debug(...args) }
+
 // --- PRACTICAL ACTIONS ---
 
 /**
@@ -38,8 +42,8 @@ export const checkState = () => {
   const currentTheme = useEasyStore.get('theme')
   const user = useEasyStore.get('user')
 
-  console.log(`Current Theme: ${currentTheme}`)
-  console.log(`User Name: ${user?.name}`)
+  debugLog(`Current Theme: ${currentTheme}`)
+  debugLog(`User Name: ${user?.name}`)
 }
 
 /**

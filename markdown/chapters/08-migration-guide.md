@@ -177,6 +177,7 @@ store.recordConsent('user123', 'marketing', true)
 This release focuses on improving developer ergonomics, security visibility, and complex dependency handling.
 
 ### 1. Nested Computed Dependencies
+
 **NEW:** Computed values can now re-trigger based on other computed values.
 
 ```typescript

@@ -161,7 +161,11 @@ export const createFirestoreAdapter = (db: unknown, docPath: string): CloudSyncA
     try {
       // In a real scenario, you'd use updateDoc from firebase/firestore
       // await updateDoc(doc(db, docPath), { ...data, updatedAt: serverTimestamp() });
-      console.log('[Mock] Firestore Syncing:', data)
+      const isDev = process.env.NODE_ENV !== 'production'
+      const debugLog = (...args: unknown[]) => { if (isDev) console.debug(...args) }
+
+      // await updateDoc(doc(db, docPath), { ...data, updatedAt: serverTimestamp() });
+      debugLog('[Mock] Firestore Syncing:', data)
       return true
     } catch (e) {
       return false

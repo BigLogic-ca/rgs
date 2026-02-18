@@ -23,6 +23,8 @@ const initialState: AppState = {
 }
 
 // 1. Initialize the store
+const isDev = process.env.NODE_ENV !== 'production'
+const debugLog = (...args: unknown[]) => { if (isDev) console.debug(...args) }
 export const useHybridStore = gstate<AppState>(initialState, {
   namespace: 'hybrid-app-vault',
   persist: false // We use plugins for persistence
@@ -51,7 +53,7 @@ export const syncNow = async () => {
   if (result.status === 'success') {
     alert(`Sync completed! ${result.stats.totalKeysSynced} items pushed to cloud.`)
   } else if (result.status === 'no-change') {
-    console.log('No new changes to sync.')
+    debugLog('No new changes to sync.')
   }
 }
 

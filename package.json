@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -40,9 +40,9 @@
     ".": "./index.js"
   },
   "scripts": {
-    "build": "tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs && npm run build:extension",
-    "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
+    "build": "rm -rf dist && tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
     "build:watch": "node ./esbuild.config.mjs --watch",
+    "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
     "dev": "npm run build:watch",
     "lint": "cd tests && npm run lint",
     "tsc": "tsc --noEmit",
@@ -65,14 +65,17 @@
     }
   },
   "devDependencies": {
+    "@types/jest": "30.0.0",
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "dphelper": "^2.6.4",
     "esbuild": "^0.27.3",
     "esbuild-plugin-copy": "^2.1.1",
+    "jest-environment-jsdom": "30.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "ts-jest": "29.4.6",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3"
   }

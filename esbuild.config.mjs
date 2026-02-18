@@ -11,7 +11,8 @@ const githubFiles = [
   { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
   { from: '.github/LICENSE', to: 'LICENSE' },
   { from: '.github/README.md', to: 'README.md' },
-  { from: '.github/SECURITY.md', to: 'SECURITY.md' }
+  { from: '.github/SECURITY.md', to: 'SECURITY.md' },
+  { from: '.github/FUNDING.md', to: 'FUNDING.md' }
 ]
 
 function copyGithubFiles() {
@@ -48,9 +49,9 @@ const buildMain = async () => {
     plugins: [
       copy({
         assets: [
-          { from: './package.json', to: './package.json' },
-          { from: './markdown/**/*', to: './markdown' },
-          { from: './examples/**/*', to: './examples' }
+          { from: './package.json', to: './package.json' }
+          // { from: './markdown/**/*', to: './markdown' },
+          // { from: './examples/**/*', to: './examples' }
         ]
       })
     ]
@@ -70,7 +71,7 @@ const buildAdvanced = async () => {
 Promise.all([buildMain(), buildAdvanced()])
   .then(() => {
     copyGithubFiles()
-    console.log('✅ Build Complete (Main + Advanced + Assets).')
+    console.debug('✅ Build Complete (Main + Advanced + Assets).\n')
   })
   .catch((error) => {
     console.error('❌ Build Failed:', error)
