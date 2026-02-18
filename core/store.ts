@@ -283,7 +283,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           dataValue = JSON.stringify(data.value)
         }
 
-        _storage.setItem(`${_getPrefix()}${key} `, JSON.stringify({
+        _storage.setItem(`${_getPrefix()}${key}`, JSON.stringify({
           v: (_versions.get(key) || 1), t: Date.now(), e: data.options.ttl ? Date.now() + data.options.ttl : null,
           d: dataValue, _sys_v: _currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: isEncoded ? true : undefined
         }))
