@@ -227,7 +227,7 @@ export const sanitizeValue = (value: unknown): unknown => {
     return value
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '[SEC-REMOVED]')
       .replace(/javascript:/gi, '[SEC-REMOVED]')
-      .replace(/data:text\/html/gi, '[SEC-REMOVED]')
+      .replace(/data:/gi, '[SEC-REMOVED]')
       .replace(/vbscript:/gi, '[SEC-REMOVED]')
       .replace(/on\w+\s*=/gi, '[SEC-REMOVED]=')
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '[SEC-REMOVED]')
