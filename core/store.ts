@@ -322,12 +322,27 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
  * @param fn - Method function
  */
     _registerMethod: (pluginNameOrName: string, methodNameOrFn: string | ((...args: unknown[]) => unknown), fn?: (...args: unknown[]) => unknown) => {
+      const isUnsafeKey = (key: string): boolean =>
+        key === '__proto__' || key === 'constructor' || key === 'prototype'
+
       // PRO-MODE: Formal signature (pluginName, methodName, fn)
       if (fn !== undefined) {
         const pluginName = pluginNameOrName
         const methodName = methodNameOrFn as string
+
+        if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
+          console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
+          return
+        }
+
         if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
         _methodNamespace[pluginName]![methodName] = fn
+        return
+      }
+
+
+      if (isUnsafeKey(name)) {
+        console.warn('[gState] Refusing to register legacy method with unsafe key:', name)
         return
       }
 
