@@ -46,7 +46,7 @@ jobs:
       delete-branch: false
 
    - name: Lock resolved issues
-     uses: dessant/lock-threads@v5
+     uses: dessant/lock-threads@v6
      if: github.event_name != 'pull_request'
      with:
       repo-token: ${{ secrets.GITHUB_TOKEN }}
