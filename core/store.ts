@@ -4,7 +4,7 @@ import * as Security from "./security"
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
   ComputedSelector, WatcherCallback, IPlugin, PluginHookName,
-  PluginContext, Middleware, CustomStorage, GStatePlugins, StateUpdater
+  PluginContext, Middleware, CustomStorage, GStatePlugins
 } from './types'
 
 /**
