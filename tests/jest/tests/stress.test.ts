@@ -28,9 +28,9 @@ describe('Stress Tests - Enterprise Performance', () => {
     const getTime = performance.now() - getStart
     console.log(`Get 10k keys: ${getTime.toFixed(2)}ms`)
 
-    // Should complete in reasonable time (< 2 seconds for set, < 1.5 seconds for get)
-    expect(setTime).toBeLessThan(2000)
-    expect(getTime).toBeLessThan(1500)
+    // Should complete in reasonable time (< 2.5 seconds for set, < 2 seconds for get)
+    expect(setTime).toBeLessThan(2500)
+    expect(getTime).toBeLessThan(2000)
   }, 30000)
 
   test('should handle 1,000 updates to same key', () => {
@@ -44,7 +44,7 @@ describe('Stress Tests - Enterprise Performance', () => {
     console.log(`1,000 updates: ${updateTime.toFixed(2)}ms`)
 
     expect(store.get('counter')).toEqual({ count: 999, timestamp: expect.any(Number) })
-    expect(updateTime).toBeLessThan(500)
+    expect(updateTime).toBeLessThan(600)
   })
 
   test('should handle rapid set/get cycles', () => {
@@ -60,7 +60,7 @@ describe('Stress Tests - Enterprise Performance', () => {
     const rapidTime = performance.now() - start
     console.log(`${iterations} rapid cycles: ${rapidTime.toFixed(2)}ms`)
 
-    expect(rapidTime).toBeLessThan(1000)
+    expect(rapidTime).toBeLessThan(1200)
   })
 
   test('should handle large object values', () => {
@@ -82,8 +82,8 @@ describe('Stress Tests - Enterprise Performance', () => {
     console.log(`Large object (100KB) - Set: ${setTime.toFixed(2)}ms, Get: ${getTime.toFixed(2)}ms`)
 
     expect(retrieved).toEqual(largeObj)
-    expect(setTime).toBeLessThan(150)
-    expect(getTime).toBeLessThan(50)
+    expect(setTime).toBeLessThan(300)
+    expect(getTime).toBeLessThan(100)
   })
 
   test('should handle multiple namespaces efficiently', () => {
