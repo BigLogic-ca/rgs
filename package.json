@@ -45,7 +45,7 @@
     "build:watch": "node ./esbuild.config.mjs --watch",
     "dev": "npm run build:watch",
     "npm:pack": "npm run build && cd dist && npm pack",
-    "npm:publish": "npm run build && cd dist && npm publish --access=public"
+    "npm:publish": "npm run build && npm run build:extension && cd dist && npm publish --access=public"
   },
   "dependencies": {
     "immer": "^11.1.4"
