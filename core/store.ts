@@ -340,12 +340,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         return
       }
 
-
-      if (isUnsafeKey(name)) {
-        console.warn('[gState] Refusing to register legacy method with unsafe key:', name)
-        return
-      }
-
       // DEPRECATED/LEGACY: signature (name, fn) - emits warning
       console.warn('[gState] _registerMethod(name, fn) is deprecated. Use _registerMethod(pluginName, methodName, fn) instead.')
       const name = pluginNameOrName
