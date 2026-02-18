@@ -6,14 +6,36 @@
     "lint": "cd .. && eslint --config tests/eslint/eslint.config.mjs .",
     "lint:fix": "cd .. && eslint --config tests/eslint/eslint.config.mjs . --fix",
     "jest": "cd .. && jest --config tests/jest/jest.config.ts",
-    "pw": "cd .. && playwright test --config tests/playwright/playwright.config.ts",
     "tsc": "cd .. && tsc -b tsconfig.json",
     "type-check": "tsc --noEmit",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./tests/jest/jest.config.ts",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./tests/jest/jest.config.ts --watch",
-    "test:e2e": "playwright test --config ./tests/playwright/playwright.config.ts",
-    "test:all": "npm run lint && npm run jest && npm run pw",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ../tests/jest/jest.config.ts",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ../tests/jest/jest.config.ts --watch",
+    "test:e2e": "playwright test --config ../tests/playwright/playwright.config.ts",
+    "test:all": "npm run lint && npm run test && npm run pw",
+    "pw": "cd .. && playwright test --config tests/playwright/playwright.config.ts",
     "pw:report": "cd .. && playwright show-report tests/playwright/reports",
     "pw:ui": "cd .. && playwright test --config tests/playwright/playwright.config.ts --ui"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "eslint": "^9.20.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "ts-jest": "^29.4.6",
+    "typescript-eslint": "^8.56.0"
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "verbatimModuleSyntax": false
+    }
   }
 }
