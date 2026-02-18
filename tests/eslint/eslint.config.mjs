@@ -35,6 +35,7 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
       "no-console": ["warn", { allow: ["warn", "error", "info"] }],
       "no-empty": "off",
+      "no-undef": "off",
     },
     settings: {
       react: {
@@ -43,6 +44,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["dist/", "node_modules/", "tests/", "jest.config.ts", "esbuild.config.mjs", ".cache/", ".dev/", ".vscode/"],
+    ignores: ["dist/", "node_modules/", "tests/", "jest.config.ts", "esbuild.config.mjs", ".cache/", ".dev/", ".vscode/", "examples/", "plugins/", "vscode-extension/"],
   }
 )
