@@ -1,0 +1,63 @@
+name: Release
+
+on:
+ push:
+  tags:
+   - "v*"
+ workflow_dispatch:
+
+permissions:
+ contents: write
+ issues: write
+ pull-requests: write
+
+jobs:
+ release:
+  name: Release
+  runs-on: ubuntu-latest
+  steps:
+   - name: Checkout Repository
+     uses: actions/checkout@v4
+     with:
+      fetch-depth: 0
+
+   - name: Setup Node.js
+     uses: actions/setup-node@v4
+     with:
+      node-version: "20"
+      registry-url: "https://registry.npmjs.org"
+      cache: "npm"
+
+   - name: Install dependencies
+     run: npm ci
+
+   - name: Build package
+     run: npm run build
+
+   - name: Install test dependencies
+     working-directory: ./tests
+     run: npm ci
+
+   - name: Run tests
+     working-directory: ./tests
+     run: npm test
+
+   - name: Publish to npm
+     run: npm publish --access public
+     env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+   - name: Generate changelog
+     id: changelog
+     run: |
+      CHANGELOG=$(git log --pretty=format:"%s (%h)" ${{ github.event.inputs.previous_tag || '' }}..${{ github.ref_name }})
+      echo "body=$CHANGELOG" >> $GITHUB_OUTPUT
+
+   - name: Create GitHub Release
+     uses: softprops/action-gh-release@v2
+     with:
+      body: ${{ steps.changelog.outputs.body }}
+      draft: false
+      prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+     env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,55 @@
+name: Stale
+
+on:
+ schedule:
+  - cron: "0 0 * * *" # Daily at midnight
+
+permissions:
+ issues: write
+ pull-requests: write
+
+jobs:
+ stale:
+  name: Mark Stale
+  runs-on: ubuntu-latest
+  steps:
+   - name: Mark Stale Issues
+     uses: actions/stale@v9
+     with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Issue configuration
+      issues-stale-message: "This issue in ${{ github.repository }} has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs."
+      issues-close-stale-message: "This issue has been automatically closed because it became stale."
+      issues-days-before-stale: 60
+      issues-days-before-close: 7
+      issues-remove-stale-when-updated: true
+      issues-label-stale: "stale"
+      issues-label-closed: "closed"
+
+      # PR configuration
+      pr-stale-message: "This pull request in ${{ github.repository }} has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs."
+      pr-close-stale-message: "This pull request has been automatically closed because it became stale."
+      pr-days-before-stale: 60
+      pr-days-before-close: 7
+      pr-remove-stale-when-updated: true
+      pr-label-stale: "stale"
+      pr-label-closed: "closed"
+
+      # Exempt labels
+      exempt-issue-labels: "bug,feature,enhancement,documentation,security,priority"
+      exempt-pr-labels: "bug,feature,enhancement,documentation,security,priority"
+
+      # Operations
+      ascending: true
+      remove-stale-when-updated: true
+      delete-branch: false
+
+   - name: Lock resolved issues
+     uses: dessant/lock-threads@v5
+     if: github.event_name != 'pull_request'
+     with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+      issues-lock-reason: "resolved"
+      issues-include-prs: false
+      issues-days-before-lock: 30

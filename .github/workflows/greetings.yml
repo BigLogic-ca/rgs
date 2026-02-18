@@ -1,16 +1,41 @@
 name: Greetings
 
-on: [pull_request_target, issues]
+on:
+ pull_request_target:
+  types: [opened, reopened]
+ issues:
+  types: [opened]
 
 jobs:
-  greeting:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: "Message that will be displayed on users' first issue"
-        pr-message: "Message that will be displayed on users' first pull request"
+ greeting:
+  name: Greeting
+  runs-on: ubuntu-latest
+  permissions:
+   issues: write
+   pull-requests: write
+  steps:
+   - uses: actions/first-interaction@v1
+     with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Custom messages for first-time contributors
+      issue-message: |
+       🎉 Thanks for opening a new issue! We appreciate your contribution to **${{ github.repository }}**.
+
+       Please make sure you've:
+       - Read the [documentation](https://a51.gitbook.io/${{ github.event.repository.name }}/)
+       - Searched for existing issues to avoid duplicates
+       - Provided a clear description of the problem
+
+       Our team will review your issue and get back to you soon!
+
+      pr-message: |
+       🎉 Thanks for your first pull request to **${{ github.repository }}**!
+
+       Please review our [Contributing Guidelines](CONTRIBUTING.md) and make sure you've:
+       - ✅ Added tests for new functionality
+       - ✅ Updated documentation if needed
+       - ✅ Followed the code style guide
+       - ✅ Run tests locally with `npm test`
+
+       Our team will review your PR and provide feedback!

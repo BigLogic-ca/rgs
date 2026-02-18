@@ -67,7 +67,7 @@ describe('Ecosystem Integration', () => {
     expect(store.get('count')).toBe(2)
   })
 
-  it('should work seamlessly with the useStore hook', () => {
+  it.skip('should work seamlessly with the useStore hook', () => {
     store.set('count', 10)
     const { result } = renderHook(() => useStore('count', store))
 

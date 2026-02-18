@@ -1,0 +1,51 @@
+name: Auto Merge
+
+on:
+ pull_request_target:
+  types: [opened, reopened, synchronize, ready_for_review]
+ check_suite:
+  types: [completed]
+
+permissions:
+ contents: write
+ pull-requests: write
+
+jobs:
+ auto-merge:
+  name: Auto Merge
+  runs-on: ubuntu-latest
+  if: github.actor == 'dependabot[bot]' || github.actor == 'renovate[bot]'
+  steps:
+   - name: Enable auto-merge for Dependabot PRs
+     uses: actions/checkout@v4
+
+   - name: Approve PR
+     run: gh pr approve ${{ github.event.pull_request.number }}
+     env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+   - name: Enable auto-merge
+     run: |
+      gh pr merge --auto --merge ${{ github.event.pull_request.number }}
+     env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+ auto-update-branch:
+  name: Auto Update Branch
+  runs-on: ubuntu-latest
+  if: github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
+  steps:
+   - name: Checkout Repository
+     uses: actions/checkout@v4
+     with:
+      ref: ${{ github.head_ref }}
+      fetch-depth: 0
+
+   - name: Update branch
+     run: |
+      git config --local user.email "github-actions[bot]@users.noreply.github.com"
+      git config --local user.name "github-actions[bot]"
+      git pull --rebase origin ${{ github.base_ref }}
+      git push --force origin ${{ github.head_ref }}
+     env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
