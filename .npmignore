@@ -29,6 +29,7 @@ coverage/
 .cache/
 docs/
 examples/
+markdown/
 /index.tsx
 
 # Include specific files that are otherwise ignored by a broader rule
