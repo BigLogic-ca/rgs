@@ -4,7 +4,7 @@ import * as Security from "./security"
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
   ComputedSelector, WatcherCallback, IPlugin, PluginHookName,
-  PluginContext, Middleware, CustomStorage, GStatePlugins, StateUpdater
+  PluginContext, Middleware, CustomStorage, GStatePlugins
 } from './types'
 
 /**
@@ -337,12 +337,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
 
         if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
         _methodNamespace[pluginName]![methodName] = fn
-        return
-      }
-
-
-      if (isUnsafeKey(name)) {
-        console.warn('[gState] Refusing to register legacy method with unsafe key:', name)
         return
       }
 
