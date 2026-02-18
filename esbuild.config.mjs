@@ -49,7 +49,7 @@ const buildMain = async () => {
     plugins: [
       copy({
         assets: [
-          { from: './package.json', to: './package.json' },
+          { from: './package.json', to: './package.json' }
           // { from: './markdown/**/*', to: './markdown' },
           // { from: './examples/**/*', to: './examples' }
         ]
@@ -71,7 +71,7 @@ const buildAdvanced = async () => {
 Promise.all([buildMain(), buildAdvanced()])
   .then(() => {
     copyGithubFiles()
-    console.log('✅ Build Complete (Main + Advanced + Assets).')
+    console.debug('✅ Build Complete (Main + Advanced + Assets).\n')
   })
   .catch((error) => {
     console.error('❌ Build Failed:', error)
