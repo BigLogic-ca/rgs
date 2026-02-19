@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test'
-import pk from '../../app.json' with { type: 'json' }
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const pk = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../app.json'), 'utf-8'))
 
 export default defineConfig(
   {
@@ -39,7 +46,7 @@ export default defineConfig(
     },
 
     // Look for test files in the "tests" directory, relative to this configuration file.
-    testDir: './tests',
+    testDir: './tests', // Punterà a tests/playwright/tests
 
     // Run all tests in parallel.
     fullyParallel: true,
@@ -85,8 +92,8 @@ export default defineConfig(
     projects: [
       {
         name: 'setup',
-        testDir: './tests/playwright/',
-        testMatch: /..\/.*setup.ts/
+        testDir: '.', // Directory del config
+        testMatch: /.*setup\.ts/
         // retries: 0
       },
       {
