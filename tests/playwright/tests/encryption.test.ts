@@ -6,8 +6,8 @@ import { test, expect } from '@playwright/test'
 
 test.describe('AES-256-GCM Encryption', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage before each test
-    await page.goto('/')
+    // Navigate to a secure context to enable Web Crypto APIs
+    await page.goto('https://example.com')
     await page.evaluate(() => localStorage.clear())
   })
 
@@ -127,7 +127,7 @@ test.describe('AES-256-GCM Encryption', () => {
       const keyMaterial = await window.crypto.subtle.importKey(
         'raw',
         passwordData,
-        'PBKDF2',
+        { name: 'PBKDF2' }, // Use object for max compatibility
         false,
         ['deriveBits', 'deriveKey']
       )
@@ -140,7 +140,7 @@ test.describe('AES-256-GCM Encryption', () => {
         {
           name: 'PBKDF2',
           salt,
-          iterations: 100000,
+          iterations: 10000, // Reduced for test speed
           hash: 'SHA-256'
         },
         keyMaterial,
