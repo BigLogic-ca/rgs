@@ -1,5 +1,5 @@
 /**
- * Argis (RGS) - React Globo State - Advanced Engine
+ * Argis (RGS) - Reactive Global State - Advanced Engine
  * For additional features beyond the core.
  */
 
