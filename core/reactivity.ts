@@ -15,11 +15,13 @@ export interface ReactivityContext {
   versions: Map<string, number>
 
   // Dependencies needed for updates
-  storeInstance: any // breaking cyclic dependency type issue for now
+  storeInstance: unknown // breaking cyclic dependency type issue for now
   immer: boolean
   onError?: (error: Error, metadata?: Record<string, unknown>) => void
   silent: boolean
 }
+
+interface BasicStore { get(k: string): unknown }
 
 export const updateComputed = (ctx: ReactivityContext, key: string, emit: (k?: string) => void) => {
   const comp = ctx.computed.get(key)
@@ -30,7 +32,7 @@ export const updateComputed = (ctx: ReactivityContext, key: string, emit: (k?: s
     depsFound.add(k)
     // Support computed dependencies
     if (ctx.computed.has(k)) return ctx.computed.get(k)!.lastValue as V
-    return ctx.storeInstance.get(k) as V | null
+    return (ctx.storeInstance as BasicStore).get(k) as V | null
   }
 
   const newValue = comp.selector(getter)
@@ -59,27 +61,20 @@ export const updateComputed = (ctx: ReactivityContext, key: string, emit: (k?: s
   }
 }
 
-export const emitChange = (ctx: ReactivityContext, changedKey?: string, isTransaction = false, setPendingEmit?: (v: boolean) => void) => {
+export const emitChange = (ctx: ReactivityContext, changedKey?: string, isTransaction = false, setPendingEmit?: (v: boolean) => void, emit?: (k?: string) => void) => {
   if (changedKey) {
     // 1. Update computed dependent on this key
     const dependents = ctx.computedDeps.get(changedKey)
-    if (dependents) {
-      // Recursively update computed values
-      // Note: In a robust system we might want a topological sort or depth limiter
+    if (dependents && emit) {
       for (const compKey of dependents) {
-        // Self-call to update computed (need to pass the same emit function)
-        // Since updateComputed calls emit, we trust the closure.
-        // However, we can't easily import updateComputed inside itself if we export it.
-        // For now, simpler to just trigger the effect via the passed context or callback?
-        // We will refactor to just call the 'updateComputed' logic via a callback or import if possible.
-        // Actually, let's keep it simple: the main store will orchestrate this.
+        updateComputed(ctx, compKey, emit)
       }
     }
 
     // 2. Notify Watchers
     const watchers = ctx.watchers.get(changedKey)
     if (watchers) {
-      const val = ctx.storeInstance.get(changedKey)
+      const val = (ctx.storeInstance as BasicStore).get(changedKey)
       for (const w of watchers) {
         try { w(val) }
         catch (e) {
