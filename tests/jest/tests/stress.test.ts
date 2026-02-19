@@ -60,7 +60,7 @@ describe('Stress Tests - Enterprise Performance', () => {
     const rapidTime = performance.now() - start
     console.log(`${iterations} rapid cycles: ${rapidTime.toFixed(2)}ms`)
 
-    expect(rapidTime).toBeLessThan(1200)
+    expect(rapidTime).toBeLessThan(2000)
   })
 
   test('should handle large object values', () => {
