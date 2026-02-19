@@ -1,5 +1,5 @@
 /**
- * Argis (RGS) - React Globo State - Official Plugins
+ * Argis (RGS) - Reactive Global State - Official Plugins
  * Performance-optimized extensions for the core engine.
  */
 
