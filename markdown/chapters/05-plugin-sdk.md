@@ -1,6 +1,6 @@
 # 🔧 Plugin SDK: Build Your Own Extensions
 
-This guide shows you how to create custom plugins for RGS (Argis) - React Globo State. Plugins are the way to extend the store with custom functionality.
+This guide shows you how to create custom plugins for RGS (Argis) - Reactive Global State. Plugins are the way to extend the store with custom functionality.
 
 ---
 
