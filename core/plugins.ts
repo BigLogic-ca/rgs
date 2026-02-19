@@ -4,13 +4,13 @@ import { IStore, PluginHookName, PluginContext, IPlugin } from "./types"
  * Manages plugins and their lifecycle hooks.
  */
 
-export interface PluginManagerContext<S> {
+export interface PluginManagerContext<S extends Record<string, unknown>> {
   plugins: Map<string, IPlugin<S>>
   onError?: (error: Error, metadata?: Record<string, unknown>) => void
   silent: boolean
 }
 
-export const runHook = <S>(
+export const runHook = <S extends Record<string, unknown>>(
   ctx: PluginManagerContext<S>,
   name: PluginHookName,
   hookContext: PluginContext<S>
@@ -29,7 +29,7 @@ export const runHook = <S>(
   }
 }
 
-export const installPlugin = <S>(
+export const installPlugin = <S extends Record<string, unknown>>(
   ctx: PluginManagerContext<S>,
   plugin: IPlugin<S>,
   storeInstance: IStore<S>
