@@ -4,7 +4,7 @@ import { initState, destroyState, createAsyncStore } from '../../../index'
 import type { IPlugin } from '../../../core/types'
 
 /**
- * Argis (RGS) - React Globo State - Core Tests
+ * Argis (RGS) - Reactive Global State - Core Tests
  * Tests for async store, plugins, and immutability features
  */
 describe('Argis (RGS)', () => {
