@@ -1,16 +1,30 @@
-# Argis (RGS) - React Globo State "The Magnetar"
+# Argis (RGS) - Reactive Global State
 
-> **Atomic Precision. Immutable Safety. Zen Simplicity.**
+> "The Magnetar" **Atomic Precision. Immutable Safety. Zen Simplicity.**
 > The most powerful state management engine for React. Built for those who demand industrial-grade reliability with a zero-boilerplate experience.
 
-[![npm version](https://badge.fury.io/js/rgs.svg)](https://badge.fury.io/js/rgs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![version](https://img.shields.io/npm/v/@biglogic/rgs.svg)](https://npmjs.org/package/@biglogic/rgs)
+[![downloads](https://img.shields.io/npm/dm/@biglogic/rgs.svg)](https://npmjs.org/package/@biglogic/rgs)
+
+![Javascript](https://img.shields.io/badge/Javascript-gray?logo=Javascript)
+![React](https://img.shields.io/badge/React-gray?logo=React)
+![TypeScript](https://img.shields.io/badge/TypeScript-gray?logo=typescript)
+![Node.js](https://img.shields.io/badge/Node.js-gray?logo=node.js)
+![Jest](https://img.shields.io/badge/Jest-gray?logo=jest)
+![ESLint](https://img.shields.io/badge/Eslint-gray?logo=eslint)
+![esbuild](https://img.shields.io/badge/esbuild-gray?logo=esbuild)
+
+![Snik](https://img.shields.io/badge/Snyk-gray?logo=Snyk)
+![Snik](https://img.shields.io/badge/Socket-gray?logo=socket)
+
+<!-- [![GitBook](https://img.shields.io/static/v1?message=Documented%20on%20GitBook&logo=gitbook&logoColor=ffffff&label=%20&labelColor=5c5c5c&color=3F89A1)](https://a51.gitbook.io/rgs) -->
 
 ---
 
 ## 🌟 Why Magnetar?
 
-We took the simplicity of **React Globo State (RGS)** and fused it with the architecture of a **High-Performance Kernel**. It's the only library that gives you:
+We took the simplicity of **Reactive Global State (RGS)** and fused it with the architecture of a **High-Performance Kernel**. It's the only library that gives you:
 
 - **💎 Absolute Immutability**: Powered by **Immer**. No more manual spreads. State is frozen by default.
 - **🛡️ Industrial-Grade Safety**: Deep Proxy guards that throw `Forbidden Mutation` errors if you try to bypass the kernel.
