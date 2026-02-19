@@ -275,7 +275,7 @@ store._addPlugin(autoSavePlugin({
 
 ## 📋 Plugin Best Practices
 
-1. **Use Namespaced Methods** - Always use `store._registerMethod('pluginName', 'method', fn)`
+1. **Use Namespaced Methods** - Always use `store._registerMethod('pluginName', 'methodName', fn)`
 2. **Clean Up Resources** - Use `onDestroy` to clean up timers, listeners, etc.
 3. **Handle Errors** - Wrap async operations in try/catch
 4. **Document Configuration** - Provide clear TypeScript interfaces
