@@ -1,5 +1,5 @@
 /**
- * Argis (RGS) - React Globo State
+ * Argis (RGS) - Reactive Global State
  * Simple, secure, scalable state management for React
  *
  * @see https://github.com/dpassariello/rgs
