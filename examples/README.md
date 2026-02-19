@@ -1,6 +1,6 @@
 # 🌌 RGS Examples & Best Practices
 
-This folder contains functional and reusable examples of **React Globo State (RGS)** implementation.
+This folder contains functional and reusable examples of **Reactive Global State (RGS)** implementation.
 
 ## 🏁 Overview: FE vs BE Recommendations
 
