@@ -72,27 +72,30 @@ const _isServer = (): boolean =>
 
 /**
  * Reactive Hook for state management.
- * SSR-safe with proper hydration support.
  *
- * @param key - State key to subscribe to
- * @param store - Optional store instance (uses default if not provided)
- * @returns Tuple of [value, setter]
- *
- * @example
- * const [count, setCount] = useStore('count')
- * // count will be undefined on SSR, actual value on client
+ * Supports two modes:
+ * 1. String Key: `useStore('count')` -> Returns [value, setter]
+ * 2. Type-Safe Selector: `useStore(state => state.count)` -> Returns value (Read-only)
  */
-export const useStore = <T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
+export function useStore<T, S extends Record<string, unknown> = Record<string, unknown>>(
+  selector: (state: S) => T,
+  store?: IStore<S>
+): T
+export function useStore<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
   key: string,
   store?: IStore<S>
-): readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean] => {
-  // Memoize store reference - always call this hook
+): readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean]
+export function useStore<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
+  keyOrSelector: string | ((state: S) => T),
+  store?: IStore<S>
+): any {
+  // Memoize store reference
   const targetStore = useMemo(() =>
-    (store || _defaultStore) as IStore<Record<string, unknown>> | null,
+    (store || _defaultStore) as IStore<S> | null,
     [store]
   )
 
-  // Ghost store fallback - ultra-light silent safe defaults for SSR/Missing store
+  // Ghost store fallback
   const ghostStore = useMemo(() => {
     const noop = () => { }
     const noopFalse = () => false
@@ -104,39 +107,67 @@ export const useStore = <T = unknown, S extends Record<string, unknown> = Record
       _subscribe: () => () => { }, _setSilently: noop, _registerMethod: noop,
       _addPlugin: noop, _removePlugin: noop, _getVersion: () => 0,
       get isReady() { return false }, whenReady: () => Promise.resolve(),
-      get plugins() { return {} }
-    }
-  }, []) as unknown as IStore<Record<string, unknown>>
+      get plugins() { return {} },
+      getSnapshot: () => ({} as S), // Ghost snapshot
+      get namespace() { return "ghost" }, get userId() { return undefined }
+    } as unknown as IStore<S>
+  }, [])
 
-  // Use ghost store if no store is available
   const safeStore = targetStore || ghostStore
 
-  // SSR-safe subscription
+  // --- MODE 1: Selector Function (Read-Only) ---
+  if (typeof keyOrSelector === 'function') {
+    const selector = keyOrSelector
+    const subscribe = useMemo(() =>
+      (cb: () => void) => safeStore._subscribe(cb), // Subscribe to all changes
+      [safeStore]
+    )
+
+    const getSnapshot = () => safeStore.getSnapshot()
+
+    // Create a stable selector wrapper to prevent infinite loops if selector returns new object
+    // However, users should memoize selectors or rely on React 18's referential checks.
+    // We pass the selector directly to useSyncExternalStore's snapshot function?
+    // No, useSyncExternalStore expects a getSnapshot that returns immutable generic state,
+    // and then we apply selector? Or selector inside getSnapshot?
+    // React docs say: getSnapshot must return cached value.
+    // Our store.getSnapshot() returns a cached object reference.
+    // So we can compute the selected value during render.
+
+    // Correct pattern for selectors with useSyncExternalStore:
+    const selection = useSyncExternalStore(
+      subscribe,
+      () => selector(safeStore.getSnapshot()),
+      () => selector({} as S) // Server snapshot
+    )
+
+    return selection
+  }
+
+  // --- MODE 2: String Key (Read/Write) ---
+  const key = keyOrSelector as string
+
+  // SSR-safe subscription (filtered by key)
   const subscribe = useMemo(() =>
     (callback: () => void) => safeStore._subscribe(callback, key),
     [safeStore, key]
   )
 
-  // Get current value (undefined on SSR, actual value on client)
+  // Get current value
   const value = useSyncExternalStore(
     subscribe,
     () => safeStore.get<T>(key) ?? undefined,
-    () => undefined // Server snapshot returns undefined
+    () => undefined // Server snapshot
   ) as T | undefined
 
-  // Memoized setter to prevent unnecessary re-renders
+  // Memoized setter
   const setter = useMemo(() =>
     (val: T | StateUpdater<T>, options?: PersistOptions) =>
       safeStore.set<T>(key, val, options),
     [safeStore, key]
   )
 
-  // Debug value for React DevTools
   useDebugValue(value, v => `${key}: ${JSON.stringify(v)}`)
-
-  // Hydration safety: If store exists but isn't ready, we might want to return undefined or a loading state
-  // However, for consistency with React 18 concurrent features, we rely on useSyncExternalStore.
-  // The store's initial get() will return null/undefined if not hydrated yet.
 
   return [value, setter] as const
 }
