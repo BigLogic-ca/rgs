@@ -1,7 +1,7 @@
 import { StorageAdapters } from "./store"
 import * as Security from "./security"
 import { deepClone } from "./utils"
-import type { IStore, StoreConfig, PersistOptions, IPlugin } from "./types"
+import type { StoreConfig, PersistOptions } from "./types"
 import { produce as _immerProduce, freeze as _immerFreeze } from 'immer'
 
 /**
@@ -18,7 +18,7 @@ export interface PersistenceContext {
   sizes: Map<string, number>
   totalSize: number
   storage: ReturnType<typeof StorageAdapters.local>
-  config: StoreConfig<any>
+  config: StoreConfig<Record<string, unknown>>
   diskQueue: Map<string, { value: unknown, options: PersistOptions }>
   encryptionKey: Security.EncryptionKey | null
   audit: (action: 'set' | 'get' | 'delete' | 'hydrate', key: string, success: boolean, error?: string) => void
