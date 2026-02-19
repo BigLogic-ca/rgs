@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.5.1] - 2026-02-19
+
+### 📚 Documentation
+- **New Branding**: Updated project name to **"Reactive Global State"** to better reflect the library's nature.
+- **Comparison Table**: Added detailed "Battle of the Giants" comparison vs Redux, Zustand, Recoil.
+- **README Overhaul**: Removed legacy references and polished the documentation.
+
+### 🧹 Maintenance
+- **Deprecations**: Formally deprecated versions < 3.0.0.
+- **Dependencies**: Pinned critical dev dependencies (ESLint 9.17) to prevent CI instability.
+
 ## [3.5.0] - 2026-02-19
 
 ### 🌟 New Features
