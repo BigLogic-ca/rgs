@@ -1,4 +1,34 @@
-# 🔄 Migration Guide
+# 8. Migration Guide
+
+## Upgrading to v3.5.0 (The Type-Safe Era)
+
+### New Feature: Selectors
+v3.5.0 introduces **Function Selectors** for `useStore`. This is fully backward compatible, but we recommend migrating new code to this pattern for better type safety.
+
+#### ✅ Recommended Pattern
+```tsx
+// Type-safe, autocomplete friendly
+const userName = useStore(state => state.user.name)
+```
+
+#### 🟡 Legacy Pattern (Still Supported)
+```tsx
+// String-based, prone to typos
+const [userName] = useStore('user_name')
+```
+
+---
+
+## Upgrading to v3.4.0
+
+### Performance Defaults
+- **Size Limits**: `maxObjectSize` and `maxTotalSize` now default to `0` (disabled). If you relied on these warnings during development, explicitly enable them in `initState` or `gstate` options.
+
+### Deprecations Removed
+- `useGState` and `useSimpleState` have been removed. Replace all instances with `useStore`.
+- `_registerMethod(name, fn)` support is removed from types (runtime warning remains). Update plugins to use `_registerMethod(pluginName, methodName, fn)`.
+
+---
 
 ## Upgrading from Previous Versions
 
