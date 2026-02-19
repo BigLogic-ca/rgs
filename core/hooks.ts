@@ -134,12 +134,9 @@ export const useStore = <T = unknown, S extends Record<string, unknown> = Record
   // Debug value for React DevTools
   useDebugValue(value, v => `${key}: ${JSON.stringify(v)}`)
 
+  // Hydration safety: If store exists but isn't ready, we might want to return undefined or a loading state
+  // However, for consistency with React 18 concurrent features, we rely on useSyncExternalStore.
+  // The store's initial get() will return null/undefined if not hydrated yet.
+
   return [value, setter] as const
 }
-
-// Legacy aliases - DEPRECATED, will be removed in next major
-/** @deprecated Use useStore instead */
-export const useGState = useStore
-
-/** @deprecated Use useStore instead */
-export const useSimpleState = useStore
