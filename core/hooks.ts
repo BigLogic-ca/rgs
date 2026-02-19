@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useDebugValue, useMemo } from "react"
+import { useSyncExternalStore, useDebugValue, useMemo, useCallback } from "react"
 import { createStore } from "./store"
 import type { IStore, StoreConfig, PersistOptions, StateUpdater } from "./types"
 
@@ -88,7 +88,7 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
 export function useStore<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
   keyOrSelector: string | ((state: S) => T),
   store?: IStore<S>
-): any {
+): T | readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean] {
   // Memoize store reference
   const targetStore = useMemo(() =>
     (store || _defaultStore) as IStore<S> | null,
@@ -115,59 +115,68 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
 
   const safeStore = targetStore || ghostStore
 
-  // --- MODE 1: Selector Function (Read-Only) ---
-  if (typeof keyOrSelector === 'function') {
-    const selector = keyOrSelector
-    const subscribe = useMemo(() =>
-      (cb: () => void) => safeStore._subscribe(cb), // Subscribe to all changes
-      [safeStore]
-    )
+  const isSelector = typeof keyOrSelector === 'function'
+  const key = !isSelector ? (keyOrSelector as string) : null
+  const selector = isSelector ? (keyOrSelector as (state: S) => T) : null
 
-    const getSnapshot = () => safeStore.getSnapshot()
-
-    // Create a stable selector wrapper to prevent infinite loops if selector returns new object
-    // However, users should memoize selectors or rely on React 18's referential checks.
-    // We pass the selector directly to useSyncExternalStore's snapshot function?
-    // No, useSyncExternalStore expects a getSnapshot that returns immutable generic state,
-    // and then we apply selector? Or selector inside getSnapshot?
-    // React docs say: getSnapshot must return cached value.
-    // Our store.getSnapshot() returns a cached object reference.
-    // So we can compute the selected value during render.
-
-    // Correct pattern for selectors with useSyncExternalStore:
-    const selection = useSyncExternalStore(
-      subscribe,
-      () => selector(safeStore.getSnapshot()),
-      () => selector({} as S) // Server snapshot
-    )
-
-    return selection
-  }
-
-  // --- MODE 2: String Key (Read/Write) ---
-  const key = keyOrSelector as string
-
-  // SSR-safe subscription (filtered by key)
-  const subscribe = useMemo(() =>
-    (callback: () => void) => safeStore._subscribe(callback, key),
-    [safeStore, key]
+  // 1. Subscribe
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      if (isSelector) {
+        // Selector mode: subscribe to all changes
+        return safeStore._subscribe(callback)
+      } else {
+        // Key mode: subscribe to key changes
+        return safeStore._subscribe(callback, key!)
+      }
+    },
+    [safeStore, isSelector, key]
   )
 
-  // Get current value
+  // 2. Get Snapshot (Client)
+  const getSnapshot = useCallback(() => {
+    if (isSelector) {
+      return selector!(safeStore.getSnapshot())
+    } else {
+      return safeStore.get<T>(key!) ?? undefined
+    }
+  }, [safeStore, isSelector, key, selector])
+
+  // 3. Get Snapshot (Server)
+  const getServerSnapshot = useCallback(() => {
+    if (isSelector) {
+      try { return selector!({} as S) } catch { return undefined }
+    } else {
+      return undefined
+    }
+  }, [selector, isSelector])
+
   const value = useSyncExternalStore(
     subscribe,
-    () => safeStore.get<T>(key) ?? undefined,
-    () => undefined // Server snapshot
-  ) as T | undefined
-
-  // Memoized setter
-  const setter = useMemo(() =>
-    (val: T | StateUpdater<T>, options?: PersistOptions) =>
-      safeStore.set<T>(key, val, options),
-    [safeStore, key]
+    getSnapshot as () => T | undefined, // Cast needed for union types
+    getServerSnapshot as () => T | undefined
   )
 
-  useDebugValue(value, v => `${key}: ${JSON.stringify(v)}`)
+  // 4. Setter (Only for Key Mode)
+  const setter = useCallback(
+    (val: T | StateUpdater<T>, options?: PersistOptions) => {
+      if (isSelector) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[gState] Cannot set value when using a selector.')
+        }
+        return false
+      }
+      return safeStore.set<T>(key!, val, options)
+    },
+    [safeStore, isSelector, key]
+  )
+
+  // Debug value
+  useDebugValue(value, v => isSelector ? `Selector: ${JSON.stringify(v)}` : `${key}: ${JSON.stringify(v)}`)
+
+  if (isSelector) {
+    return value as T
+  }
 
   return [value, setter] as const
 }
