@@ -2,13 +2,16 @@
 import { test as setup, expect } from '@playwright/test'
 
 import path from 'node:path'
-import pk from '../../app.json'
+import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const pk = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../app.json'), 'utf-8'))
 
 ///
 
-const
-  __dirname = path.resolve(),
-  authFile = path.join(__dirname, 'tests/playwright/.auth/user.json')
+const authFile = path.join(__dirname, '.auth/user.json')
 
 setup(
   'authenticate',
