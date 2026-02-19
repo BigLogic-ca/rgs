@@ -1,6 +1,6 @@
 # ❓ Chapter 7: FAQ - Architectural Insights
 
-This section provides technical context for the design decisions behind RGS (Argis) - React Globo State.
+This section provides technical context for the design decisions behind RGS (Argis) - Reactive Global State.
 
 ## 1. "Why integrate Security and GDPR into the State layer?"
 

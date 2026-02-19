@@ -1,6 +1,6 @@
-# 🌌 Argis (RGS) - React Globo State: The Final Guide
+# 🌌 Argis (RGS) - Reactive Global State: The Final Guide
 
-Welcome to the definitive documentation for **React Globo State (RGS)**. If you are here, you're likely tired of endless boilerplate, complex configurations, and state management tools that seem to require a PhD in rocket science.
+Welcome to the definitive documentation for **Reactive Global State (RGS)**. If you are here, you're likely tired of endless boilerplate, complex configurations, and state management tools that seem to require a PhD in rocket science.
 
 This documentation is written for everyone: from **easy setup** for those who just want things to work, to **advanced implementation** for those who want to master the engine.
 

@@ -1,7 +1,7 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.5.0",
-  "description": "Argis (RGS) - React Globo State: A react state everywhere made easy",
+  "version": "3.5.1",
+  "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
     "rgs",

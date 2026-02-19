@@ -1,6 +1,6 @@
 # Security
 
-React Globo State (RGS) implements enterprise-grade security including AES-256-GCM encryption, RBAC, and internal XSS sanitization as a secondary defense layer.
+Reactive Global State (RGS) implements enterprise-grade security including AES-256-GCM encryption, RBAC, and internal XSS sanitization as a secondary defense layer.
 
 ## Reporting a Vulnerability
 

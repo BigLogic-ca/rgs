@@ -1,6 +1,6 @@
 # RGS Highlighter
 
-VSCode extension for [RGS (React Globo State)](https://www.npmjs.com/package/rgs) - a powerful state management library with automatic persistence, atomic subscriptions, and built-in Immer support.
+VSCode extension for [RGS (Reactive Global State)](https://www.npmjs.com/package/rgs) - a powerful state management library with automatic persistence, atomic subscriptions, and built-in Immer support.
 
 ## What is RGS?
 

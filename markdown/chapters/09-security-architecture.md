@@ -1,7 +1,7 @@
 # Security Architecture & Hardening
 
 ## Overview
-React Globo State (RGS) is designed with a "Security-First" philosophy. Our architecture ensures that global state is not only reactive but protected against common web vulnerabilities and unauthorized access.
+Reactive Global State (RGS) is designed with a "Security-First" philosophy. Our architecture ensures that global state is not only reactive but protected against common web vulnerabilities and unauthorized access.
 
 ## 1. Data Sanitization (XSS Defense)
 The `sanitizeValue` utility provides a robust baseline defense by stripping malicious content from strings and objects before they enter the store.

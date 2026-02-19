@@ -1,4 +1,4 @@
-# Contributing to RGS (Argis) - React Globo State
+# Contributing to RGS (Argis) - Reactive Global State
 
 Thank you for your interest in contributing!
 
