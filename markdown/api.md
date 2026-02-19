@@ -1,6 +1,6 @@
 # 📚 API Reference
 
-Complete API reference for RGS (Argis) - React Globo State.
+Complete API reference for RGS (Argis) - Reactive Global State.
 
 ---
 
