@@ -1,5 +1,5 @@
 /**
- * Argis (RGS) - React Globo State - Advanced API
+ * Argis (RGS) - Reactive Global State - Advanced API
  * Expert-level state management utilities
  */
 
