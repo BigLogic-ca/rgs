@@ -1,6 +1,10 @@
 import { produce as _immerProduce, freeze as _immerFreeze } from 'immer'
 
 import * as Security from "./security"
+import * as Persistence from "./persistence"
+import * as Plugins from "./plugins"
+import { deepClone, isEqual } from './utils'
+
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
   ComputedSelector, WatcherCallback, IPlugin, PluginHookName,
@@ -24,8 +28,6 @@ export const StorageAdapters = {
     }
   }
 }
-
-import { deepClone, isEqual } from './utils'
 
 /**
  * Creates an enterprise-grade state management store.
@@ -55,8 +57,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     _currentVersion = config?.version ?? 0,
     _storage = config?.storage || StorageAdapters.local(),
     _onError = config?.onError,
-    _maxObjectSize = config?.maxObjectSize ?? (5 * 1024 * 1024),
-    _maxTotalSize = config?.maxTotalSize ?? (50 * 1024 * 1024),
+    _maxObjectSize = config?.maxObjectSize ?? 0,
+    _maxTotalSize = config?.maxTotalSize ?? 0,
     _encryptionKey = config?.encryptionKey ?? null,
     _validateInput = config?.validateInput ?? true,
     _auditEnabled = config?.auditEnabled ?? true,
@@ -64,24 +66,39 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     _immer = config?.immer ?? true,
     _persistByDefault = config?.persistByDefault ?? config?.persistence ?? config?.persist ?? false
 
-  // Pre-load Immer if enabled is handled by static import
-
   if (config?.accessRules) {
     config.accessRules.forEach(rule => Security.addAccessRule(_accessRules, rule.pattern, rule.permissions))
   }
 
   let
     _isTransaction = false, _pendingEmit = false, _isReady = false, _totalSize = 0,
-    _diskTimer: ReturnType<typeof setTimeout> | null = null
+    _diskTimer: ReturnType<typeof setTimeout> | null = null,
+    _snapshot: S | null = null // Cache for stable state snapshot
 
   let _readyResolver: () => void
   const _readyPromise = new Promise<void>(resolve => { _readyResolver = resolve })
 
+  // --- Context Helpers ---
+
+  const _getPrefix = () => `${_namespace}_`
+
+  const getPersistenceContext = (): Persistence.PersistenceContext => ({
+    store: _store, versions: _versions, sizes: _sizes, totalSize: _totalSize,
+    storage: _storage, config: config || {}, diskQueue: _diskQueue,
+    encryptionKey: _encryptionKey, audit: _audit,
+    onError: _onError as unknown as ((error: Error, metadata?: Record<string, unknown>) => void) | undefined,
+    silent: _silent, debounceTime: _debounceTime, currentVersion: _currentVersion
+  })
+
+  const getPluginContext = (): Plugins.PluginManagerContext<S> => ({
+    plugins: _plugins,
+    onError: _onError as unknown as ((error: Error, metadata?: Record<string, unknown>) => void) | undefined,
+    silent: _silent
+  })
+
   /**
    * Enterprise-grade iterative walker for precise memory estimation.
    * Faster than JSON.stringify and handles circular references accurately.
-   * @param val - Value to measure
-   * @returns Size in bytes
    */
   const _calculateSize = (val: unknown): number => {
     if (val === null || val === undefined) return 0
@@ -97,13 +114,10 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
 
     while (stack.length > 0) {
       const value = stack.pop()
-      if (typeof value === 'boolean') {
-        bytes += 4
-      } else if (typeof value === 'number') {
-        bytes += 8
-      } else if (typeof value === 'string') {
-        bytes += value.length * 2
-      } else if (typeof value === 'object' && value !== null) {
+      if (typeof value === 'boolean') { bytes += 4 }
+      else if (typeof value === 'number') { bytes += 8 }
+      else if (typeof value === 'string') { bytes += value.length * 2 }
+      else if (typeof value === 'object' && value !== null) {
         const obj = value as Record<string, unknown>
         if (seen.has(obj)) continue
         seen.add(obj)
@@ -120,104 +134,32 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     return bytes
   }
 
-  /**
- * Gets the storage key prefix for this namespace.
- * @returns Prefix string
- */
-  const _getPrefix = () => `${_namespace}_`
-
-  /**
- * Runs a plugin lifecycle hook.
- * @param name - Hook name to execute
- * @param context - Plugin context
- */
   const _runHook = (name: PluginHookName, context: PluginContext<S>) => {
-    if (_plugins.size === 0) return
-    for (const p of _plugins.values()) {
-      const hook = p.hooks?.[name]
-      if (hook) {
-        try { hook(context) }
-        catch (e) {
-          const error = e instanceof Error ? e : new Error(String(e))
-          if (_onError) _onError(error, { operation: `plugin:${p.name}:${name}`, key: context.key })
-          else if (!_silent) console.error(`[gState] Plugin "${p.name}" error:`, e)
-        }
-      }
-    }
+    Plugins.runHook(getPluginContext(), name, context)
   }
 
-  /**
-   * Records an audit log entry if auditing is enabled.
-   * Optimized to skip processing if no audit logger is configured.
-   */
   const _audit = (action: 'set' | 'get' | 'delete' | 'hydrate', key: string, success: boolean, error?: string) => {
     if (_auditEnabled && Security.isAuditActive() && Security.logAudit) {
       Security.logAudit({ timestamp: Date.now(), action, key, userId: _userId, success, error })
     }
   }
 
-  /**
- * Emits change notifications to subscribers.
- * Handles computed values, watchers, and listeners.
- * @param changedKey - Optional key that changed
- */
-  const _emit = (changedKey?: string) => {
-    if (changedKey) {
-      const dependents = _computedDeps.get(changedKey)
-      if (dependents) {
-        for (const compKey of dependents) _updateComputed(compKey)
-      }
+  // --- Reactivity ---
 
-      const watchers = _watchers.get(changedKey)
-      if (watchers) {
-        const val = instance.get(changedKey)
-        for (const w of watchers) {
-          try { w(val) }
-          catch (e) {
-            const error = e instanceof Error ? e : new Error(String(e))
-            if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
-            else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
-          }
-        }
-      }
-
-      const keyListeners = _keyListeners.get(changedKey)
-      if (keyListeners) {
-        for (const l of keyListeners) {
-          try { l() }
-          catch (e) {
-            const error = e instanceof Error ? e : new Error(String(e))
-            if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
-            else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
-          }
-        }
-      }
-    }
-    if (_isTransaction) { _pendingEmit = true; return }
-    for (const l of _listeners) {
-      try { l() }
-      catch (e) {
-        const error = e instanceof Error ? e : new Error(String(e))
-        if (_onError) _onError(error, { operation: 'listener' })
-        else if (!_silent) console.error(`[gState] Global listener error: `, e)
-      }
-    }
-  }
-
-  /**
- * Updates a computed value by running its selector.
- * @param key - Computed value key
- */
   const _updateComputed = (key: string) => {
-    const comp = _computed.get(key), depsFound = new Set<string>()
+    const comp = _computed.get(key)
     if (!comp) return
+
+    const depsFound = new Set<string>()
     const getter = <V>(k: string): V | null => {
       depsFound.add(k)
-      // Support computed dependencies: if the key is a computed value, retrieve its last calculated value
       if (_computed.has(k)) return _computed.get(k)!.lastValue as V
       return instance.get(k) as V | null
     }
+
     const newValue = comp.selector(getter)
+
+    // Update dependencies
     comp.deps.forEach(d => {
       if (!depsFound.has(d)) {
         const dependents = _computedDeps.get(d)
@@ -231,129 +173,105 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       }
     })
     comp.deps = depsFound
+
     if (!isEqual(comp.lastValue, newValue)) {
-      comp.lastValue = (_immer && newValue !== null && typeof newValue === 'object') ? _immerFreeze!(deepClone(newValue), true) : newValue
-      _versions.set(key, (_versions.get(key) || 0) + 1); _emit(key)
+      comp.lastValue = (_immer && newValue !== null && typeof newValue === 'object') ? _immerFreeze(deepClone(newValue), true) : newValue
+      _versions.set(key, (_versions.get(key) || 0) + 1)
+      _emit(key)
     }
   }
 
-  /**
- * Flushes the disk queue to persistent storage.
- * Handles encryption and encoding.
- */
-  const _flushDisk = async () => {
-    if (!_storage) return
-
-    // Save entire state under namespace key for simpler loading
-    try {
-      const stateObj: Record<string, unknown> = {}
-      _store.forEach((v, k) => { stateObj[k] = v })
-
-      let dataValue: unknown
-      const isEncoded = config?.encoded
-      if (isEncoded) {
-        dataValue = btoa(JSON.stringify(stateObj))
-      } else {
-        dataValue = JSON.stringify(stateObj)
-      }
-
-      _storage.setItem(_getPrefix().replace('_', ''), JSON.stringify({
-        v: 1, t: Date.now(), e: null,
-        d: dataValue, _sys_v: _currentVersion, _b64: isEncoded ? true : undefined
-      }))
-      _audit('set', 'FULL_STATE', true)
-    } catch (e) {
-      const error = e instanceof Error ? e : new Error(String(e))
-      if (_onError) _onError(error, { operation: 'persist', key: 'FULL_STATE' })
-      else if (!_silent) console.error(`[gState] Persist failed: `, error)
-    }
-
-    const queue = Array.from(_diskQueue.entries()); _diskQueue.clear()
-    for (const [key, data] of queue) {
-      // Old individual key persistence (kept for backward compatibility)
-      try {
-        let dataValue: unknown = data.value
-        const isEncoded = data.options.encoded || data.options.secure
-        if (data.options.encrypted) {
-          if (!_encryptionKey) throw new Error(`Encryption key missing for "${key}"`)
-          dataValue = await Security.encrypt(data.value, _encryptionKey)
-        } else if (isEncoded) {
-          dataValue = btoa(JSON.stringify(data.value))
-        } else if (typeof data.value === 'object' && data.value !== null) {
-          dataValue = JSON.stringify(data.value)
+  const _emit = (changedKey?: string) => {
+    if (changedKey) {
+      // 1. Update computed dependent on this key
+      if (_computedDeps.has(changedKey)) {
+        const dependents = _computedDeps.get(changedKey)!
+        for (const dependentKey of dependents) {
+          _updateComputed(dependentKey)
         }
+      }
 
-        _storage.setItem(`${_getPrefix()}${key}`, JSON.stringify({
-          v: (_versions.get(key) || 1), t: Date.now(), e: data.options.ttl ? Date.now() + data.options.ttl : null,
-          d: dataValue, _sys_v: _currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: isEncoded ? true : undefined
-        }))
-        _audit('set', key, true)
-      } catch (e) {
-        const error = e instanceof Error ? e : new Error(String(e))
-        if (_onError) _onError(error, { operation: 'persist', key })
-        else if (!_silent) console.error(`[gState] Persist failed: `, error)
+      // 2. Notify Watchers
+      const watchers = _watchers.get(changedKey)
+      if (watchers) {
+        const val = instance.get(changedKey)
+        for (const w of watchers) {
+          try { w(val) }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
+            else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+          }
+        }
+      }
+
+      // 3. Notify Key Listeners
+      const keyListeners = _keyListeners.get(changedKey)
+      if (keyListeners) {
+        for (const l of keyListeners) {
+          try { l() }
+          catch (e) {
+            const error = e instanceof Error ? e : new Error(String(e))
+            if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
+            else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+          }
+        }
       }
     }
+
+    if (_isTransaction) { _pendingEmit = true; return }
+
+    // 4. Notify Global Listeners
+    for (const l of _listeners) {
+      try { l() }
+      catch (e) {
+        const error = e instanceof Error ? e : new Error(String(e))
+        if (_onError) _onError(error, { operation: 'listener' })
+        else if (!_silent) console.error(`[gState] Global listener error: `, e)
+      }
+    }
+  }
+
+  const _flushDisk = async () => {
+    // We pass current values to the persistence module
+    // Note: totalSize update is not handled here as flush doesn't change memory size
+    Persistence.flushDisk(getPersistenceContext())
   }
 
   /**
    * Plugin namespace for safely storing plugin methods.
-   * Prevents method name collisions with core store methods.
    */
   const _methodNamespace: Record<string, Record<string, unknown>> = {}
 
   const instance: IStore<S> = {
-    /**
- * Sets a value in the store without triggering listeners or persistence.
- * Internal method for plugin/system use.
- * @param key - Store key
- * @param value - Value to set
- */
     _setSilently: (key: string, value: unknown) => {
       const oldSize = _sizes.get(key) || 0, frozen = (_immer && value !== null && typeof value === 'object') ? _immerFreeze!(deepClone(value), true) : value
-      const newSize = _calculateSize(frozen)
+      const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && process.env.NODE_ENV !== 'production'
+      const newSize = hasLimits ? _calculateSize(frozen) : 0
+
       _totalSize = _totalSize - oldSize + newSize
       _sizes.set(key, newSize)
       _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
+      _snapshot = null // Invalidate snapshot
     },
     /**
- * Registers a custom method on the store instance.
- * @param name - Method name
- * @param fn - Method function
- */
-    _registerMethod: (pluginNameOrName: string, methodNameOrFn: string | ((...args: unknown[]) => unknown), fn?: (...args: unknown[]) => unknown) => {
+     * Registers a custom method on the store instance.
+     * @param pluginName - Plugin name
+     * @param methodName - Method name
+     * @param fn - Method function
+     */
+    _registerMethod: (pluginName: string, methodName: string, fn: (...args: unknown[]) => unknown) => {
       const isUnsafeKey = (key: string): boolean =>
         key === '__proto__' || key === 'constructor' || key === 'prototype'
 
-      // PRO-MODE: Formal signature (pluginName, methodName, fn)
-      if (fn !== undefined) {
-        const pluginName = pluginNameOrName
-        const methodName = methodNameOrFn as string
-
-        if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
-          console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
-          return
-        }
-
-        if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
-        _methodNamespace[pluginName]![methodName] = fn
+      if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
+        console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
         return
       }
 
-      // DEPRECATED/LEGACY: signature (name, fn) - emits warning
-      console.warn('[gState] _registerMethod(name, fn) is deprecated. Use _registerMethod(pluginName, methodName, fn) instead.')
-      const name = pluginNameOrName
-      const methodFn = methodNameOrFn as (...args: unknown[]) => unknown
-      if (!_methodNamespace['core']) _methodNamespace['core'] = {}
-      _methodNamespace['core']![name] = methodFn
+      if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
+      _methodNamespace[pluginName]![methodName] = fn
     },
-    /**
- * Sets a value in the store.
- * @param key - Store key
- * @param valOrUp - Value or updater function (for Immer)
- * @param options - Persistence options
- * @returns True if value was actually changed
- */
     set: (key: string, valOrUp: unknown, options: PersistOptions = {}): boolean => {
       const oldVal = _store.get(key), newVal = _immer && typeof valOrUp === 'function' ? _immerProduce!(oldVal, valOrUp as (draft: unknown) => void) : valOrUp
       if (_validateInput && !Security.validateKey(key)) { if (!_silent) console.warn(`[gState] Invalid key: ${key}`); return false }
@@ -366,8 +284,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze(deepClone(sani), true) : sani
 
       if (!isEqual(oldVal, frozen)) {
-        // Sentinel Optimization: Only calculate size if limits are enabled
-        const hasLimits = _maxObjectSize > 0 || _maxTotalSize > 0
+        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && process.env.NODE_ENV !== 'production'
         const finalSize = hasLimits ? _calculateSize(frozen) : 0
 
         if (_maxObjectSize > 0 && finalSize > _maxObjectSize) {
@@ -388,7 +305,9 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
-        // Persist if requested in options or if persistByDefault is enabled
+
+        _snapshot = null // Invalidate snapshot
+
         const shouldPersist = options.persist ?? _persistByDefault
         if (shouldPersist) {
           _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist, encoded: options.encoded || config?.encoded } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
@@ -410,12 +329,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       _audit('get', key, true)
       return val as T
     },
-    /**
- * Creates or retrieves a computed (derived) value.
- * @param key - Computed value key
- * @param selector - Function to compute the value
- * @returns The computed value
- */
     compute: <T>(key: string, selector: ComputedSelector<T>): T => {
       try {
         if (!_computed.has(key)) { _computed.set(key, { selector: selector as ComputedSelector<unknown>, lastValue: null, deps: new Set() }); _updateComputed(key) }
@@ -427,22 +340,11 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         return null as unknown as T
       }
     },
-    /**
- * Watches for changes to a specific key.
- * @param key - Key to watch
- * @param callback - Callback function
- * @returns Unsubscribe function
- */
     watch: <T>(key: string, callback: WatcherCallback<T>) => {
       if (!_watchers.has(key)) _watchers.set(key, new Set())
       const set = _watchers.get(key)!; set.add(callback as WatcherCallback<unknown>)
       return () => { set.delete(callback as WatcherCallback<unknown>); if (set.size === 0) _watchers.delete(key) }
     },
-    /**
- * Removes a key from the store.
- * @param key - Key to remove
- * @returns True if key was removed
- */
     remove: (key: string): boolean => {
       if (!Security.hasPermission(_accessRules, key, 'delete', _userId)) {
         _audit('delete', key, false, 'RBAC Denied')
@@ -453,94 +355,47 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize -= (_sizes.get(key) || 0)
         _sizes.delete(key)
         _runHook('onRemove', { store: instance, key, value: old })
+        _snapshot = null // Invalidate snapshot
       }
       _versions.set(key, (_versions.get(key) || 0) + 1)
-      if (_storage) _storage.removeItem(`${_getPrefix()}${key} `)
+      if (_storage) _storage.removeItem(`${_getPrefix()}${key}`)
+
       _audit('delete', key, true)
       _emit(key); return deleted
     },
-    /**
- * Alias for remove.
- * @param key - Key to delete
- */
     delete: (key: string) => instance.remove(key),
-    /**
- * Removes all keys from the store and storage.
- * @returns True
- */
     deleteAll: () => {
       Array.from(_store.keys()).forEach(k => instance.remove(k))
       if (_storage) {
-        const prefix = _getPrefix()
+        const prefix = _namespace + "_"
         for (let i = 0; i < (_storage.length || 0); i++) {
           const k = _storage.key(i); if (k?.startsWith(prefix)) { _storage.removeItem(k); i-- }
         }
       }
       _totalSize = 0
       _sizes.clear()
+      _snapshot = null // Invalidate snapshot
       return true
     },
-    /**
- * Returns all store values as an object.
- * @returns Object with all key-value pairs
- */
     list: () => Object.fromEntries(_store.entries()),
-    /**
- * Adds a middleware function to the store.
- * @param m - Middleware function
- */
     use: (m: Middleware) => { _middlewares.add(m) },
-    /**
- * Executes multiple operations in a single transaction.
- * Batches listener notifications until all operations complete.
- * @param fn - Transaction function
- */
     transaction: (fn: () => void) => {
       _isTransaction = true; _runHook('onTransaction', { store: instance, key: 'START' })
       try { fn() } finally { _isTransaction = false; _runHook('onTransaction', { store: instance, key: 'END' }); if (_pendingEmit) { _pendingEmit = false; _emit() } }
     },
-    /**
- * Destroys the store instance.
- * Removes all listeners, watchers, and clears data.
- */
     destroy: () => {
-      // Cleanup timers and pending disk operations
       if (_diskTimer) { clearTimeout(_diskTimer); _diskTimer = null }
       _diskQueue.clear()
-
       if (typeof window !== 'undefined') window.removeEventListener('beforeunload', _unloadHandler)
       _runHook('onDestroy', { store: instance })
-
-      // Clear all internal state
       _listeners.clear(); _keyListeners.clear(); _watchers.clear(); _computed.clear()
       _computedDeps.clear(); _plugins.clear(); _store.clear(); _sizes.clear(); _totalSize = 0
       _accessRules.clear(); _consents.clear(); _versions.clear(); _regexCache.clear(); _middlewares.clear()
     },
-    /**
- * Adds a plugin to the store.
- * @param p - Plugin instance
- */
     _addPlugin: (p: IPlugin<S>) => {
-      try {
-        _plugins.set(p.name, p)
-        p.hooks?.onInstall?.({ store: instance })
-      } catch (e) {
-        const error = e instanceof Error ? e : new Error(String(e))
-        if (_onError) _onError(error, { operation: 'plugin:install', key: p.name })
-        else if (!_silent) console.error(`[gState] Failed to install plugin "${p.name}": `, e)
-      }
+      Plugins.installPlugin(getPluginContext(), p, instance)
     },
-    /**
- * Removes a plugin from the store.
- * @param name - Plugin name to remove
- */
     _removePlugin: (name: string) => { _plugins.delete(name) },
-    /**
- * Subscribes to store changes.
- * @param cb - Callback function
- * @param key - Optional key to subscribe to specific key
- * @returns Unsubscribe function
- */
     _subscribe: (cb: StoreSubscriber, key?: string) => {
       if (key) {
         if (!_keyListeners.has(key)) _keyListeners.set(key, new Set())
@@ -549,18 +404,10 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       }
       _listeners.add(cb); return () => _listeners.delete(cb)
     },
-    /**
- * Gets the version number for a key.
- * @param key - Store key
- * @returns Version number
- */
     _getVersion: (key: string) => _versions.get(key) ?? 0,
 
     // Enterprise Security & Compliance
     addAccessRule: (pattern, permissions) => Security.addAccessRule(_accessRules, pattern, permissions),
-    /**
-     * Checks permission using instance-specific regex cache for performance.
-     */
     hasPermission: (key, action, userId) => {
       if (_accessRules.size === 0) return true
       for (const [pattern, perms] of _accessRules) {
@@ -585,10 +432,13 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     exportUserData: (userId) => Security.exportUserData(_consents, userId),
     deleteUserData: (userId) => Security.deleteUserData(_consents, userId),
 
-    /**
- * Returns the plugin methods namespace.
- * Provides safe access to plugin methods via store.plugins.undoRedo.undo()
- */
+    getSnapshot: (): S => {
+      if (!_snapshot) {
+        _snapshot = Object.fromEntries(_store.entries()) as S
+      }
+      return _snapshot
+    },
+
     get plugins() { return _methodNamespace as unknown as GStatePlugins },
     get isReady() { return _isReady },
     get namespace() { return _namespace },
@@ -596,7 +446,6 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     whenReady: () => _readyPromise
   }
 
-  // Register security methods under 'security' namespace too for consistency
   const secMethods = ['addAccessRule', 'recordConsent', 'hasConsent', 'getConsents', 'revokeConsent', 'exportUserData', 'deleteUserData']
   secMethods.forEach(m => {
     const fn = (instance as unknown as Record<string, (...args: unknown[]) => unknown>)[m]
@@ -607,59 +456,19 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
   if (typeof window !== 'undefined') window.addEventListener('beforeunload', _unloadHandler)
 
   if (_storage) {
-    /**
- * Hydrates the store from persistent storage.
- * Loads persisted values, handles encryption/decryption, and runs migrations.
- */
-    const hydrate = async () => {
-      try {
-        const persisted: Record<string, unknown> = {}, prefix = _getPrefix()
-        let savedV = 0
-        for (let i = 0; i < (_storage.length || 0); i++) {
-          const k = _storage.key(i)
-          if (!k || !k.startsWith(prefix)) continue
-          const raw = _storage.getItem(k)
-          if (!raw) continue
-          try {
-            const meta = JSON.parse(raw), key = k.substring(prefix.length)
-
-            // Version fallback for older stores where _sys_v was v
-            savedV = Math.max(savedV, meta._sys_v !== undefined ? meta._sys_v : (meta.v || 0))
-
-            if (meta.e && Date.now() > meta.e) { _storage.removeItem(k); i--; continue }
-            let d = meta.d
-            if (meta._enc && _encryptionKey) {
-              d = await Security.decrypt(d, _encryptionKey)
-            } else if (typeof d === "string") {
-              if (meta._b64) { try { d = JSON.parse(atob(d)) } catch (_e) { } }
-              else if (d.startsWith("{") || d.startsWith("[")) { try { d = JSON.parse(d) } catch (_e) { } }
-            }
-            persisted[key] = d; _audit('hydrate', key, true)
-          } catch (err) {
-            _audit('hydrate', k, false, String(err))
-            const error = err instanceof Error ? err : new Error(String(err))
-            if (_onError) _onError(error, { operation: 'hydration', key: k })
-            else if (!_silent) console.error(`[gState] Hydration failed for "${k}": `, err)
-          }
-        }
-        const final = (savedV < _currentVersion && config?.migrate) ? config.migrate(persisted, savedV) : persisted
-        Object.entries(final).forEach(([k, v]) => {
-          const frozen = (_immer && v !== null && typeof v === 'object') ? _immerFreeze!(deepClone(v as object), true) : v
-          const size = _calculateSize(frozen)
-          const oldSize = _sizes.get(k) || 0
-          _totalSize = _totalSize - oldSize + size
-          _sizes.set(k, size)
-          _store.set(k, frozen); _versions.set(k, 1)
-        })
-        _isReady = true; _readyResolver(); _emit()
-      } catch (e) {
-        _isReady = true; _readyResolver()
-        const error = e instanceof Error ? e : new Error(String(e))
-        if (_onError) _onError(error, { operation: 'hydration' })
-        else if (!_silent) console.error(`[gState] Hydration failed: `, error)
-      }
-    }
-    hydrate()
+    Persistence.hydrateStore(
+      getPersistenceContext(),
+      // We pass the calculateSize function to update memory usage correctly after hydration
+      (val) => {
+        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && process.env.NODE_ENV !== 'production'
+        return hasLimits ? _calculateSize(val) : 0
+      },
+      () => { _isReady = true; _snapshot = null; _readyResolver(); _emit() }
+    ).then(() => {
+      // Hydration logic handles isReady and emit internally via callback or promise resolution if needed
+      // But here we rely on the callback passed to hydrateStore
+    })
   } else { _isReady = true; _readyResolver!() }
+
   return instance
 }

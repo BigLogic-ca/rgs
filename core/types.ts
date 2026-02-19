@@ -165,7 +165,6 @@ export interface IStore<S extends Record<string, unknown> = Record<string, unkno
   _subscribe(cb: StoreSubscriber, key?: string): () => void
   _getVersion(key: string): number
   _setSilently(key: string, value: unknown): void
-  _registerMethod(name: string, fn: (...args: unknown[]) => unknown): void
   /**
    * Registers a method from a specific plugin.
    * @param pluginName - Name of the plugin
@@ -173,6 +172,12 @@ export interface IStore<S extends Record<string, unknown> = Record<string, unkno
    * @param fn - Method function
    */
   _registerMethod(pluginName: string, methodName: string, fn: (...args: unknown[]) => unknown): void
+
+  /**
+   * Returns a coherent snapshot of the entire store state.
+   * Optimized for React's useSyncExternalStore.
+   */
+  getSnapshot(): S
 
   // Security & Compliance (Enterprise)
   addAccessRule(pattern: string | ((key: string, userId?: string) => boolean), permissions: Permission[]): void

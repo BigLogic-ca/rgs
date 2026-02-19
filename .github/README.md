@@ -110,15 +110,19 @@ graph TB
 
 ### Path A: The Zen Way (Modular)
 
-Best for modern applications. Clean imports, zero global pollution.
+Best for modern applications. Clean imports, zero global pollution, **Type-Safe**.
 
 ```tsx
 import { gstate } from '@biglogic/rgs'
 
-// gstate CREATES a custom hook - it is NOT imported!
-const useCounter = gstate({ count: 0 })
+// 1. Create a typed store hook
+const useCounter = gstate({ count: 0, user: { name: 'Alice' } })
 
-// In your component
+// 2. Use with Type-Safe Selectors (Preferred)
+const count = useCounter(state => state.count)
+const userName = useCounter(state => state.user.name)
+
+// OR use string keys (Legacy)
 const [count, setCount] = useCounter('count')
 ```
 
@@ -192,9 +196,9 @@ Protect your app from memory issues with automatic size warnings:
 
 ```tsx
 const store = gstate({ data: {} }, {
-  // Warn if single value exceeds 5MB (default)
+  // Warn if single value exceeds 5MB (Default is 0/Disabled for performance)
   maxObjectSize: 5 * 1024 * 1024,
-  // Warn if total store exceeds 50MB (default)
+  // Warn if total store exceeds 50MB (Default is 0/Disabled)
   maxTotalSize: 50 * 1024 * 1024
 })
 ```

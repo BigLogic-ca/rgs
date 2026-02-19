@@ -145,6 +145,7 @@ export type {
 // Global Augmentation
 // ============================================================================
 
+/* eslint-disable no-var */
 declare global {
   var createStore: typeof baseCreateStore
   var gstate: <S extends Record<string, unknown>>(initialState: S, configOrNamespace?: string | StoreConfig<S>) => IStore<S> & ((key: string) => unknown)

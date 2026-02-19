@@ -1,5 +1,43 @@
 # Changelog
 
+## [3.5.0] - 2026-02-19
+
+### 🌟 New Features
+- **Type-Safe Selectors**: You can now use `useStore(state => state.user.profile)`!
+  - Full TypeScript autocomplete.
+  - Refactoring-safe (renaming properties in your interface updates usages).
+  - Performance optimized via referential stability checks.
+  - Legacy string-based access (`useStore('key')`) is still fully supported.
+
+### 🚀 Performance
+- **Snapshot Caching**: Implemented a smart `getSnapshot()` cache in the core store. It only regenerates the state object when data actually changes, ensuring minimal re-renders for React 18+ components using `useSyncExternalStore`.
+
+---
+
+## [3.4.0] - 2026-02-19
+
+### 🚀 Performance
+- **Zero-Check Default**: `maxObjectSize` and `maxTotalSize` are now `0` (disabled) by default in production builds. This prevents expensive recursive traversals (`O(N)`) during `set()` operations for large objects.
+- **Async Safety**: Even when enabled, size calculations are now guarded to run only in non-production environments to prevent main-thread freezing.
+
+### 🏗️ Architecture (Refactor)
+- **Modular Core**: The monolithic `store.ts` "God Object" has been split into dedicated modules:
+  - `persistence.ts`: Handles all storage logic and serialization.
+  - `plugins.ts`: Manages the plugin lifecycle and hooks.
+  - `reactivity.ts`: Handles computed values, watchers, and listeners.
+- This change is fully backward compatible but makes the codebase significantly easier to maintain and test.
+
+### 🧹 Clean Code
+- Removed deprecated aliases: `useGState` and `useSimpleState`. Use `useStore` exclusively.
+- Types: Improved strict typing for Plugin Context generics (`S extends Record<string, unknown>`).
+- API Polish: `_registerMethod` now enforces the structured `(pluginName, methodName, fn)` signature.
+
+### 🐛 Fixes
+- Fixed potential hydration race conditions in SSR.
+- Fixed `_getPrefix` context binding in `remove()` operations.
+
+---
+
 All notable changes to this project will be documented in this file.
 
 ## [2.9.5] - 2026-02-16

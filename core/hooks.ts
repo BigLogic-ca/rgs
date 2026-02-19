@@ -1,4 +1,4 @@
-import { useSyncExternalStore, useDebugValue, useMemo } from "react"
+import { useSyncExternalStore, useDebugValue, useMemo, useCallback } from "react"
 import { createStore } from "./store"
 import type { IStore, StoreConfig, PersistOptions, StateUpdater } from "./types"
 
@@ -72,27 +72,30 @@ const _isServer = (): boolean =>
 
 /**
  * Reactive Hook for state management.
- * SSR-safe with proper hydration support.
  *
- * @param key - State key to subscribe to
- * @param store - Optional store instance (uses default if not provided)
- * @returns Tuple of [value, setter]
- *
- * @example
- * const [count, setCount] = useStore('count')
- * // count will be undefined on SSR, actual value on client
+ * Supports two modes:
+ * 1. String Key: `useStore('count')` -> Returns [value, setter]
+ * 2. Type-Safe Selector: `useStore(state => state.count)` -> Returns value (Read-only)
  */
-export const useStore = <T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
+export function useStore<T, S extends Record<string, unknown> = Record<string, unknown>>(
+  selector: (state: S) => T,
+  store?: IStore<S>
+): T
+export function useStore<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
   key: string,
   store?: IStore<S>
-): readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean] => {
-  // Memoize store reference - always call this hook
+): readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean]
+export function useStore<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>(
+  keyOrSelector: string | ((state: S) => T),
+  store?: IStore<S>
+): T | readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean] {
+  // Memoize store reference
   const targetStore = useMemo(() =>
-    (store || _defaultStore) as IStore<Record<string, unknown>> | null,
+    (store || _defaultStore) as IStore<S> | null,
     [store]
   )
 
-  // Ghost store fallback - ultra-light silent safe defaults for SSR/Missing store
+  // Ghost store fallback
   const ghostStore = useMemo(() => {
     const noop = () => { }
     const noopFalse = () => false
@@ -104,42 +107,76 @@ export const useStore = <T = unknown, S extends Record<string, unknown> = Record
       _subscribe: () => () => { }, _setSilently: noop, _registerMethod: noop,
       _addPlugin: noop, _removePlugin: noop, _getVersion: () => 0,
       get isReady() { return false }, whenReady: () => Promise.resolve(),
-      get plugins() { return {} }
-    }
-  }, []) as unknown as IStore<Record<string, unknown>>
+      get plugins() { return {} },
+      getSnapshot: () => ({} as S), // Ghost snapshot
+      get namespace() { return "ghost" }, get userId() { return undefined }
+    } as unknown as IStore<S>
+  }, [])
 
-  // Use ghost store if no store is available
   const safeStore = targetStore || ghostStore
 
-  // SSR-safe subscription
-  const subscribe = useMemo(() =>
-    (callback: () => void) => safeStore._subscribe(callback, key),
-    [safeStore, key]
+  const isSelector = typeof keyOrSelector === 'function'
+  const key = !isSelector ? (keyOrSelector as string) : null
+  const selector = isSelector ? (keyOrSelector as (state: S) => T) : null
+
+  // 1. Subscribe
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      if (isSelector) {
+        // Selector mode: subscribe to all changes
+        return safeStore._subscribe(callback)
+      } else {
+        // Key mode: subscribe to key changes
+        return safeStore._subscribe(callback, key!)
+      }
+    },
+    [safeStore, isSelector, key]
   )
 
-  // Get current value (undefined on SSR, actual value on client)
+  // 2. Get Snapshot (Client)
+  const getSnapshot = useCallback(() => {
+    if (isSelector) {
+      return selector!(safeStore.getSnapshot())
+    } else {
+      return safeStore.get<T>(key!) ?? undefined
+    }
+  }, [safeStore, isSelector, key, selector])
+
+  // 3. Get Snapshot (Server)
+  const getServerSnapshot = useCallback(() => {
+    if (isSelector) {
+      try { return selector!({} as S) } catch { return undefined }
+    } else {
+      return undefined
+    }
+  }, [selector, isSelector])
+
   const value = useSyncExternalStore(
     subscribe,
-    () => safeStore.get<T>(key) ?? undefined,
-    () => undefined // Server snapshot returns undefined
-  ) as T | undefined
-
-  // Memoized setter to prevent unnecessary re-renders
-  const setter = useMemo(() =>
-    (val: T | StateUpdater<T>, options?: PersistOptions) =>
-      safeStore.set<T>(key, val, options),
-    [safeStore, key]
+    getSnapshot as () => T | undefined, // Cast needed for union types
+    getServerSnapshot as () => T | undefined
   )
 
-  // Debug value for React DevTools
-  useDebugValue(value, v => `${key}: ${JSON.stringify(v)}`)
+  // 4. Setter (Only for Key Mode)
+  const setter = useCallback(
+    (val: T | StateUpdater<T>, options?: PersistOptions) => {
+      if (isSelector) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[gState] Cannot set value when using a selector.')
+        }
+        return false
+      }
+      return safeStore.set<T>(key!, val, options)
+    },
+    [safeStore, isSelector, key]
+  )
+
+  // Debug value
+  useDebugValue(value, v => isSelector ? `Selector: ${JSON.stringify(v)}` : `${key}: ${JSON.stringify(v)}`)
+
+  if (isSelector) {
+    return value as T
+  }
 
   return [value, setter] as const
 }
-
-// Legacy aliases - DEPRECATED, will be removed in next major
-/** @deprecated Use useStore instead */
-export const useGState = useStore
-
-/** @deprecated Use useStore instead */
-export const useSimpleState = useStore
