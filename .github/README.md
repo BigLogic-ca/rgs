@@ -61,7 +61,24 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 
 ---
 
-### Installation?
+## ⚔️ The Arena: RGS vs The World
+
+|Feature|**RGS (Argis)**|Zustand|Redux Toolkit|Recoil|
+|:---|:---|:---|:---|:---|
+| **Philosophy** | **Zen State** | Minimalist | Enterprise Flux | Atomic |
+| **API Surface** | **1 Function** | Simple | Complex | Complex |
+| **Mutations** | **Magic (Immer)** | Manual Spreads | Magic (Immer) | Manual |
+| **Selectors** | ✅ **Type-Safe** | ✅ Functional | ✅ Functional | ⚠️ Selectors |
+| **Security** | 🛡️ **AES-256 + RBAC** | ❌ None | ❌ Ecosystem | ❌ None |
+| **Persistence** | 💾 **First-class** | 🔌 Middleware | 🔌 Middleware | 🔌 Effects |
+| **Async** | ✅ **Atomic** | ✅ Async/Await | ✅ Thunks | ✅ Suspense |
+| **Bundle Size** | **~2kB** | ~1kB | >10kB | >20kB |
+
+> **RGS** is the only library on the market that treats **Security** and **Persistence** as first-class citizens.
+
+---
+
+### Installation
 
 ```shell
 npm install @biglogic/rgs
