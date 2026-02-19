@@ -184,9 +184,11 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
   const _emit = (changedKey?: string) => {
     if (changedKey) {
       // 1. Update computed dependent on this key
-      const dependents = _computedDeps.get(changedKey)
-      if (dependents) {
-        for (const compKey of dependents) _updateComputed(compKey)
+      if (_computedDeps.has(changedKey)) {
+        const dependents = _computedDeps.get(changedKey)!
+        for (const dependentKey of dependents) {
+          _updateComputed(dependentKey)
+        }
       }
 
       // 2. Notify Watchers
