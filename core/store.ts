@@ -72,7 +72,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
 
   let
     _isTransaction = false, _pendingEmit = false, _isReady = false, _totalSize = 0,
-    _diskTimer: ReturnType<typeof setTimeout> | null = null
+    _diskTimer: ReturnType<typeof setTimeout> | null = null,
+    _snapshot: S | null = null // Cache for stable state snapshot
 
   let _readyResolver: () => void
   const _readyPromise = new Promise<void>(resolve => { _readyResolver = resolve })
@@ -249,30 +250,25 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       _totalSize = _totalSize - oldSize + newSize
       _sizes.set(key, newSize)
       _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
+      _snapshot = null // Invalidate snapshot
     },
-    _registerMethod: (pluginNameOrName: string, methodNameOrFn: string | ((...args: unknown[]) => unknown), fn?: (...args: unknown[]) => unknown) => {
+    /**
+     * Registers a custom method on the store instance.
+     * @param pluginName - Plugin name
+     * @param methodName - Method name
+     * @param fn - Method function
+     */
+    _registerMethod: (pluginName: string, methodName: string, fn: (...args: unknown[]) => unknown) => {
       const isUnsafeKey = (key: string): boolean =>
         key === '__proto__' || key === 'constructor' || key === 'prototype'
 
-      if (fn !== undefined) {
-        const pluginName = pluginNameOrName
-        const methodName = methodNameOrFn as string
-
-        if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
-          console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
-          return
-        }
-
-        if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
-        _methodNamespace[pluginName]![methodName] = fn
+      if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
+        console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
         return
       }
 
-      console.warn('[gState] _registerMethod(name, fn) is deprecated. Use _registerMethod(pluginName, methodName, fn) instead.')
-      const name = pluginNameOrName
-      const methodFn = methodNameOrFn as (...args: unknown[]) => unknown
-      if (!_methodNamespace['core']) _methodNamespace['core'] = {}
-      _methodNamespace['core']![name] = methodFn
+      if (!_methodNamespace[pluginName]) _methodNamespace[pluginName] = {}
+      _methodNamespace[pluginName]![methodName] = fn
     },
     set: (key: string, valOrUp: unknown, options: PersistOptions = {}): boolean => {
       const oldVal = _store.get(key), newVal = _immer && typeof valOrUp === 'function' ? _immerProduce!(oldVal, valOrUp as (draft: unknown) => void) : valOrUp
@@ -307,6 +303,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
         _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
+
+        _snapshot = null // Invalidate snapshot
 
         const shouldPersist = options.persist ?? _persistByDefault
         if (shouldPersist) {
@@ -355,6 +353,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         _totalSize -= (_sizes.get(key) || 0)
         _sizes.delete(key)
         _runHook('onRemove', { store: instance, key, value: old })
+        _snapshot = null // Invalidate snapshot
       }
       _versions.set(key, (_versions.get(key) || 0) + 1)
       if (_storage) _storage.removeItem(`${_getPrefix()}${key}`)
@@ -373,6 +372,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       }
       _totalSize = 0
       _sizes.clear()
+      _snapshot = null // Invalidate snapshot
       return true
     },
     list: () => Object.fromEntries(_store.entries()),
@@ -430,6 +430,13 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     exportUserData: (userId) => Security.exportUserData(_consents, userId),
     deleteUserData: (userId) => Security.deleteUserData(_consents, userId),
 
+    getSnapshot: (): S => {
+      if (!_snapshot) {
+        _snapshot = Object.fromEntries(_store.entries()) as S
+      }
+      return _snapshot
+    },
+
     get plugins() { return _methodNamespace as unknown as GStatePlugins },
     get isReady() { return _isReady },
     get namespace() { return _namespace },
@@ -454,7 +461,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && process.env.NODE_ENV !== 'production'
         return hasLimits ? _calculateSize(val) : 0
       },
-      () => { _isReady = true; _readyResolver(); _emit() }
+      () => { _isReady = true; _snapshot = null; _readyResolver(); _emit() }
     ).then(() => {
       // Hydration logic handles isReady and emit internally via callback or promise resolution if needed
       // But here we rely on the callback passed to hydrateStore
