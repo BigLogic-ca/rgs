@@ -1,0 +1,105 @@
+npm verbose cli C:\Program Files\nodejs\node.exe C:\Users\dario\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+npm info using npm@11.10.0
+npm info using node@v24.5.0
+npm verbose title npm exec playwright test --config tests/playwright/playwright.config.ts --project=production
+npm verbose argv "exec" "--yes" "--" "playwright" "test" "--config" "tests/playwright/playwright.config.ts" "--project=production"
+npm verbose logfile logs-max:10 dir:C:\Users\dario\AppData\Local\npm-cache\_logs\2026-02-20T03_27_57_214Z-
+npm verbose logfile C:\Users\dario\AppData\Local\npm-cache\_logs\2026-02-20T03_27_57_214Z-debug-0.log
+npm http fetch GET 200 https://registry.npmjs.org/playwright 229ms (cache revalidated)
+Error: Playwright Test did not expect test.use() to be called here.
+Most common reasons include:
+- You are calling test.use() in a configuration file.
+- You are calling test.use() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+
+   at api.test.ts:12
+
+  10 |
+  11 | // Configure baseURL for this file.
+> 12 | test.use({ baseURL: pk.app.host.prod })
+     |      ^
+  13 |
+  14 | test(
+  15 |   'check intro contents',
+    at TestTypeImpl._currentSuite (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:75:13)
+    at TestTypeImpl._use (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:230:24)
+    at Function.use (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\transform\transform.js:282:12)
+    at A:\RnD\biglogic.rgs\tests\playwright\tests\api.test.ts:12:6
+
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+
+   at encryption.test.ts:7
+
+   5 | import { test, expect } from '@playwright/test'
+   6 |
+>  7 | test.describe('AES-256-GCM Encryption', () => {
+     |      ^
+   8 |   test.beforeEach(async ({ page }) => {
+   9 |     // Navigate to a secure context to enable Web Crypto APIs
+  10 |     await page.goto('https://example.com')
+    at TestTypeImpl._currentSuite (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:75:13)
+    at TestTypeImpl._describe (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:115:24)
+    at Function.describe (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\transform\transform.js:282:12)
+    at A:\RnD\biglogic.rgs\tests\playwright\tests\encryption.test.ts:7:6
+
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+
+   at lab.test.ts:7
+
+   5 |  * This test simulates multiple browser contexts interacting concurrently.
+   6 |  */
+>  7 | test.describe('Test Lab: Cross-Tab Resilience', () => {
+     |      ^
+   8 |   test('Sync consistency across multiple concurrent tabs', async ({ context }) => {
+   9 |     // Open 3 independent tabs with a real origin (data URLs or unique origins)
+  10 |     const pages = await Promise.all([
+    at TestTypeImpl._currentSuite (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:75:13)
+    at TestTypeImpl._describe (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:115:24)
+    at Function.describe (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\transform\transform.js:282:12)
+    at A:\RnD\biglogic.rgs\tests\playwright\tests\lab.test.ts:7:6
+
+Error: Playwright Test did not expect test.use() to be called here.
+Most common reasons include:
+- You are calling test.use() in a configuration file.
+- You are calling test.use() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+
+   at simple.test.ts:12
+
+  10 |
+  11 | // Configure baseURL for this file.
+> 12 | test.use({ baseURL: pk.app.host.prod })
+     |      ^
+  13 |
+  14 | test(
+  15 |   'check intro contents',
+    at TestTypeImpl._currentSuite (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:75:13)
+    at TestTypeImpl._use (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\common\testType.js:230:24)
+    at Function.use (A:\RnD\biglogic.rgs\tests\node_modules\playwright\lib\transform\transform.js:282:12)
+    at A:\RnD\biglogic.rgs\tests\playwright\tests\simple.test.ts:12:6
+
+Error: No tests found
+
+[1A[2K
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report tests\playwright\tests\playwright\reports[39m
+[36m[39m
+npm verbose cwd A:\RnD\biglogic.rgs
+npm verbose os Windows_NT 10.0.26200
+npm verbose node v24.5.0
+npm verbose npm  v11.10.0
+npm verbose exit 1
+npm verbose code 1
