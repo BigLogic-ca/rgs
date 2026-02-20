@@ -1,6 +1,4 @@
-# Code of Conduct - dphelper
-
-![dphelper](https://raw.githubusercontent.com/passariello/container/refs/heads/main/dphelper/assets/logos/logo.svg)
+# Code of Conduct
 
 ## Our Pledge
 
