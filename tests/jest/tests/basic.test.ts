@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals'
-import 'dphelper'
+import 'memorio'
 
 /**
  * Basic State Management Tests
