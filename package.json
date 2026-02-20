@@ -49,9 +49,6 @@
     "npm:pack": "npm run build && cd dist && npm pack",
     "npm:publish": "npm run build && npm run build:extension && cd dist && npm publish --access=public"
   },
-  "dependencies": {
-    "immer": "^11.1.4"
-  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
@@ -64,12 +61,15 @@
       "optional": false
     }
   },
+  "dependencies": {
+    "immer": "^11.1.4"
+  },
   "devDependencies": {
+    "memorio": "^2.2.1",
     "@types/jest": "30.0.0",
     "@types/node": "^25.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "dphelper": "^2.6.4",
     "esbuild": "^0.27.3",
     "esbuild-plugin-copy": "^2.1.1",
     "react": "^19.2.4",
