@@ -7,6 +7,11 @@
 - **Environment Compatibility**: Improved Web Crypto API testing by forcing secure contexts (HTTPS) in headless environments.
 - **E2E Infrastructure**: Refactored Playwright configuration to avoid conflicts with Jest suites.
 - **Improved Tooling**: Fixed JSON import issues in Playwright setup and tests for better ESM compatibility.
+- **Jest ESM Support**: Configured `transformIgnorePatterns` and `ts-jest` to properly handle ESM dependencies like `memorio` and `dphelper.types`.
+- **E2E Path Mobility**: Corrected relative paths in Playwright tests using `import.meta.url` for reliable execution from any directory.
+
+### 📚 Documentation
+- **Full English Translation**: Translated the QA Release Checklist and verified all documentation modules (chapters, API, and README) are 100% in English.
 
 ## [3.5.1] - 2026-02-19
 
