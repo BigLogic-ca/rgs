@@ -1,12 +1,10 @@
 {
   "app": {
-    "folder": "/",
     "port": 3000,
     "code": "rgs",
-    "type": "alpha",
     "host": {
       "dev": "http://localhost",
-      "prod": "https://picla.net/rgs"
+      "prod": "https://biglogic.ca/rgs"
     },
     "socket": {
       "url": {
@@ -28,20 +26,10 @@
         "dev": "http://localhost:5003/",
         "pro": "https://api.a51.dev/"
       }
-    }
-  },
-  "expo": {
-    "ios": {
-      "requireFullScreen": true
     },
-    "plugins": [
-      [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "PORTRAIT_UP"
-        }
-      ],
-      "expo-web-browser"
-    ]
+    "url": {
+      "dev": "http://localhost/"
+    },
+    "cdn": {}
   }
 }
