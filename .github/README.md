@@ -37,18 +37,18 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 
 ## gState vs useState
 
-| Feature | useState | gState |
-|---------|----------|--------|
-| **Global state across components** | ❌ Need Context/props | ✅ Automatic sharing |
-| **Provider wrapper** | ❌ Required | ✅ Not needed |
-| **Persistence (localStorage)** | ❌ Manual | ✅ Built-in |
-| **Data encryption** | ❌ | ✅ AES-256-GCM |
-| **Multiple namespaces/stores** | ❌ | ✅ |
-| **Plugins (Immer, Undo/Redo)** | ❌ | ✅ |
-| **Audit logging** | ❌ | ✅ |
-| **RBAC/GDPR consent** | ❌ | ✅ |
-| **SSR/Hydration** | ❌ Manual | ✅ Automatic |
-| **Computed values** | ❌ | ✅ |
+| Feature | RGS gState | React useState |
+|---------|--------|----------|
+| **Global state across components** | ✅ Automatic sharing | ❌ Need Context/props |
+| **Provider wrapper** | ✅ Not needed | ❌ Required |
+| **Persistence (localStorage)** | ✅ Built-in | ❌ Manual |
+| **Data encryption** | ✅ AES-256-GCM | ❌ |
+| **Multiple namespaces/stores** | ✅ | ❌ |
+| **Plugins (Immer, Undo/Redo)** | ✅ | ❌ |
+| **Audit logging** | ✅ | ❌ |
+| **RBAC/GDPR consent** | ✅ | ❌ |
+| **SSR/Hydration** | ✅ Automatic | ❌ Manual |
+| **Computed values** | ✅ | ❌ |
 
 ### When to use what?
 
