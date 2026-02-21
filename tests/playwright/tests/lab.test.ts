@@ -36,7 +36,7 @@ test.describe('Test Lab: Cross-Tab Resilience', () => {
         }
 
         bc.onmessage = (event) => {
-          const { key, value, ts, source } = event.data
+          const { key, value, ts } = event.data
           // @ts-ignore
           const currentTs = window.timestamps[key] || 0
 
