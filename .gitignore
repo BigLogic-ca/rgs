@@ -29,6 +29,9 @@ node_modules
 /tests/**/screenshot
 coverage
 .auth
+.log
+tsc_output*.txt
+eslint_error*.txt
 
 # production
 /build
