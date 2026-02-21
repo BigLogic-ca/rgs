@@ -1,5 +1,12 @@
 import { test } from '@playwright/test'
-import pk from '../../../app.json' with { type: 'json' }
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const pk = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../app.json'), 'utf-8'))
 
 // Configure baseURL for this file.
 test.use({ baseURL: pk.app.host.prod })

@@ -18,21 +18,33 @@ test.describe('Test Lab: Cross-Tab Resilience', () => {
       await page.goto('https://example.com/?tab=' + id)
       await page.evaluate((tabId: number) => {
         // @ts-ignore
+        // @ts-ignore
         const bc = new BroadcastChannel('gstate_sync')
         // @ts-ignore
         window.storeState = {}
+        // @ts-ignore
+        window.timestamps = {}
 
         // @ts-ignore
         window.dispatchSync = (key: string, value: any) => {
+          const ts = Date.now() + Math.random() // Uniqueish timestamp
           // @ts-ignore
           window.storeState[key] = value
-          bc.postMessage({ key, value, source: tabId })
+          // @ts-ignore
+          window.timestamps[key] = ts
+          bc.postMessage({ key, value, ts, source: tabId })
         }
 
         bc.onmessage = (event) => {
-          if (event.data.source !== tabId) {
+          const { key, value, ts } = event.data
+          // @ts-ignore
+          const currentTs = window.timestamps[key] || 0
+
+          if (ts > currentTs) {
             // @ts-ignore
-            window.storeState[event.data.key] = event.data.value
+            window.storeState[key] = value
+            // @ts-ignore
+            window.timestamps[key] = ts
           }
         }
       }, id)

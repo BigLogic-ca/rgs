@@ -1,57 +1,58 @@
 name: Security
 
 on:
- push:
-  branches: [main, develop]
- pull_request:
-  branches: [main, develop]
- schedule:
-  - cron: "0 0 * * 0" # Weekly on Sunday
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 0 * * 0" # Weekly on Sunday
 
 concurrency:
- group: ${{ github.workflow }}-${{ github.ref }}
- cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
- codeql:
-  name: CodeQL
-  runs-on: ubuntu-latest
-  permissions:
-   actions: read
-   contents: read
-   security-events: write
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
-  steps:
-   - name: Checkout repository
-     uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-   - name: Initialize CodeQL
-     uses: github/codeql-action/init@v4
-     with:
-      languages: javascript, typescript
-      queries: security-extended
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript, typescript
+          queries: security-extended
 
-   - name: Autobuild
-     uses: github/codeql-action/autobuild@v4
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
 
-   - name: Perform CodeQL Analysis
-     uses: github/codeql-action/analyze@v4
-     with:
-      category: "/language:javascript,typescript"
-      upload: true
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript,typescript"
+          upload: true
 
- dependency-review:
-  name: Dependency Review
-  runs-on: ubuntu-latest
-  permissions:
-   contents: read
-  steps:
-   - name: Checkout Repository
-     uses: actions/checkout@v4
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-   - name: Dependency Review
-     uses: actions/dependency-review-action@v4
-     with:
-      comment-summary-in-pr: always
-      fail-on-severity: moderate
-      license-allow-list: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, CC0-1.0
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: always
+          fail-on-severity: moderate
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, CC0-1.0

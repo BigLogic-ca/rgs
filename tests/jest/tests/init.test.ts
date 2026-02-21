@@ -3,7 +3,7 @@
  * Tests for global state object and configuration
  */
 import { test, expect } from '@jest/globals'
-import 'dphelper'
+import 'memorio'
 
 // require('/src/core/global')
 // state.config = {}

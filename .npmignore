@@ -4,7 +4,6 @@ tmp/
 *.log
 *.dev
 
-
 # Ignore development-related files and directories
 node_modules/
 src/

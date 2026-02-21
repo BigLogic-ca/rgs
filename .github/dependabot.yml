@@ -1,12 +1,90 @@
 # .github/dependabot.yml
 version: 2
 updates:
- - package-ecosystem: "npm" # Example for Node.js
-   directory: "/"
-   schedule:
-    interval: "daily"
-   # Optional: Add labels, reviewers, etc.
- - package-ecosystem: "github-actions" # Example for GitHub Actions
-   directory: "/"
-   schedule:
-    interval: "daily"
+  # Aggiornamenti npm per il progetto principale
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "04:00"
+      timezone: "America/Edmonton"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+    groups:
+      # Raggruppa aggiornamenti minori e patch per le dipendenze di produzione
+      production-dependencies:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      # Raggruppa aggiornamenti minori e patch per le devDependencies
+      development-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+      # Raggruppa tutti gli aggiornamenti dei tipi (@types/*)
+      types:
+        patterns:
+          - "@types/*"
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps):"
+
+  # Aggiornamenti npm per la cartella dei test
+  - package-ecosystem: "npm"
+    directory: "/tests"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:30"
+      timezone: "America/Edmonton"
+    open-pull-requests-limit: 5
+    groups:
+      test-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    labels:
+      - "dependencies"
+      - "tests"
+    commit-message:
+      prefix: "chore(deps-test):"
+
+  # Aggiornamenti npm per l'estensione VS Code
+  - package-ecosystem: "npm"
+    directory: "/vscode-extension"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "America/Edmonton"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "vscode-extension"
+    commit-message:
+      prefix: "chore(deps-vscode):"
+
+  # Aggiornamenti per le GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "America/Edmonton"
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps-actions):"

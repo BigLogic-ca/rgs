@@ -11,13 +11,16 @@ const config: Config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/jest/jest.setup.ts'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest'
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
   },
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/']
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(memorio|dphelper\\.types)/)'
+  ]
 }
 
 export default config

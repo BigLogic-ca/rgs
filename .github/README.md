@@ -12,6 +12,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-gray?logo=typescript)
 ![Node.js](https://img.shields.io/badge/Node.js-gray?logo=node.js)
 ![Jest](https://img.shields.io/badge/Jest-gray?logo=jest)
+![Playwright](https://img.shields.io/badge/Playwright-gray?logo=playwright)
 ![ESLint](https://img.shields.io/badge/Eslint-gray?logo=eslint)
 ![esbuild](https://img.shields.io/badge/esbuild-gray?logo=esbuild)
 
@@ -291,6 +292,24 @@ Need the heavy artillery? We've got you covered.
 - `createAsyncStore(fetcher)`: Atomic async state management.
 - `StorageAdapters`: High-level interfaces for any storage engine.
 - `Middleware / IPlugin`: Build your own extensions.
+
+---
+
+## 🛡️ Quality & Testing
+
+RGS is built with an obsession for reliability. Our test suite covers multiple layers to ensure zero-regressions:
+
+- **Unit Tests (Jest)**: 100+ tests covering core logic, stores, and hooks.
+- **E2E Tests (Playwright)**: Real-world browser testing for cross-tab synchronization and Web Crypto API.
+- **Concurrency Testing**: Verification of race conditions in multi-tab environments.
+
+```bash
+# Run unit tests
+npm run test
+
+# Run E2E tests
+npm run test:e2e
+```
 
 ---
 
