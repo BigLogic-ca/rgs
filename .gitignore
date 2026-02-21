@@ -9,7 +9,6 @@ node_modules
 # dependencies
 /.pnp
 .pnp.js
-
 **/*OLD/*
 **/*old/*
 
@@ -22,6 +21,7 @@ node_modules
 .project
 .profile
 .backup
+.env*
 
 # testing
 /tests/**/reports
@@ -30,6 +30,7 @@ node_modules
 coverage
 .auth
 .log
+
 tsc_output*.txt
 eslint_error*.txt
 
