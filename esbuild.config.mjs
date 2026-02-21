@@ -12,42 +12,40 @@ import fs from 'node:fs'
 
 ///
 
-const common = {
-  external: Object.keys(pk.devDependencies),
-  entryPoints: ['./index.ts'],
-  legalComments: 'none',
-  outdir: 'dist',
-  logLevel: 'verbose',
-  bundle: true,
-  minify: true,
-  keepNames: false,
-  treeShaking: true,
-  metafile: true,
-  platform: 'node',
-  format: 'esm',
-  target: ['es2024'],
-  sourcemap: true,
-  write: true,
-  color: true,
-  globalName: 'memorio',
-  inject: ['./index.js'],
-  define: {
-    'process.env.NODE_ENV': '"production"'
+const
+  common = {
+    external: Object.keys(pk.devDependencies),
+    entryPoints: ['./index.ts'],
+    legalComments: 'none',
+    outdir: 'dist',
+    logLevel: 'verbose',
+    bundle: true,
+    minify: true,
+    keepNames: false,
+    treeShaking: true,
+    metafile: true,
+    platform: 'node',
+    format: 'esm',
+    target: ['es2024'],
+    sourcemap: true,
+    write: true,
+    color: true,
+    globalName: 'dphelper',
+    inject: ['./index.js'],
+    define: {
+      'process.env.NODE_ENV': '"production"'
+    }
+  },
+  files = {
+    assets: [
+      { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
+      { from: '.github/LICENSE.md', to: 'LICENSE.md' },
+      { from: '.github/README.md', to: 'README.md' },
+      { from: '.github/SECURITY.md', to: 'SECURITY.md' },
+      { from: '.github/FUNDING.yml', to: 'FUNDING.yml' },
+      { from: './package.json', to: './package.json' }
+    ]
   }
-}
-
-const files = {
-  assets: [
-    { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
-    { from: '.github/LICENSE', to: 'LICENSE' },
-    { from: '.github/README.md', to: 'README.md' },
-    { from: '.github/SECURITY.md', to: 'SECURITY.md' },
-    { from: '.github/FUNDING.md', to: 'FUNDING.md' },
-    { from: './package.json', to: './package.json' },
-    { from: 'types/**/*', to: './types' },
-    { from: './index.d.ts', to: './index.d.ts' }
-  ]
-}
 
 ///
 
