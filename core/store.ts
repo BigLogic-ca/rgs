@@ -4,6 +4,7 @@ import * as Security from "./security"
 import * as Persistence from "./persistence"
 import * as Plugins from "./plugins"
 import { deepClone, isEqual } from './utils'
+import { SyncEngine } from './sync'
 
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
@@ -469,6 +470,17 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       // But here we rely on the callback passed to hydrateStore
     })
   } else { _isReady = true; _readyResolver!() }
+
+  // Initialize sync engine if configured
+  let _syncEngine: SyncEngine<S> | null = null
+  if ((config as StoreConfig<S>)?.sync) {
+    _syncEngine = new SyncEngine(instance, (config as StoreConfig<S>).sync!)
+    // Register sync methods on the store
+    instance._registerMethod('sync', 'flush', () => _syncEngine?.flush())
+    instance._registerMethod('sync', 'getState', () => _syncEngine?.getState())
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instance._registerMethod('sync', 'onStateChange', (cb: any) => _syncEngine?.onStateChange(cb))
+  }
 
   return instance
 }
