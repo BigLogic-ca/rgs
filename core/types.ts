@@ -1,4 +1,5 @@
 import type { EncryptionKey, AuditEntry, Permission, AccessRule } from './security'
+import type { SyncConfig } from './sync'
 
 /**
  * Options for persisting state values.
@@ -232,6 +233,11 @@ export interface GStatePlugins {
     sync: () => Promise<{ status: string; stats: import('../plugins/official/cloud-sync.plugin').SyncStats }>
     getStats: () => import('../plugins/official/cloud-sync.plugin').SyncStats
   }
+  sync: {
+    flush: () => Promise<import('../core/sync').SyncResult>
+    getState: () => import('../core/sync').SyncState
+    onStateChange: (callback: (state: import('../core/sync').SyncState) => void) => () => void
+  }
   logger: Record<string, never>
 
   // Placeholder for other plugins
@@ -280,6 +286,8 @@ export interface StoreConfig<S extends Record<string, unknown> = Record<string, 
   accessRules?: Array<{ pattern: string | ((key: string, userId?: string) => boolean); permissions: Permission[] }>
   /** Enable Immer for immutable updates (default: true). Set to false for better performance with frequent updates. */
   immer?: boolean
+  /** Local-First Sync: Enable automatic synchronization with remote server */
+  sync?: SyncConfig
 }
 
 /**

@@ -1,79 +1,102 @@
 import esbuild from 'esbuild'
+import alias from 'esbuild-plugin-alias'
+
 import { copy } from 'esbuild-plugin-copy'
-import { copyFileSync, mkdirSync, existsSync } from 'fs'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { nodeExternalsPlugin } from 'esbuild-node-externals'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// import { sassPlugin } from 'esbuild-sass-plugin'
+// import { ScssModulesPlugin } from 'esbuild-scss-modules-plugin'
 
-// Copy .github files to dist root (except workflow)
-const githubFiles = [
-  { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
-  { from: '.github/LICENSE', to: 'LICENSE' },
-  { from: '.github/README.md', to: 'README.md' },
-  { from: '.github/SECURITY.md', to: 'SECURITY.md' },
-  { from: '.github/FUNDING.md', to: 'FUNDING.md' }
-]
+import pk from './package.json' with { type: 'json' }
+import fs from 'node:fs'
 
-function copyGithubFiles() {
-  githubFiles.forEach(({ from, to }) => {
-    const src = join(__dirname, from)
-    const dest = join(__dirname, 'dist', to)
-    if (existsSync(src)) {
-      copyFileSync(src, dest)
-      console.log(`  ✅ Copied: ${to}`)
+///
+
+const
+  common = {
+    external: Object.keys(pk.devDependencies),
+    entryPoints: ['./index.ts'],
+    legalComments: 'none',
+    outdir: 'dist',
+    logLevel: 'verbose',
+    bundle: true,
+    minify: true,
+    keepNames: false,
+    treeShaking: true,
+    metafile: true,
+    platform: 'node',
+    format: 'esm',
+    target: ['es2024'],
+    sourcemap: true,
+    write: true,
+    color: true,
+    globalName: 'dphelper',
+    inject: ['./index.js'],
+    define: {
+      'process.env.NODE_ENV': '"production"'
     }
-  })
-}
-
-const common = {
-  bundle: true,
-  legalComments: 'none',
-  allowOverwrite: true,
-  treeShaking: true,
-  keepNames: false,
-  minify: true,
-  sourcemap: false,
-  write: true,
-  color: true,
-  format: "esm",
-  external: ['react', 'react-dom'],
-}
-
-// Build Main Entry
-const buildMain = async () => {
-  await esbuild.build({
-    ...common,
-    entryPoints: ['index.ts'],
-    outfile: 'dist/index.js',
-    plugins: [
-      copy({
-        assets: [
-          { from: './package.json', to: './package.json' }
-          // { from: './markdown/**/*', to: './markdown' },
-          // { from: './examples/**/*', to: './examples' }
-        ]
-      })
+  },
+  files = {
+    assets: [
+      { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
+      { from: '.github/LICENSE.md', to: 'LICENSE.md' },
+      { from: '.github/README.md', to: 'README.md' },
+      { from: '.github/SECURITY.md', to: 'SECURITY.md' },
+      { from: '.github/FUNDING.yml', to: 'FUNDING.yml' },
+      { from: './package.json', to: './package.json' }
     ]
-  })
-}
+  }
 
-// Build Advanced Entry
-const buildAdvanced = async () => {
-  await esbuild.build({
+///
+
+const result = esbuild.build(
+  {
     ...common,
-    entryPoints: ['advanced.ts'],
-    outfile: 'dist/advanced.js',
-  })
-}
+    plugins: [
+      nodeExternalsPlugin(),
+      alias(
+        {
+          '/*': './'
+        }
+      ),
+      copy(
+        files
+      )
+    ],
+    // ScssModulesPlugin(
+    //   {
+    //     inject: true,
+    //     minify: true
+    //   }
+    // ),
+    // sassPlugin(
+    //   {
+    //     type: 'style',
+    //     loadPaths: ['./node_modules'],
+    //     css: {
+    //       preprocessorOptions: {
+    //         scss: {
+    //           api: 'modern'
+    //         }
+    //       }
+    //     }
+    //   }
+    // ),
+  }
+)
+  .then(
+    (result) => {
+      // Ensure .cache directory exists
+      if (!fs.existsSync('./.cache')) fs.mkdirSync('./.cache', { recursive: true })
+      fs.writeFileSync('./.cache/meta.json', JSON.stringify(result.metafile, null, 2))
+      console.log('Complete.')
+    }
+  )
+  .catch(
+    (error) => {
+      console.error(error)
+      process.exit(1)
+    }
+  )
 
-// Run builds and copy .github files
-Promise.all([buildMain(), buildAdvanced()])
-  .then(() => {
-    copyGithubFiles()
-    console.debug('✅ Build Complete (Main + Advanced + Assets).\n')
-  })
-  .catch((error) => {
-    console.error('❌ Build Failed:', error)
-    process.exit(1)
-  })
+console.log(result)

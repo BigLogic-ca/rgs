@@ -1,6 +1,7 @@
-import { useSyncExternalStore, useDebugValue, useMemo, useCallback } from "react"
+import { useSyncExternalStore, useDebugValue, useMemo, useCallback, useEffect, useState } from "react"
 import { createStore } from "./store"
 import type { IStore, StoreConfig, PersistOptions, StateUpdater } from "./types"
+import { SyncEngine, SyncConfig, SyncState } from "./sync"
 
 let _defaultStore: IStore<Record<string, unknown>> | null = null
 
@@ -179,4 +180,179 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
   }
 
   return [value, setter] as const
+}
+
+// Store map for sync engines - using any to avoid complex generic issues
+const _syncEngines = new Map<string, SyncEngine<Record<string, unknown>>>()
+
+/**
+ * Initialize sync engine for a store
+ * @param store - The store to sync
+ * @param config - Sync configuration
+ * @returns SyncEngine instance
+ */
+export const initSync = (
+  store: IStore<Record<string, unknown>>,
+  config: SyncConfig
+): SyncEngine<Record<string, unknown>> => {
+  const key = store.namespace
+  if (_syncEngines.has(key)) {
+    console.warn(`[gState] Sync engine already exists for namespace "${key}". Call destroySync first.`)
+    return _syncEngines.get(key)!
+  }
+
+  const engine = new SyncEngine(store, config)
+  _syncEngines.set(key, engine)
+  return engine
+}
+
+/**
+ * Destroy sync engine for a namespace
+ */
+export const destroySync = (namespace: string): void => {
+  const engine = _syncEngines.get(namespace)
+  if (engine) {
+    engine.destroy()
+    _syncEngines.delete(namespace)
+  }
+}
+
+/**
+ * Hook for synchronized state management.
+ * Provides offline-by-default functionality with automatic sync.
+ *
+ * @param key - State key
+ * @param store - Optional store instance (uses default if not provided)
+ * @returns [value, setter, syncState]
+ *
+ * @example
+ * const [count, setCount, syncState] = useSyncedState('count')
+ *
+ * // syncState contains:
+ * // - isOnline: boolean
+ * // - isSyncing: boolean
+ * // - pendingChanges: number
+ * // - conflicts: number
+ */
+export function useSyncedState<T = unknown>(
+  key: string,
+  store?: IStore<Record<string, unknown>>
+): readonly [
+  T | undefined,
+  (val: T | StateUpdater<T>, options?: PersistOptions) => boolean,
+  SyncState
+] {
+  const targetStore = store || _defaultStore
+  const namespace = targetStore?.namespace || 'default'
+
+  // Get or create sync engine
+  const engine = _syncEngines.get(namespace)
+
+  // Use useStore with any cast to handle generics
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result = useStore(key, targetStore as any) as readonly [T | undefined, (val: any, options?: PersistOptions) => boolean]
+  const value = result[0] as T | undefined
+  const setter = result[1]
+
+  // Track sync state
+  const [syncState, setSyncState] = useState<SyncState>(() => engine?.getState() || {
+    isOnline: true,
+    isSyncing: false,
+    lastSyncTimestamp: null,
+    pendingChanges: 0,
+    conflicts: 0
+  })
+
+  // Subscribe to sync state changes
+  useEffect(() => {
+    if (!engine) return
+
+    const unsubscribe = engine.onStateChange(setSyncState)
+    return unsubscribe
+  }, [engine])
+
+  // Wrapper setter that queues changes for sync
+  const syncedSetter = useCallback(
+    (val: T | StateUpdater<T>, options?: PersistOptions) => {
+      const result = setter(val, options)
+
+      if (result && engine) {
+        // Get the current value and queue for sync
+        const currentValue = targetStore?.get(key)
+        engine.queueChange(key, currentValue)
+      }
+
+      return result
+    },
+    [setter, engine, key, targetStore]
+  )
+
+  return [value, syncedSetter, syncState] as const
+}
+
+/**
+ * Hook to get global sync status
+ *
+ * @example
+ * const status = useSyncStatus()
+ * // status.isOnline, status.isSyncing, status.pendingChanges
+ */
+export const useSyncStatus = (): SyncState => {
+  const [state, setState] = useState<SyncState>({
+    isOnline: true,
+    isSyncing: false,
+    lastSyncTimestamp: null,
+    pendingChanges: 0,
+    conflicts: 0
+  })
+
+  useEffect(() => {
+    // Aggregate state from all sync engines
+    const updateState = () => {
+      let isOnline = true
+      let isSyncing = false
+      let pendingChanges = 0
+      let conflicts = 0
+
+      _syncEngines.forEach(engine => {
+        const s = engine.getState()
+        isOnline = isOnline && s.isOnline
+        isSyncing = isSyncing || s.isSyncing
+        pendingChanges += s.pendingChanges
+        conflicts += s.conflicts
+      })
+
+      setState({
+        isOnline,
+        isSyncing,
+        lastSyncTimestamp: null,
+        pendingChanges,
+        conflicts
+      })
+    }
+
+    updateState()
+
+    // Subscribe to all engines
+    const unsubscribes = Array.from(_syncEngines.values()).map(engine =>
+      engine.onStateChange(updateState)
+    )
+
+    return () => unsubscribes.forEach(fn => fn())
+  }, [])
+
+  return state
+}
+
+/**
+ * Trigger manual sync for a specific namespace
+ */
+export const triggerSync = async (namespace?: string): Promise<void> => {
+  const targetNamespace = namespace || _defaultStore?.namespace
+  if (!targetNamespace) return
+
+  const engine = _syncEngines.get(targetNamespace)
+  if (engine) {
+    await engine.flush()
+  }
 }

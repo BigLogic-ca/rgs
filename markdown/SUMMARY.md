@@ -45,6 +45,11 @@ This documentation is written for everyone: from **easy setup** for those who ju
   - Advanced XSS prevention and deep cloning reliability.
   - AES-256-GCM and RBAC.
 
+- **[Local-First Sync Engine](chapters/10-local-first-sync.md)**
+  - Offline-by-default with automatic background sync.
+  - Conflict resolution strategies (last-write-wins, merge, etc.).
+  - `useSyncedState` hook for React components.
+
 ---
 
 ## Reference

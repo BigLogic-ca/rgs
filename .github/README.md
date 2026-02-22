@@ -37,18 +37,18 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 
 ## gState vs useState
 
-| Feature | useState | gState |
-|---------|----------|--------|
-| **Global state across components** | ❌ Need Context/props | ✅ Automatic sharing |
-| **Provider wrapper** | ❌ Required | ✅ Not needed |
-| **Persistence (localStorage)** | ❌ Manual | ✅ Built-in |
-| **Data encryption** | ❌ | ✅ AES-256-GCM |
-| **Multiple namespaces/stores** | ❌ | ✅ |
-| **Plugins (Immer, Undo/Redo)** | ❌ | ✅ |
-| **Audit logging** | ❌ | ✅ |
-| **RBAC/GDPR consent** | ❌ | ✅ |
-| **SSR/Hydration** | ❌ Manual | ✅ Automatic |
-| **Computed values** | ❌ | ✅ |
+| Feature | RGS gState | React useState |
+|---------|--------|----------|
+| **Global state across components** | ✅ Automatic sharing | ❌ Need Context/props |
+| **Provider wrapper** | ✅ Not needed | ❌ Required |
+| **Persistence (localStorage)** | ✅ Built-in | ❌ Manual |
+| **Data encryption** | ✅ AES-256-GCM | ❌ |
+| **Multiple namespaces/stores** | ✅ | ❌ |
+| **Plugins (Immer, Undo/Redo)** | ✅ | ❌ |
+| **Audit logging** | ✅ | ❌ |
+| **RBAC/GDPR consent** | ✅ | ❌ |
+| **SSR/Hydration** | ✅ Automatic | ❌ Manual |
+| **Computed values** | ✅ | ❌ |
 
 ### When to use what?
 
@@ -73,6 +73,7 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 | **Security** | 🛡️ **AES-256 + RBAC** | ❌ None | ❌ Ecosystem | ❌ None |
 | **Persistence** | 💾 **First-class** | 🔌 Middleware | 🔌 Middleware | 🔌 Effects |
 | **Async** | ✅ **Atomic** | ✅ Async/Await | ✅ Thunks | ✅ Suspense |
+| **Local-First Sync** | ✅ **Built-in** | ❌ None | ❌ None | ❌ None |
 | **Bundle Size** | **~2kB** | ~1kB | >10kB | >20kB |
 
 > **RGS** is the only library on the market that treats **Security** and **Persistence** as first-class citizens.
@@ -235,6 +236,41 @@ const store = gstate({ data: {} }, {
 })
 ```
 
+### Local-First Sync (Offline-by-Default)
+
+RGS now includes a powerful Local-First Sync Engine that makes your app work offline by default:
+
+```tsx
+import { gstate, useSyncedState } from '@biglogic/rgs'
+
+// Create store with built-in sync
+const store = gstate({
+  todos: [],
+  user: null
+}, {
+  namespace: 'myapp',
+  sync: {
+    endpoint: 'https://api.example.com/sync',
+    authToken: 'your-token',
+    autoSyncInterval: 30000,  // Sync every 30s
+    syncOnReconnect: true,   // Auto-sync when back online
+    strategy: 'last-write-wins'  // Conflict resolution
+  }
+})
+
+// Use in React - automatically synced!
+function TodoList() {
+  const [todos, setTodos] = useSyncedState('todos')
+
+  // Works offline automatically
+  const addTodo = (text) => {
+    setTodos([...todos, { id: Date.now(), text }])
+  }
+
+  return <div>{/* ... */}</div>
+}
+```
+
 ---
 
 ## Multiple Stores
@@ -273,6 +309,7 @@ Extend the core functionality dynamically with specialized modules.
 8. **AnalyticsPlugin**: Tracking bridge for metrics.
 9. **SnapshotPlugin**: Manual state checkpointing.
 10. **GuardPlugin**: Data transformation layer.
+11. **Local-First Sync**: Built-in offline-first with auto-sync (NEW!)
 
 ```typescript
 import { createStore, PersistencePlugin, undoRedoPlugin } from '@biglogic/rgs'
