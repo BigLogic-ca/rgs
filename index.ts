@@ -69,6 +69,22 @@ export {
 export { createAsyncStore } from "./core/async"
 
 // ============================================================================
+// Local-First Sync Engine
+// ============================================================================
+
+export { SyncEngine, createSyncEngine } from "./core/sync"
+export type {
+  SyncConfig,
+  SyncState,
+  SyncResult,
+  SyncStrategy,
+  ConflictInfo,
+  ConflictResolution
+} from "./core/sync"
+
+export { initSync, destroySync, useSyncedState, useSyncStatus, triggerSync } from "./core/hooks"
+
+// ============================================================================
 // Plugins
 // ============================================================================
 
