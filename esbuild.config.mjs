@@ -86,6 +86,8 @@ const result = esbuild.build(
 )
   .then(
     (result) => {
+      // Ensure .cache directory exists
+      if (!fs.existsSync('./.cache')) fs.mkdirSync('./.cache', { recursive: true })
       fs.writeFileSync('./.cache/meta.json', JSON.stringify(result.metafile, null, 2))
       console.log('Complete.')
     }
