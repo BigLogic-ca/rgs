@@ -40,7 +40,7 @@
     ".": "./index.js"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --emitDeclarationOnly --outDir dist && node ./esbuild.config.mjs",
+    "build": "rm -rf dist && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",
     "build:watch": "node ./esbuild.config.mjs --watch",
     "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
     "dev": "npm run build:watch",
