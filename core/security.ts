@@ -18,15 +18,32 @@ const REGEX_TIMEOUT_MS = 100
  */
 const safeRegexTest = (pattern: string, key: string): boolean => {
   const startTime = Date.now()
+
+  // Reject dangerous patterns that could cause ReDoS (nested quantifiers)
+  if (/\(\.*\+\?\)\+/.test(pattern) || /\(\.*\?\)\*/.test(pattern)) {
+    console.warn(`[gstate] Potentially dangerous regex pattern blocked: ${pattern}`)
+    return false
+  }
+
+  // Limit pattern length to prevent complexity attacks
+  if (pattern.length > 500) {
+    console.warn(`[gstate] Regex pattern too long (${pattern.length} chars), blocking: ${pattern.slice(0, 50)}...`)
+    return false
+  }
+
   try {
     const regex = new RegExp(pattern)
-    return regex.test(key)
+    const result = regex.test(key)
+
+    // Log warning if execution was slow (for monitoring)
+    const elapsed = Date.now() - startTime
+    if (elapsed > REGEX_TIMEOUT_MS) {
+      console.warn(`[gstate] Slow regex detected (${elapsed}ms) for pattern: ${pattern}`)
+    }
+
+    return result
   } catch {
     return false
-  } finally {
-    if (Date.now() - startTime > REGEX_TIMEOUT_MS) {
-      console.warn(`[gstate] Regex timeout for pattern: ${pattern}`)
-    }
   }
 }
 
@@ -42,8 +59,20 @@ const safeRandomUUID = (): string => {
       // Fallback
     }
   }
-  // Fallback: timestamp + random hex
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`
+  // Fallback: cryptographically secure random UUID (v4 format)
+  const bytes = new Uint8Array(16)
+  const getRandomValuesFn = typeof crypto !== 'undefined' ? crypto.getRandomValues : null
+  if (getRandomValuesFn) {
+    getRandomValuesFn(bytes)
+  } else {
+    // Last resort - not cryptographically secure
+    for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256)
+  }
+  // Set version (4) and variant bits for UUID v4
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
 /**
@@ -52,6 +81,58 @@ const safeRandomUUID = (): string => {
 export const isCryptoAvailable = typeof crypto !== 'undefined' &&
   typeof crypto.subtle !== 'undefined' &&
   typeof crypto.subtle.generateKey === 'function'
+
+/**
+ * Derives an encryption key from a password using PBKDF2
+ * @param password User password
+ * @param salt Salt for key derivation (should be stored alongside encrypted data)
+ * @param iterations Number of PBKDF2 iterations (recommended: 100000+)
+ * @returns Promise<EncryptionKey>
+ */
+export const deriveKeyFromPassword = async (
+  password: string,
+  salt: Uint8Array,
+  iterations: number = 100000
+): Promise<EncryptionKey> => {
+  if (!isCryptoAvailable) throw new Error('Web Crypto API not available')
+
+  // Import password as key material
+  const passwordKey = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  )
+
+  // Derive AES-GCM key using PBKDF2
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: new Uint8Array(salt) as unknown as BufferSource,
+      iterations,
+      hash: 'SHA-256'
+    },
+    passwordKey,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['encrypt', 'decrypt']
+  )
+
+  // Generate random IV
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+
+  return { key, iv }
+}
+
+/**
+ * Generates a random salt for key derivation
+ * @param length Salt length in bytes (recommended: 16+)
+ * @returns Uint8Array salt
+ */
+export const generateSalt = (length: number = 16): Uint8Array => {
+  return crypto.getRandomValues(new Uint8Array(length))
+}
 
 export interface EncryptionKey {
   key: CryptoKey
