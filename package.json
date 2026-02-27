@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -34,10 +34,21 @@
       "email": "valeriacalascaglitta@gmail.com"
     }
   ],
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/BigLogic-ca/rgs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigLogic-ca/rgs.git"
+  },
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {
     ".": "./index.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   },
   "scripts": {
     "build": "rm -rf dist && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",
