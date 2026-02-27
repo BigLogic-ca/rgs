@@ -45,8 +45,8 @@ export const gstate = <S extends Record<string, unknown>>(
   // Magic function that returns a typed hook when called with a key
   const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
 
-  // Expose as global for debugging purposes in dev environments
-  if (typeof window !== 'undefined') {
+  // Expose as global for debugging purposes ONLY in dev environments
+  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
     (window as unknown as Record<string, unknown>).gstate = store;
     (window as unknown as Record<string, unknown>).gState = store; // Backward compatibility
     (window as unknown as Record<string, unknown>).rgs = store
