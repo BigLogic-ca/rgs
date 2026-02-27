@@ -35,9 +35,9 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 
 ---
 
-## gState vs useState
+## ggtate vs useState
 
-| Feature | RGS gState | React useState |
+| Feature | RGS ggtate | React useState |
 |---------|--------|----------|
 | **Global state across components** | ✅ Automatic sharing | ❌ Need Context/props |
 | **Provider wrapper** | ✅ Not needed | ❌ Required |
@@ -53,7 +53,7 @@ We took the simplicity of **Reactive Global State (RGS)** and fused it with the 
 ### When to use what?
 
 - **useState**: Local UI, single component, temporary state
-- **gState**:
+- **gstate**:
   - Shared state across multiple components
   - Persistent data (preferences, cart, authentication)
   - Sensitive data (encryption)
