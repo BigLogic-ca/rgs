@@ -16,8 +16,8 @@ export type SyncStrategy = 'last-write-wins' | 'merge' | 'crdt' | 'server-wins' 
 export interface SyncConfig {
   /** Remote endpoint for synchronization */
   endpoint: string
-  /** Authentication token */
-  authToken?: string
+  /** Authentication token getter - function that returns current token (recommended: retrieve from memory/httpOnly cookie) */
+  authToken?: string | (() => string | null)
   /** Conflict resolution strategy (default: 'last-write-wins') */
   strategy?: SyncStrategy
   /** Auto-sync interval in ms (default: 30000 = 30s) */
@@ -117,6 +117,17 @@ export class SyncEngine<S extends Record<string, unknown> = Record<string, unkno
     if (this.config.autoSyncInterval > 0) {
       this._startAutoSync()
     }
+  }
+
+  /**
+   * Get current auth token (supports both static string and getter function)
+   */
+  private _getAuthToken(): string {
+    const token = this.config.authToken
+    if (typeof token === 'function') {
+      return token() || ''
+    }
+    return token || ''
   }
 
   private _setupOnlineListener(): void {
@@ -293,11 +304,12 @@ export class SyncEngine<S extends Record<string, unknown> = Record<string, unkno
 
   private async _fetchRemoteVersions(keys: string[]): Promise<void> {
     try {
+      const authToken = this._getAuthToken()
       const response = await this.config.fetch(`${this.config.endpoint}/versions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(this.config.authToken && { 'Authorization': `Bearer ${this.config.authToken}` })
+          ...(authToken && { 'Authorization': `Bearer ${authToken}` })
         },
         body: JSON.stringify({ keys })
       })
@@ -320,11 +332,12 @@ export class SyncEngine<S extends Record<string, unknown> = Record<string, unkno
 
     while (retries < this.config.maxRetries) {
       try {
+        const authToken = this._getAuthToken()
         const response = await this.config.fetch(`${this.config.endpoint}/sync`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.config.authToken && { 'Authorization': `Bearer ${this.config.authToken}` })
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` })
           },
           body: JSON.stringify({
             key: change.key,
