@@ -20,11 +20,14 @@ To ensure state immutability and prevent unintended side effects, RGS uses an in
 The security module uses the Web Crypto API to provide high-performance, authenticated encryption:
 - **AES-GCM**: Provides both confidentiality and integrity verification.
 - **GCM (Galois/Counter Mode)**: Ensures that data has not been tampered with during storage.
+- **Safe Random UUID**: Fallback generation for environments without Web Crypto API.
 
 ## 4. RBAC (Role-Based Access Control)
 RGS supports fine-grained access rules:
 - **Fail-Closed Design**: Access is denied by default if any rules are defined.
 - **Regex Caching**: Store instances cache compiled regular expressions for ultra-fast permission checks.
+- **ReDoS Protection**: Regex patterns have a 100ms timeout to prevent denial-of-service attacks.
+- **Storage Key Validation**: All persisted keys are validated against a strict pattern before storage.
 
 ## 5. Security Best Practices
 For real-world implementations, refer to the `examples/security-best-practices` directory, which covers:
@@ -38,3 +41,9 @@ For real-world implementations, refer to the `examples/security-best-practices` 
 - `Map` and `Set` support in `deepClone`.
 - **Exposed Metadata**: Store instances now expose read-only `namespace` and `userId`.
 - **Direct Store Access**: Added `getStore()` utility for non-React contexts.
+
+## Summary of 3.7.0 Enhancements
+- **ReDoS Protection**: Regex patterns timeout after 100ms to prevent malicious patterns.
+- **Safe UUID**: Fallback UUID generation for environments without Web Crypto API.
+- **Storage Key Validation**: Keys validated before persistence to prevent injection.
+- **Production Safety**: Global window access only enabled in development mode (`NODE_ENV !== 'production'`).
