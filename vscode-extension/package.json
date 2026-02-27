@@ -1,7 +1,7 @@
 {
   "name": "rgs-highlighter",
   "displayName": "RGS Highlighter",
-  "description": "Highlights rgs and gState in magenta bold - code only, no comments",
+  "description": "Highlights rgs, gState and gstate in magenta bold - code only, no comments",
   "version": "1.0.0",
   "publisher": "biglogic",
   "repository": {
