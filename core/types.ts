@@ -7,6 +7,8 @@ import type { SyncConfig } from './sync'
 export interface PersistOptions {
   /** Persist the value to the configured storage (default: localStorage). */
   persist?: boolean
+  /** @deprecated Use 'encoded' for base64 encoding or 'encrypted' for AES-256-GCM encryption. */
+  secure?: boolean
   /** @deprecated Use 'encrypted' for AES-256-GCM encryption. 'encoded' applies base64 encoding only. */
   encoded?: boolean
   /** AES-256-GCM encryption (REAL security). Requires 'encryptionKey' in store config. */
