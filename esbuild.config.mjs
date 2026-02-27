@@ -39,9 +39,9 @@ const
   files = {
     assets: [
       // GUIDE
-      { from: '.github/README.md', to: '../docs/README.md' },
+      { from: 'markdown/**/*', to: 'docs/' },
+      { from: '.github/README.md', to: 'docs/README.md' },
       // { from: 'markdown/**/*', to: '../docs/' },
-      { from: 'markdown/**/*', to: '../docs/' },
 
       // GENERAL
       { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
@@ -50,7 +50,6 @@ const
       { from: '.github/SECURITY.md', to: 'SECURITY.md' },
       { from: '.github/FUNDING.yml', to: 'FUNDING.yml' },
       { from: './package.json', to: './package.json' },
-      { from: 'markdown/*', to: 'markdown/*' }
     ]
   }
 
