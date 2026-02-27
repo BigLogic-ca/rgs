@@ -201,7 +201,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           catch (e) {
             const error = e instanceof Error ? e : new Error(String(e))
             if (_onError) _onError(error, { operation: 'watcher', key: changedKey })
-            else if (!_silent) console.error(`[gState] Watcher error for "${changedKey}":`, e)
+            else if (!_silent) console.error(`[gstate] Watcher error for "${changedKey}":`, e)
           }
         }
       }
@@ -214,7 +214,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           catch (e) {
             const error = e instanceof Error ? e : new Error(String(e))
             if (_onError) _onError(error, { operation: 'keyListener', key: changedKey })
-            else if (!_silent) console.error(`[gState] Listener error for "${changedKey}":`, e)
+            else if (!_silent) console.error(`[gstate] Listener error for "${changedKey}":`, e)
           }
         }
       }
@@ -228,7 +228,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'listener' })
-        else if (!_silent) console.error(`[gState] Global listener error: `, e)
+        else if (!_silent) console.error(`[gstate] Global listener error: `, e)
       }
     }
   }
@@ -266,7 +266,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         key === '__proto__' || key === 'constructor' || key === 'prototype'
 
       if (isUnsafeKey(pluginName) || isUnsafeKey(methodName)) {
-        console.warn('[gState] Refusing to register method with unsafe key:', pluginName, methodName)
+        console.warn('[gstate] Refusing to register method with unsafe key:', pluginName, methodName)
         return
       }
 
@@ -275,8 +275,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     },
     set: (key: string, valOrUp: unknown, options: PersistOptions = {}): boolean => {
       const oldVal = _store.get(key), newVal = _immer && typeof valOrUp === 'function' ? _immerProduce!(oldVal, valOrUp as (draft: unknown) => void) : valOrUp
-      if (_validateInput && !Security.validateKey(key)) { if (!_silent) console.warn(`[gState] Invalid key: ${key}`); return false }
-      if (!Security.hasPermission(_accessRules, key, 'write', _userId)) { _audit('set', key, false, 'RBAC Denied'); if (!_silent) console.error(`[gState] RBAC Denied for "${key}"`); return false }
+      if (_validateInput && !Security.validateKey(key)) { if (!_silent) console.warn(`[gstate] Invalid key: ${key}`); return false }
+      if (!Security.hasPermission(_accessRules, key, 'write', _userId)) { _audit('set', key, false, 'RBAC Denied'); if (!_silent) console.error(`[gstate] RBAC Denied for "${key}"`); return false }
 
       const sani = _validateInput ? Security.sanitizeValue(newVal) : newVal
       const oldSize = _sizes.get(key) || 0
@@ -291,7 +291,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
         if (_maxObjectSize > 0 && finalSize > _maxObjectSize) {
           const error = new Error(`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`)
           if (_onError) _onError(error, { operation: 'set', key })
-          else if (!_silent) console.warn(`[gState] ${error.message} for "${key}"`)
+          else if (!_silent) console.warn(`[gstate] ${error.message} for "${key}"`)
         }
 
         if (_maxTotalSize > 0) {
@@ -299,7 +299,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           if (est > _maxTotalSize) {
             const error = new Error(`Total store size (${est} bytes) exceeds limit (${_maxTotalSize} bytes)`)
             if (_onError) _onError(error, { operation: 'set' })
-            else if (!_silent) console.warn(`[gState] ${error.message}`)
+            else if (!_silent) console.warn(`[gstate] ${error.message}`)
           }
         }
 
@@ -337,7 +337,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e))
         if (_onError) _onError(error, { operation: 'compute', key })
-        else if (!_silent) console.error(`[gState] Compute error for "${key}": `, e)
+        else if (!_silent) console.error(`[gstate] Compute error for "${key}": `, e)
         return null as unknown as T
       }
     },
