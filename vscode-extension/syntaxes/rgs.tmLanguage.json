@@ -7,8 +7,12 @@
       "match": "\\b(rgs)\\b"
     },
     {
-      "name": "variable.gstate",
+      "name": "variable.gState",
       "match": "\\b(gState)\\b"
+    },
+    {
+      "name": "variable.gstate",
+      "match": "\\b(gstate)\\b"
     },
     {
       "name": "keyword",
