@@ -162,7 +162,8 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
   const setter = useCallback(
     (val: T | StateUpdater<T>, options?: PersistOptions) => {
       if (isSelector) {
-        if (process.env.NODE_ENV !== 'production') {
+        const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
+        if (!isProd) {
           console.warn('[gstate] Cannot set value when using a selector.')
         }
         return false
