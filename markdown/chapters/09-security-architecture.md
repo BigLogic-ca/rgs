@@ -47,3 +47,4 @@ For real-world implementations, refer to the `examples/security-best-practices` 
 - **Safe UUID**: Fallback UUID generation for environments without Web Crypto API.
 - **Storage Key Validation**: Keys validated before persistence to prevent injection.
 - **Production Safety**: Global window access only enabled in development mode (`NODE_ENV !== 'production'`).
+- **PBKDF2 Key Derivation**: New `deriveKeyFromPassword()` and `generateSalt()` functions for secure password-based encryption (NIST SC-12 compliant).
