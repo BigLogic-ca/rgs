@@ -27,7 +27,7 @@ const safeRegexTest = (pattern: string, key: string): boolean => {
 
   // Limit pattern length to prevent complexity attacks
   if (pattern.length > 500) {
-    console.warn(`[gstate] Regex pattern too long (${pattern.length} chars), blocking: ${pattern.slice(0, 50)}...`)
+    console.warn(`[gstate] Regex pattern exceeds maximum length limit`)
     return false
   }
 
@@ -59,20 +59,8 @@ const safeRandomUUID = (): string => {
       // Fallback
     }
   }
-  // Fallback: cryptographically secure random UUID (v4 format)
-  const bytes = new Uint8Array(16)
-  const getRandomValuesFn = typeof crypto !== 'undefined' ? crypto.getRandomValues : null
-  if (getRandomValuesFn) {
-    getRandomValuesFn(bytes)
-  } else {
-    // Last resort - not cryptographically secure
-    for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256)
-  }
-  // Set version (4) and variant bits for UUID v4
-  bytes[6] = (bytes[6]! & 0x0f) | 0x40
-  bytes[8] = (bytes[8]! & 0x3f) | 0x80
-  const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+  // Fallback: throw error - crypto.randomUUID must be available for security
+  throw new Error('Cryptographically secure random UUID generation is required but crypto.randomUUID is unavailable. Please use a browser or environment with Web Crypto API support.')
 }
 
 /**
