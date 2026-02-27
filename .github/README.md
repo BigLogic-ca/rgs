@@ -174,6 +174,34 @@ const [user, setUser] = useStore('user')
 
 ---
 
+## 🛡️ Security Architecture
+
+RGS includes enterprise-grade security features to protect your application and user data:
+
+### ReDoS Protection
+All regex patterns used in RBAC permission matching include timeout protection (100ms) to prevent Regex Denial of Service attacks.
+
+### Safe UUID Generation
+Falls back to cryptographically secure random UUID generation when native `crypto.randomUUID()` is unavailable.
+
+### Input Validation
+- **Storage Key Validation**: Keys are validated against `/^[a-zA-Z0-9_.-]+$/` to prevent injection attacks
+- **Value Sanitization**: All persisted values are sanitized to prevent XSS attacks
+
+### Encryption
+- **AES-256-GCM**: Industry-standard encryption for sensitive data
+- **Encoded Mode**: Use `{ encoded: true }` option for base64-encoded storage (note: renamed from `secure` for clarity)
+
+### GDPR Compliance
+- Consent management system
+- Data export (`exportData()`)
+- Data deletion (`deleteData()`)
+
+### Development vs Production
+Global `gstate` exposure to window is only enabled in development mode (`NODE_ENV !== 'production'`).
+
+---
+
 ## 📚 Quick Examples
 
 ```tsx
