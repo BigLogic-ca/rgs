@@ -53,7 +53,7 @@ function activate(context) {
     const text = document.getText()
 
     // Find rgs and gState
-    const regex = /\b(rgs|gState)\b/g
+    const regex = /\b(rgs|gState|gstate)\b/g
     const decorations = []
     let match
     while ((match = regex.exec(text)) !== null) {
