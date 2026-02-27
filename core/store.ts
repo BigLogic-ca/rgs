@@ -411,7 +411,13 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     addAccessRule: (pattern, permissions) => Security.addAccessRule(_accessRules, pattern, permissions),
     hasPermission: (key, action, userId) => {
       if (_accessRules.size === 0) return true
+      const startTime = Date.now()
       for (const [pattern, perms] of _accessRules) {
+        // Prevent ReDoS: timeout check
+        if (Date.now() - startTime > 100) {
+          console.warn('[gstate] Regex timeout in hasPermission')
+          return false
+        }
         let matches: boolean
         if (typeof pattern === 'function') {
           matches = pattern(key, userId)
