@@ -1,41 +1,21 @@
 name: Greetings
 
 on:
- pull_request_target:
-  types: [opened, reopened]
- issues:
-  types: [opened]
+  pull_request_target:
+   types: [opened, reopened]
+  issues:
+   types: [opened]
 
 jobs:
- greeting:
-  name: Greeting
-  runs-on: ubuntu-latest
-  permissions:
-   issues: write
-   pull-requests: write
-  steps:
-   - uses: actions/first-interaction@v3
-     with:
-      repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Custom messages for first-time contributors
-      issue-message: |
-       🎉 Thanks for opening a new issue! We appreciate your contribution to **${{ github.repository }}**.
-
-       Please make sure you've:
-       - Read the [documentation](https://a51.gitbook.io/${{ github.event.repository.name }}/)
-       - Searched for existing issues to avoid duplicates
-       - Provided a clear description of the problem
-
-       Our team will review your issue and get back to you soon!
-
-      pr-message: |
-       🎉 Thanks for your first pull request to **${{ github.repository }}**!
-
-       Please review our [Contributing Guidelines](CONTRIBUTING.md) and make sure you've:
-       - ✅ Added tests for new functionality
-       - ✅ Updated documentation if needed
-       - ✅ Followed the code style guide
-       - ✅ Run tests locally with `npm test`
-
-       Our team will review your PR and provide feedback!
+  greeting:
+   name: Greeting
+   runs-on: ubuntu-latest
+   permissions:
+    issues: write
+    pull-requests: write
+   steps:
+    - uses: actions/first-interaction@v3
+      with:
+       repo-token: ${{ secrets.GITHUB_TOKEN }}
+       issue-message: "🎉 Thanks for opening a new issue! We appreciate your contribution to **${{ github.repository }}**. Please make sure you've read the documentation and searched for existing issues. Our team will review your issue and get back to you soon!"
+       pr-message: "🎉 Thanks for your first pull request to **${{ github.repository }}**! Please review our Contributing Guidelines and make sure you've added tests, updated documentation, and followed the code style guide. Our team will review your PR and provide feedback!"
