@@ -1,0 +1,8 @@
+
+> test
+> npm run jest
+
+
+> jest
+> cd .. && jest --config tests/jest/jest.config.ts
+
