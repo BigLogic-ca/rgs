@@ -736,7 +736,7 @@ var createSyncEngine = (store, config) => {
 // core/env.ts
 var isProduction = () => {
   try {
-    if (typeof process !== "undefined" && false) return true;
+    if (typeof process !== "undefined" && process.env && process.env.NODE_ENV === "production") return true;
     const glob = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : {};
     if (typeof glob.__DEV__ !== "undefined" && glob.__DEV__ === false) return true;
     return false;
