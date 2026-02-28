@@ -27,7 +27,7 @@
     "provenance": true
   },
   "files": [
-    "dist/**/*"
+    "**/*"
   ],
   "license": "MIT",
   "author": "Dario Passariello <dariopassariello@gmail.com>",
