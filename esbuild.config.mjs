@@ -13,7 +13,7 @@ const common = {
   legalComments: 'none',
   logLevel: 'warning',
   bundle: true,
-  minify: true,
+  minify: false, // NPM packages shouldn't be minified
   keepNames: false,
   treeShaking: true,
   platform: 'browser',
@@ -54,10 +54,7 @@ async function build() {
   const minimalResult = await esbuild.build({
     ...common,
     entryPoints: ['./core/minimal.ts'],
-    outfile: 'dist/core/minimal.js',
-    define: {
-      'process.env.NODE_ENV': '"production"'
-    }
+    outfile: 'dist/core/minimal.js'
   })
 
   if (minimalResult.errors?.length) {
@@ -71,9 +68,6 @@ async function build() {
     ...common,
     entryPoints: ['./index.ts'],
     outfile: 'dist/index.js',
-    define: {
-      'process.env.NODE_ENV': '"production"'
-    },
     plugins: [
       nodeExternalsPlugin(),
       copy({ assets: files.assets })
