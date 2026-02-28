@@ -44,9 +44,8 @@ jobs:
      working-directory: ./tests
      run: npm test
 
-   - name: "Auth for npm"
-     run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
+   #- name: "Auth for npm"
+   #  run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
    - name: Publish to npm
      run: npm publish
      # Trusted Publisher handles authentication automatically
