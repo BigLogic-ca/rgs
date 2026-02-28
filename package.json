@@ -3,6 +3,9 @@
   "version": "3.7.6",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "keywords": [
     "rgs",
     "gstate",
