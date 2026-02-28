@@ -40,6 +40,9 @@ jobs:
      working-directory: ./tests
      run: npm ci
 
+   - name: Generate .npmrc
+     run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+
    - name: Run tests
      working-directory: ./tests
      run: npm test
