@@ -21,6 +21,14 @@
   "bugs": {
     "url": "https://github.com/BigLogic-ca/rgs/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "author": "Dario Passariello <dariopassariello@gmail.com>",
   "contributors": [
