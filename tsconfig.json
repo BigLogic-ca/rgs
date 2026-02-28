@@ -59,6 +59,6 @@
     "*OLD*",
     "tests/**/*",
     "examples/**/*",
-    "markdown/**/*"
+    "docs/**/*"
   ]
 }

@@ -76,7 +76,7 @@ export const flushDisk = async (ctx: PersistenceContext) => {
       }
 
       let dataValue: unknown = data.value
-      const isEncoded = data.options.encoded || data.options.encrypted
+      const isEncoded = data.options.encoded || data.options.encrypted || data.options.secure
       if (data.options.encrypted) {
         if (!encryptionKey) throw new Error(`Encryption key missing for "${key}"`)
         dataValue = await Security.encrypt(data.value, encryptionKey)
@@ -88,7 +88,7 @@ export const flushDisk = async (ctx: PersistenceContext) => {
 
       storage.setItem(`${prefix}${key}`, JSON.stringify({
         v: (ctx.versions.get(key) || 1), t: Date.now(), e: data.options.ttl ? Date.now() + data.options.ttl : null,
-        d: dataValue, _sys_v: currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: isEncoded ? true : undefined
+        d: dataValue, _sys_v: currentVersion, _enc: data.options.encrypted ? true : undefined, _b64: (data.options.encoded || data.options.secure) ? true : undefined
       }))
       audit('set', key, true)
     } catch (e) {

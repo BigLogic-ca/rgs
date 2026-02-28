@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -34,13 +34,30 @@
       "email": "valeriacalascaglitta@gmail.com"
     }
   ],
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/BigLogic-ca/rgs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigLogic-ca/rgs.git"
+  },
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {
-    ".": "./index.js"
+    ".": "./index.js",
+    "./core/minimal": "./dist/core/minimal.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
   },
   "scripts": {
-    "build": "rm -rf dist && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",
+    "build": "node -e \"const fs=require('fs');if(fs.existsSync('./dist'))fs.rmSync('./dist',{recursive:true});\" && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",
     "build:watch": "node ./esbuild.config.mjs --watch",
     "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
     "dev": "npm run build:watch",

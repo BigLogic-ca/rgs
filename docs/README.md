@@ -383,11 +383,8 @@ npm run test:e2e
 
 RGS provides an **ultra-minimal** version for projects where bundle size is critical. This version includes only the core state management functionality.
 
-> [!WARNING]
-> ⚠️ **Not indicated for security and enterprise-level applications.**
-> For production apps requiring AES-256 encryption, RBAC, GDPR compliance, or audit logging, use the full version.
-
----
+> [!NOTE]
+> Not indicated for use in security and enterprise level applications.
 
 ### What's Included
 
@@ -405,6 +402,9 @@ RGS provides an **ultra-minimal** version for projects where bundle size is crit
 - ❌ Immer integration
 - ❌ Computed values
 - ❌ React hooks
+
+> ⚠️ **Not indicated for security and enterprise-level applications.**
+> For production apps requiring AES-256 encryption, RBAC, GDPR compliance, or audit logging, use the full version.
 
 ### How to Use
 

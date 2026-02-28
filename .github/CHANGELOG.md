@@ -81,7 +81,7 @@ All notable changes to this project will be documented in this file.
 
 - **Multiple Stores**: Support for multiple independent stores via namespaces.
 - **Global Type Declarations**: TypeScript global types for `gState`, `gstate`, `useStore`, `initState`, `destroyState`.
-- **README**: Comprehensive documentation with comparison table (gState vs useState).
+- **README**: Comprehensive documentation with comparison table (gstate vs useState).
 - **Architecture Diagram**: ASCII diagram showing system components.
 - **Quick Examples**: Common use cases (persistence, encryption, undo/redo, sync, computed).
 - **CI/CD**: GitHub Actions workflow for automated testing and publishing.
