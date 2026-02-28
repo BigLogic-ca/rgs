@@ -42,10 +42,13 @@
     "type": "git",
     "url": "git+https://github.com/BigLogic-ca/rgs.git"
   },
+  "files": [
+    "dist"
+  ],
   "main": "./index.js",
   "types": "./index.d.ts",
   "exports": {
-    ".": "./index.js",
+    ".": "./dist/index.js",
     "./core/minimal": "./dist/core/minimal.js"
   },
   "engines": {
