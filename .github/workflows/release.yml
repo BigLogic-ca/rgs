@@ -10,7 +10,7 @@ on:
 # Requires: id-token: write + package configured in npmjs.com
 permissions:
  id-token: write # Required for OIDC
- contents: read
+ contents: write
 
 jobs:
  release:

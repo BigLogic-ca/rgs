@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.7.7",
+  "version": "3.7.8",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
