@@ -17,6 +17,7 @@ node_modules
 *.obsidian
 *.njsproj
 *.cache
+*.output.txt
 .private
 .project
 .profile

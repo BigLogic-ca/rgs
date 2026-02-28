@@ -1,7 +1,6 @@
 import type { Config } from 'jest'
 
 const config: Config = {
-  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   rootDir: '../../',
   displayName: 'CLIENT',
@@ -11,7 +10,7 @@ const config: Config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/jest/jest.setup.ts'],
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx|js|jsx)$': '<rootDir>/tests/node_modules/ts-jest'
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
@@ -19,7 +18,7 @@ const config: Config = {
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
   transformIgnorePatterns: [
-    'node_modules/(?!(memorio|dphelper\\.types)/)'
+    '/node_modules/(?!(memorio|immer|dphelper.types)/)'
   ]
 }
 
