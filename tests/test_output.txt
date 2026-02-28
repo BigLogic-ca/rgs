@@ -1,0 +1,317 @@
+
+> test
+> npm run jest
+
+
+> jest
+> cd .. && jest --config tests/jest/jest.config.ts
+
+  console.info
+    [Stress] Rapid Fire (1000 updates): 9.27ms
+
+      at Object.<anonymous> (tests/jest/tests/stress_v.test.ts:16:17)
+
+  console.info
+    [Stress] Big Payload (2000 keys): 84.61ms
+
+      at Object.<anonymous> (tests/jest/tests/stress_v.test.ts:28:17)
+
+  console.info
+    [Stress] Computed Chain verified: base(10) -> l5(15)
+
+      at Object.<anonymous> (tests/jest/tests/stress_v.test.ts:45:17)
+
+PASS CLIENT tests/jest/tests/stress_v.test.ts
+  RGS Stress Test Validation
+    √ Rapid Fire: handle 1000 synchronous sets (212 ms)
+    √ Big Payload: handle 2000 keys object (99 ms)
+    √ Computed Chain: recursive dependency updates (8 ms)
+
+PASS CLIENT tests/jest/tests/basic.test.ts
+  Basic State Tests
+    √ State should exist globally (50 ms)
+    √ Should set and get a simple value (9 ms)
+    √ Should handle number values (4 ms)
+  Object State Tests
+    √ Should handle object values (2 ms)
+    √ Should handle nested objects (2 ms)
+  Array State Tests
+    √ Should handle array values (10 ms)
+    √ Should allow array mutations (5 ms)
+
+  console.log
+    Set 10k keys: 851.10ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:18:17)
+
+  console.error
+    [gstate] RBAC Denied for "logs"
+
+    [0m [90m 289 |[39m         [36mconst[39m hasLimits [33m=[39m (_maxObjectSize [33m>[39m [35m0[39m [33m||[39m _maxTotalSize [33m>[39m [35m0[39m) [33m&&[39m [33m![39misProduction()
+     [90m 290 |[39m         [36mconst[39m finalSize [33m=[39m hasLimits [33m?[39m _calculateSize(frozen) [33m:[39m [35m0[39m
+    [31m[1m>[22m[39m[90m 291 |[39m
+     [90m     |[39m [31m[1m^[22m[39m
+     [90m 292 |[39m         [36mif[39m (_maxObjectSize [33m>[39m [35m0[39m [33m&&[39m finalSize [33m>[39m _maxObjectSize) {
+     [90m 293 |[39m           [36mconst[39m error [33m=[39m [36mnew[39m [33mError[39m([32m`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`[39m)
+     [90m 294 |[39m           [36mif[39m (_onError) _onError(error[33m,[39m { operation[33m:[39m [32m'set'[39m[33m,[39m key })[0m
+
+      at magic.set (core/store.ts:291:29)
+      at Object.<anonymous> (tests/jest/tests/examples_v.test.ts:47:39)
+
+  console.error
+    [gstate] RBAC Denied for "logs"
+
+    [0m [90m 289 |[39m         [36mconst[39m hasLimits [33m=[39m (_maxObjectSize [33m>[39m [35m0[39m [33m||[39m _maxTotalSize [33m>[39m [35m0[39m) [33m&&[39m [33m![39misProduction()
+     [90m 290 |[39m         [36mconst[39m finalSize [33m=[39m hasLimits [33m?[39m _calculateSize(frozen) [33m:[39m [35m0[39m
+    [31m[1m>[22m[39m[90m 291 |[39m
+     [90m     |[39m [31m[1m^[22m[39m
+     [90m 292 |[39m         [36mif[39m (_maxObjectSize [33m>[39m [35m0[39m [33m&&[39m finalSize [33m>[39m _maxObjectSize) {
+     [90m 293 |[39m           [36mconst[39m error [33m=[39m [36mnew[39m [33mError[39m([32m`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`[39m)
+     [90m 294 |[39m           [36mif[39m (_onError) _onError(error[33m,[39m { operation[33m:[39m [32m'set'[39m[33m,[39m key })[0m
+
+      at magic.set (core/store.ts:291:29)
+      at addLog (examples/rbac-dashboard/DashboardStore.ts:40:42)
+      at Object.<anonymous> (tests/jest/tests/examples_v.test.ts:48:53)
+
+  console.warn
+    [Security] Access Denied for user manager-101: Insufficient permissions for 'logs'
+
+    [0m [90m 42 |[39m   [36mif[39m ([33m![39msuccess) {
+     [90m 43 |[39m     console[33m.[39mwarn([32m`[Security] Access Denied for user ${useDashboard.userId}: Insufficient permissions for 'logs'`[39m)
+    [31m[1m>[22m[39m[90m 44 |[39m   }
+     [90m    |[39m    [31m[1m^[22m[39m
+     [90m 45 |[39m   [36mreturn[39m success
+     [90m 46 |[39m }
+     [90m 47 |[39m[0m
+
+      at addLog (examples/rbac-dashboard/DashboardStore.ts:44:17)
+      at Object.<anonymous> (tests/jest/tests/examples_v.test.ts:48:53)
+
+PASS CLIENT tests/jest/tests/examples_v.test.ts
+  RGS Examples Validation
+    √ Basic Counter validation (23 ms)
+    √ Global Theme validation (6 ms)
+    √ Persistent Cart validation (17 ms)
+    √ Secure Auth validation (11 ms)
+    √ Security Vault validation (Async Init) (61 ms)
+    √ RBAC Dashboard validation (223 ms)
+
+PASS CLIENT tests/jest/tests/security.test.ts
+  Security Tests
+    Input Validation
+      √ should validate correct keys (9 ms)
+      √ should reject invalid keys (4 ms)
+      √ should sanitize values (8 ms)
+    Access Control (RBAC)
+      √ should allow by default (2 ms)
+      √ should restrict with rules (8 ms)
+      √ should fail closed when rule exists but not matched (2 ms)
+    GDPR Compliance
+      √ should record consent (2 ms)
+      √ should check consent status (4 ms)
+      √ should get all consents (3 ms)
+      √ should revoke consent (8 ms)
+      √ should export user data (6 ms)
+      √ should delete user data (18 ms)
+    Audit Logging
+      √ should log operations to custom logger (9 ms)
+
+  console.info
+    [BruteForce] 1000 concurrent sets: 0.50ms
+
+      at Object.<anonymous> (tests/jest/tests/brute_force_v.test.ts:22:17)
+
+PASS CLIENT tests/jest/tests/features.test.ts
+  New Features
+    encoded option (replaces secure)
+      √ should encode data with encoded: true (99 ms)
+      √ should support legacy secure option (backward compatibility) (68 ms)
+      √ should not encode when encoded: false (68 ms)
+    onError callback
+      √ should call onError on plugin crash (19 ms)
+      √ should call onError on hydration failure (17 ms)
+      √ should fallback to console.error when onError not provided (14 ms)
+    maxObjectSize warning
+      √ should warn when object exceeds maxObjectSize (10 ms)
+      √ should not warn when object is within limit (3 ms)
+      √ should disable warnings when maxObjectSize is 0 (10 ms)
+      √ should use default 5MB limit when not specified (4 ms)
+    Integration: All features together
+      √ should work with encoded + onError + maxObjectSize (74 ms)
+
+  console.info
+    [BruteForce] 100-level deep object (Set+Get): 11.94ms
+
+      at Object.<anonymous> (tests/jest/tests/brute_force_v.test.ts:42:17)
+
+PASS CLIENT tests/jest/tests/multi-store-security.test.ts
+  Multi-Store Security Isolation
+    √ should isolate access rules between different stores (22 ms)
+    √ should isolate consents between different stores (4 ms)
+    √ should handle plugin methods isolation (2 ms)
+
+PASS CLIENT tests/jest/tests/init.test.ts
+  √ state config exist (3 ms)
+
+PASS CLIENT tests/jest/tests/core.test.ts
+  Argis (RGS)
+    √ Async Store: Auto-handling life-cycle (26 ms)
+    √ Plugins: Kernel Transaction Hook (12 ms)
+    √ Immutability: Deep recursive freezing (21 ms)
+
+PASS CLIENT tests/jest/tests/migration.test.ts
+  Migration Tests
+    √ should migrate data on version change (8 ms)
+    √ should not migrate if versions match (3 ms)
+    √ should handle multiple migrations (2 ms)
+
+  console.log
+    --- Scenario 1: Basic Store ---
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:7:17)
+
+  console.log
+    ✅ Basic Store OK
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:16:17)
+
+  console.log
+    --- Scenario 2: Computed Values ---
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:20:17)
+
+  console.log
+    ✅ Computed Values OK
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:34:17)
+
+  console.log
+    --- Scenario 3: Custom Plugin ---
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:38:17)
+
+  console.log
+    ✅ Custom Plugin OK
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:59:17)
+
+  console.log
+    --- Scenario 4: Transactions ---
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:63:17)
+
+  console.log
+    ✅ Transactions OK
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:77:17)
+
+  console.log
+    --- Scenario 5: Type-Safe Selectors ---
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:81:17)
+
+  console.log
+    ✅ Type-Safe Selectors OK
+
+      at Object.<anonymous> (tests/jest/tests/simulation.test.ts:101:17)
+
+PASS CLIENT tests/jest/tests/simulation.test.ts
+  100M$ DOLLAR SIMULATION 🚀
+    √ Scenario 1: Basic Store - Increment (152 ms)
+    √ Scenario 2: Computed Values (18 ms)
+    √ Scenario 3: Custom Plugin (10 ms)
+    √ Scenario 4: Transactions (15 ms)
+    √ Scenario 5: Type-Safe Selectors (15 ms)
+
+  console.info
+    [BruteForce] 50,000 updates via 500 transactions: 364.58ms
+
+      at Object.<anonymous> (tests/jest/tests/brute_force_v.test.ts:57:17)
+
+PASS CLIENT tests/jest/tests/integration.test.ts
+  Ecosystem Integration
+    √ should create a store with plugins (34 ms)
+    √ should use immer plugin to update nested state (36 ms)
+    √ should use undo-redo plugin to manage history (6 ms)
+    √ should handle both plugins together (4 ms)
+    ○ skipped should work seamlessly with the useStore hook
+
+  console.log
+    Get 10k keys: 2110.25ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:26:17)
+
+  console.log
+    1,000 updates: 38.25ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:38:17)
+
+  console.info
+    [BruteForce] 10,000 keys (~40MB raw state): 1590.93ms
+
+      at Object.<anonymous> (tests/jest/tests/brute_force_v.test.ts:71:17)
+
+  console.info
+    [BruteForce] 1000 RBAC evaluations x 500 ops: 55.30ms
+
+      at Object.<anonymous> (tests/jest/tests/brute_force_v.test.ts:94:17)
+
+PASS CLIENT tests/jest/tests/brute_force_v.test.ts (5.107 s)
+  RGS Brutal Force Test Suite (Core Only)
+    √ Concurrency: 1000 "parallel" async sets (319 ms)
+    √ Deep Nesting: 100-level deep object (Recursion Test) (25 ms)
+    √ Transaction Overload: 500 transactions / 100 ops each (599 ms)
+    √ Memory Pressure: 10,000 large-ish keys (Total ~20MB) (1638 ms)
+    √ RBAC Chaos: 1000 dynamic rules evaluation (66 ms)
+
+  console.log
+    5000 rapid cycles: 1140.72ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:52:17)
+
+  console.log
+    Large object (100KB) - Set: 188.87ms, Get: 0.01ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:67:17)
+
+  console.log
+    50 namespaces x 100 keys: 105.97ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:83:17)
+
+  console.log
+    1,000 updates with 100 listeners: 41.10ms
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:97:17)
+
+FAIL CLIENT tests/jest/tests/stress.test.ts (7.222 s)
+  Stress Tests - Enterprise Performance
+    × should handle 10,000 keys efficiently (3114 ms)
+    √ should handle 1,000 updates to same key (57 ms)
+    √ should handle rapid set/get cycles (1143 ms)
+    √ should handle large object values (483 ms)
+    √ should handle multiple namespaces efficiently (116 ms)
+    √ should maintain performance with listeners (62 ms)
+
+  ● Stress Tests - Enterprise Performance › should handle 10,000 keys efficiently
+
+    expect(received).toBeLessThan(expected)
+
+    Expected: < 2000
+    Received:   2110.2498000000005
+
+    [0m [90m 27 |[39m     }
+     [90m 28 |[39m     [36mconst[39m getTime [33m=[39m performance[33m.[39mnow() [33m-[39m getStart
+    [31m[1m>[22m[39m[90m 29 |[39m     console[33m.[39mlog([32m`Get 10k keys: ${getTime.toFixed(2)}ms`[39m)
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 30 |[39m
+     [90m 31 |[39m     [90m// Should complete in reasonable time (< 2.5 seconds for set, < 2 seconds for get)[39m
+     [90m 32 |[39m     expect(setTime)[33m.[39mtoBeLessThan([35m2500[39m)[0m
+
+      at Object.<anonymous> (tests/jest/tests/stress.test.ts:29:40)
+
+Test Suites: 1 failed, 12 passed, 13 total
+Tests:       1 failed, 1 skipped, 69 passed, 71 total
+Snapshots:   0 total
+Time:        13.559 s
+Ran all test suites.

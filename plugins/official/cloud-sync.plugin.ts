@@ -1,4 +1,5 @@
 import type { IPlugin, PluginContext } from '../../core/types'
+import { isProduction } from '../../core/env'
 
 /**
  * Sync Stats interface for reporting and analytics.
@@ -161,7 +162,7 @@ export const createFirestoreAdapter = (db: unknown, docPath: string): CloudSyncA
     try {
       // In a real scenario, you'd use updateDoc from firebase/firestore
       // await updateDoc(doc(db, docPath), { ...data, updatedAt: serverTimestamp() });
-      const isDev = process.env.NODE_ENV !== 'production'
+      const isDev = !isProduction()
       const debugLog = (...args: unknown[]) => { if (isDev) console.debug(...args) }
 
       // await updateDoc(doc(db, docPath), { ...data, updatedAt: serverTimestamp() });

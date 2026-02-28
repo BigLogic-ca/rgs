@@ -17,5 +17,5 @@ jobs:
     - uses: actions/first-interaction@v3
       with:
        repo-token: ${{ secrets.GITHUB_TOKEN }}
-       issue-message: "🎉 Thanks for opening a new issue! We appreciate your contribution to **${{ github.repository }}**. Please make sure you've read the documentation and searched for existing issues. Our team will review your issue and get back to you soon!"
-       pr-message: "🎉 Thanks for your first pull request to **${{ github.repository }}**! Please review our Contributing Guidelines and make sure you've added tests, updated documentation, and followed the code style guide. Our team will review your PR and provide feedback!"
+       issue_message: "🎉 Thanks for opening a new issue! We appreciate your contribution to **${{ github.repository }}**. Please make sure you've read the documentation and searched for existing issues. Our team will review your issue and get back to you soon!"
+       pr_message: "🎉 Thanks for your first pull request to **${{ github.repository }}**! Please review our Contributing Guidelines and make sure you've added tests, updated documentation, and followed the code style guide. Our team will review your PR and provide feedback!"

@@ -5,6 +5,7 @@ import * as Persistence from "./persistence"
 import * as Plugins from "./plugins"
 import { deepClone, isEqual } from './utils'
 import { SyncEngine } from './sync'
+import { isProduction } from './env'
 
 import type {
   IStore, StoreConfig, PersistOptions, StoreSubscriber,
@@ -247,8 +248,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
   const instance: IStore<S> = {
     _setSilently: (key: string, value: unknown) => {
       const oldSize = _sizes.get(key) || 0, frozen = (_immer && value !== null && typeof value === 'object') ? _immerFreeze!(deepClone(value), true) : value
-      const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
-      const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProd
+      const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProduction()
       const newSize = hasLimits ? _calculateSize(frozen) : 0
 
       _totalSize = _totalSize - oldSize + newSize
@@ -286,8 +286,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       const frozen = (_immer && sani !== null && typeof sani === 'object') ? _immerFreeze(deepClone(sani), true) : sani
 
       if (!isEqual(oldVal, frozen)) {
-        const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
-        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProd
+        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProduction()
         const finalSize = hasLimits ? _calculateSize(frozen) : 0
 
         if (_maxObjectSize > 0 && finalSize > _maxObjectSize) {
@@ -447,8 +446,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
       getPersistenceContext(),
       // We pass the calculateSize function to update memory usage correctly after hydration
       (val) => {
-        const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
-        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProd
+        const hasLimits = (_maxObjectSize > 0 || _maxTotalSize > 0) && !isProduction()
         return hasLimits ? _calculateSize(val) : 0
       },
       () => { _isReady = true; _snapshot = null; _readyResolver(); _emit() }

@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -57,7 +57,7 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "provenance": true
+    "provenance": false
   },
   "scripts": {
     "build": "node -e \"const fs=require('fs');if(fs.existsSync('./dist'))fs.rmSync('./dist',{recursive:true});\" && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",

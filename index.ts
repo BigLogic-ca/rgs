@@ -8,6 +8,7 @@
 import { createStore as baseCreateStore } from "./core/store"
 import { useStore as baseUseStore, getStore } from "./core/hooks"
 import * as Security from "./core/security"
+import { isDevelopment } from "./core/env"
 import type { IStore, StoreConfig } from "./core/types"
 
 // ============================================================================
@@ -46,9 +47,8 @@ export const gstate = <S extends Record<string, unknown>>(
   const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
 
   // Expose as global for debugging purposes ONLY in dev environments
-  // Note: process.env may not exist in browser, so we use a safe check
-  const isDev = typeof process === 'undefined' ? true : process.env?.NODE_ENV !== 'production'
-  if (typeof window !== 'undefined' && isDev) {
+  // We use multiple checks to catch common bundler environments (Vite, Webpack, etc.)
+  if (typeof window !== 'undefined' && isDevelopment()) {
     (window as unknown as Record<string, unknown>).gstate = store;
     (window as unknown as Record<string, unknown>).gState = store; // Backward compatibility
     (window as unknown as Record<string, unknown>).rgs = store
@@ -166,7 +166,6 @@ export type {
 // Global Augmentation
 // ============================================================================
 
-/* eslint-disable no-var */
 declare global {
   var createStore: typeof baseCreateStore
   var gstate: <S extends Record<string, unknown>>(initialState: S, configOrNamespace?: string | StoreConfig<S>) => IStore<S> & ((key: string) => unknown)

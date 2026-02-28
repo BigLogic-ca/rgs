@@ -332,15 +332,15 @@ export const sanitizeValue = (value: unknown): unknown => {
     // This must happen BEFORE scheme checks to catch encoded attacks
     let decoded = value.replace(/&#[xX]?[0-9a-fA-F]+;?/g, (match) => {
       // Decode HTML entity to character
-      const hexMatch = match.match(/&amp;#x([0-9a-fA-F]+);?/i)
+      const hexMatch = match.match(/&#x([0-9a-fA-F]+);?/i)
       if (hexMatch && hexMatch[1]) {
         return String.fromCharCode(parseInt(hexMatch[1], 16))
       }
-      const decMatch = match.match(/&amp;#([0-9]+);?/)
+      const decMatch = match.match(/&#([0-9]+);?/)
       if (decMatch && decMatch[1]) {
         return String.fromCharCode(parseInt(decMatch[1], 10))
       }
-      return ''
+      return match // Return original match if not a valid entity to prevent bypass
     })
 
     // Also decode URL-encoded characters to catch %6Aavascript: style bypasses

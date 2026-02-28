@@ -1,3 +1,4 @@
+import { isProduction } from '../../core/env'
 import type { IPlugin } from '../../core/types'
 
 /**
@@ -6,7 +7,7 @@ import type { IPlugin } from '../../core/types'
  *
  * @example
  * ```typescript
- * if (process.env.NODE_ENV === 'development') {
+ * if (!isProduction()) {
  *   store._addPlugin(debugPlugin())
  * }
  *
@@ -18,11 +19,11 @@ import type { IPlugin } from '../../core/types'
  */
 export const debugPlugin = (): IPlugin => {
   // Security: Only run in development
-  if (process.env.NODE_ENV === 'production') {
+  if (isProduction()) {
     return { name: 'gstate-debug-noop', hooks: {} }
   }
 
-  const isDev = process.env.NODE_ENV !== 'production'
+  const isDev = !isProduction()
 
   const debugLog = (...args: unknown[]) => {
     if (isDev) console.debug(...args)

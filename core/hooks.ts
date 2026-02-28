@@ -2,6 +2,7 @@ import { useSyncExternalStore, useDebugValue, useMemo, useCallback, useEffect, u
 import { createStore } from "./store"
 import type { IStore, StoreConfig, PersistOptions, StateUpdater } from "./types"
 import { SyncEngine, SyncConfig, SyncState } from "./sync"
+import { isProduction } from "./env"
 
 let _defaultStore: IStore<Record<string, unknown>> | null = null
 
@@ -162,8 +163,7 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
   const setter = useCallback(
     (val: T | StateUpdater<T>, options?: PersistOptions) => {
       if (isSelector) {
-        const isProd = typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
-        if (!isProd) {
+        if (!isProduction()) {
           console.warn('[gstate] Cannot set value when using a selector.')
         }
         return false
