@@ -1,5 +1,4 @@
 import esbuild from 'esbuild'
-import alias from 'esbuild-plugin-alias'
 
 import { copy } from 'esbuild-plugin-copy'
 import { nodeExternalsPlugin } from 'esbuild-node-externals'
@@ -83,19 +82,19 @@ async function build() {
   if (!fs.existsSync('./.cache')) fs.mkdirSync('./.cache', { recursive: true })
 
   // --- Post-build sanitization for socket.dev bypass ---
-  const indexPath = 'dist/index.js';
+  const indexPath = 'dist/index.js'
   if (fs.existsSync(indexPath)) {
-    let indexContent = fs.readFileSync(indexPath, 'utf8');
-    indexContent = indexContent.replace(/process\.env/g, 'process["env"]');
-    indexContent = indexContent.replace(/https:\/\/bit\.ly\/[a-zA-Z0-9]+/g, '[SEC-REMOVED]');
-    fs.writeFileSync(indexPath, indexContent);
+    let indexContent = fs.readFileSync(indexPath, 'utf8')
+    indexContent = indexContent.replace(/process\.env/g, 'process["env"]')
+    indexContent = indexContent.replace(/https:\/\/bit\.ly\/[a-zA-Z0-9]+/g, '[SEC-REMOVED]')
+    fs.writeFileSync(indexPath, indexContent)
   }
 
-  const minimalPath = 'dist/core/minimal.js';
+  const minimalPath = 'dist/core/minimal.js'
   if (fs.existsSync(minimalPath)) {
-    let minimalContent = fs.readFileSync(minimalPath, 'utf8');
-    minimalContent = minimalContent.replace(/process\.env/g, 'process["env"]');
-    fs.writeFileSync(minimalPath, minimalContent);
+    let minimalContent = fs.readFileSync(minimalPath, 'utf8')
+    minimalContent = minimalContent.replace(/process\.env/g, 'process["env"]')
+    fs.writeFileSync(minimalPath, minimalContent)
   }
   // ----------------------------------------------------
 
