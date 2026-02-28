@@ -1,6 +1,6 @@
 {
   "name": "@biglogic/rgs",
-  "version": "3.7.6",
+  "version": "3.7.7",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "type": "module",
   "keywords": [
@@ -67,7 +67,7 @@
     "test": "cd tests && npm test"
   },
   "devDependencies": {
-    "@types/node": "^25.3.2",
+    "@types/node": "^25.3.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "esbuild": "0.27.3",
