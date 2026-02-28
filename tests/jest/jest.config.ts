@@ -19,7 +19,7 @@ const config: Config = {
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
   testPathIgnorePatterns: ['/node_modules/', '<rootDir>/dist/'],
   transformIgnorePatterns: [
-    'node_modules/(?!(memorio|dphelper\\.types)/)'
+    '/node_modules/(?!(memorio|immer)/)'
   ]
 }
 
