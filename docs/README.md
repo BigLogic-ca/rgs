@@ -462,7 +462,7 @@ store._addPlugin(undoRedoPlugin())
 
 ## 📄 License
 
-MIT © [Dario Passariello](https://github.com/dpassariello)
+MIT © [Dario Passariello](https://github.com/passariello)
 
 ---
 

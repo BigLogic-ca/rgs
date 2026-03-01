@@ -6,7 +6,7 @@ Thank you for your interest in contributing!
 
 ```bash
 # Clone the repository
-git clone https://github.com/dpassariello/rgs.git
+git clone https://github.com/@biglogic/rgs.git
 cd rgs
 
 # Install dependencies

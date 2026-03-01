@@ -276,7 +276,7 @@ If you relied on `addAccessRule()` from the global export to affect a `createSto
 
 ## Need Help?
 
-- **Issues:** [GitHub Issues](https://github.com/dpassariello/rgs/issues)
+- **Issues:** [GitHub Issues](https://github.com/@biglogic/rgs/issues)
 - **Docs:** [Galaxy Documentation](../SUMMARY.md)
 
 ---
