@@ -437,11 +437,11 @@ graph TB
 
 ## 📚 Documentation
 
-- [Getting Started](docs/chapters/02-getting-started.md)
-- [Plugin SDK](docs/chapters/05-plugin-sdk.md)
-- [Security Architecture](docs/chapters/09-security-architecture.md)
-- [Migration Guide](docs/chapters/08-migration-guide.md)
-- [API Reference](docs/api.md)
+- [Getting Started](docs/chapters/getting-started.md)
+- [Plugin SDK](docs/chapters/plugin-sdk.md)
+- [Security Architecture](docs/chapters/security-architecture.md)
+- [Migration Guide](docs/chapters/migration-guide.md)
+- [API Reference](docs/chapters/api.md)
 
 ---
 
