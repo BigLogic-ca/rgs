@@ -29,12 +29,13 @@ node_modules
 /tests/**/reports
 /tests/**/results
 /tests/**/screenshot
+/tests/**/*_output*.txt
+/tests/**/*_error*.txt
+/tests/**/*_result*.txt
+
 coverage
 .auth
 .log
-
-tsc_output*.txt
-eslint_error*.txt
 
 # production
 /build
