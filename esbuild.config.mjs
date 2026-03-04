@@ -25,6 +25,7 @@ const common = {
 const files = {
   assets: [
     // ROOT
+    { from: 'README.md', to: 'README.md' },
     { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
     { from: '.github/LICENSE.md', to: 'LICENSE.md' },
     { from: '.github/README.md', to: 'README.md' },
@@ -32,7 +33,7 @@ const files = {
     { from: '.github/FUNDING.yml', to: 'FUNDING.yml' },
     { from: 'package.json', to: 'package.json' },
     // DOCS
-    { from: '.github/README.md', to: 'docs/README.md' },
+    { from: 'README.md', to: 'docs/README.md' },
     { from: 'docs/**/*', to: 'docs/' },
   ]
 }
