@@ -34,7 +34,7 @@ This documentation is written for everyone: from **easy setup** for those who ju
   - **E-commerce**: Cart isolation and atomic updates.
   - **Dashboards**: Multi-store strategies and complex flows.
 
-- **[Architectural Insights (FAQ)](markdown/07-faq.md)**
+- **[Architectural Insights (FAQ)](markdown/faq.md)**
   - Honest answers on security, performance, and Proxies.
 
 - **[Migration Guide](markdown/migration-guide.md)**
