@@ -1,8 +1,9 @@
 {
-  "name": "rgs-highlighter",
-  "displayName": "RGS Highlighter",
-  "description": "Highlights rgs, gState, gstate",
-  "version": "1.0.0",
+  "name": "rgs-intellisense",
+  "displayName": "RGS (Argis) IntelliSense",
+  "description": "Complete IntelliSense, autocomplete, diagnostics and State Explorer for RGS state management library",
+  "icon": "media/icon.png",
+  "version": "2.1.0",
   "publisher": "biglogic",
   "repository": {
     "type": "git",
@@ -11,22 +12,109 @@
   "engines": {
     "vscode": "^1.75.0"
   },
-  "scripts": {
-    "create": "vsce package -o rgs-extension.vsix",
-    "install": "code --install-extension ./build/rgs-highlighter.vsix"
-  },
   "categories": [
-    "Other",
-    "Programming Languages"
+    "AI",
+    "Programming Languages",
+    "Snippets",
+    "Other"
   ],
   "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
     "workspaceContains:**/*.ts",
     "workspaceContains:**/*.tsx",
     "workspaceContains:**/*.js",
     "workspaceContains:**/*.jsx"
   ],
-  "main": "./extension.ts",
+  "main": "./build/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rgsSidebar",
+          "title": "RGS",
+          "icon": "media/icon.svg"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "rgsStateExplorer",
+          "title": "RGS State Explorer",
+          "icon": "$(database)"
+        }
+      ]
+    },
+    "views": {
+      "rgsSidebar": [
+        {
+          "id": "rgsWelcome",
+          "name": "Welcome"
+        },
+        {
+          "id": "rgsStateExplorer",
+          "name": "State Explorer",
+          "when": "workspaceFolderExists"
+        }
+      ],
+      "explorer": [
+        {
+          "id": "rgsStateExplorer",
+          "name": "RGS State Explorer",
+          "when": "workspaceFolderExists"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "rgs.welcome",
+        "title": "RGS: Welcome",
+        "category": "RGS",
+        "description": "Show RGS welcome page"
+      },
+      {
+        "command": "rgs.analyzeWorkspace",
+        "title": "RGS: Analyze Workspace",
+        "category": "RGS",
+        "description": "Analyze the workspace for RGS stores, states, and plugins"
+      },
+      {
+        "command": "rgs.showStoreDetails",
+        "title": "RGS: Show Store Details",
+        "category": "RGS",
+        "description": "Show detailed information about a selected store"
+      },
+      {
+        "command": "rgs.goToStoreDefinition",
+        "title": "RGS: Go to Store Definition",
+        "category": "RGS",
+        "description": "Navigate to the definition of a store"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "rgs.analyzeWorkspace",
+          "when": "workspaceFolderExists"
+        },
+        {
+          "command": "rgs.showStoreDetails",
+          "when": "workspaceFolderExists"
+        },
+        {
+          "command": "rgs.goToStoreDefinition",
+          "when": "workspaceFolderExists"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "rgs.analyzeWorkspace",
+          "when": "view == rgsStateExplorer",
+          "group": "navigation"
+        }
+      ]
+    },
     "languages": [
       {
         "id": "rgs",
@@ -37,15 +125,80 @@
         "extensions": [
           ".rgs"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./json/language.json"
       }
     ],
     "grammars": [
       {
         "language": "rgs",
         "scopeName": "source.rgs",
-        "path": "./syntaxes/rgs.tmLanguage.json"
+        "path": "./json/list.json"
+      }
+    ],
+    "configuration": {
+      "title": "RGS Configuration",
+      "properties": {
+        "rgs.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time diagnostics for RGS code"
+        },
+        "rgs.enableAutocomplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable autocomplete for RGS API"
+        },
+        "rgs.enableHover": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable hover documentation"
+        },
+        "rgs.enableSnippets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code snippets"
+        },
+        "rgs.trace.server": {
+          "type": "string",
+          "default": "off",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "description": "Trace server communication"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "typescript",
+        "path": "./json/snippets.json"
+      },
+      {
+        "language": "typescriptreact",
+        "path": "./json/snippets.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./json/snippets.json"
+      },
+      {
+        "language": "javascriptreact",
+        "path": "./json/snippets.json"
       }
     ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./tsconfig.json",
+    "watch": "tsc -watch -p ./tsconfig.json",
+    "package": "vsce package -o rgs-intellisense.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.0",
+    "vsce": "^2.15.0"
   }
 }
