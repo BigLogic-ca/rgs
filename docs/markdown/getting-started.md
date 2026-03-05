@@ -65,4 +65,4 @@ getStore()?.set('count', 9001);
 
 ---
 
-**Next step:** [The Magnetar Way: One-Liner Power](03-the-magnetar-way.md)
+**Next step:** [The Magnetar Way: One-Liner Power](the-magnetar-way.md)
