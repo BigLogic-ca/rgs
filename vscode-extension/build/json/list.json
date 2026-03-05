@@ -1,0 +1,23 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "RGS",
+    "patterns": [
+        {
+            "name": "variable.rgs",
+            "match": "\\b(rgs)\\b"
+        },
+        {
+            "name": "variable.gState",
+            "match": "\\b(gState)\\b"
+        },
+        {
+            "name": "variable.gstate",
+            "match": "\\b(gstate|gState)\\b"
+        },
+        {
+            "name": "keyword",
+            "match": "\\b(useStore|createStore|initState)\\b"
+        }
+    ],
+    "scopeName": "source.rgs"
+}
