@@ -1,23 +1,16 @@
 import { defineConfig, type Options } from 'tsup'
 import { sassPlugin } from 'esbuild-sass-plugin'
-
-// import injectCss from './tsup.plugin.injectCss'
-// import Types from './tsup.plugin.types'
 import copyStatic from './tsup.plugin.copyStatic'
-
 import pk from "./package.json"
-import buildType from './core/buildType'
 
 export default defineConfig(
   {
     plugins: [
-      // injectCss,
-      // Types,
       copyStatic
     ] as Options['plugins'],
     globalName: pk.name,
     format: ['cjs', 'esm'],
-    entry: ['index.ts'],
+    entry: ['index.ts', 'core/minimal.ts', 'core/advanced.ts'],
     platform: 'browser',
     target: "es2024",
     outDir: 'dist',
@@ -42,7 +35,6 @@ export default defineConfig(
     noExternal: [
       "immer"
     ],
-    // inject: [],
     swc: {
       swcrc: true
     },
@@ -51,7 +43,6 @@ export default defineConfig(
     ],
     esbuildOptions(options) {
       options.legalComments = 'none'
-      options.logLevel = 'warning'
       // options.minify = true
     },
     terserOptions: {
@@ -68,7 +59,6 @@ export default defineConfig(
       '.css': 'css'
     },
     async onSuccess() {
-      await buildType()
       console.debug("Compilation: OK")
     }
   }
