@@ -1,4 +1,4 @@
-import { gstate, getStore } from '../../index'
+import { gstate } from '../../index'
 
 // Define the shape of our theme state
 export interface ThemeState extends Record<string, unknown> {
