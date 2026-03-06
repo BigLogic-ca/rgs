@@ -1,4 +1,3 @@
-import { act } from '@testing-library/react'
 import { describe, test, expect, beforeEach, jest } from '@jest/globals'
 import { initState, destroyState, createAsyncStore } from '../../../index'
 import type { IPlugin } from '../../../core/types'
