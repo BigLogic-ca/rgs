@@ -8,7 +8,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://react.dev/)
-[![NIST SP 800-132 Compliant](https://img.shields.io/badge/NIST-SP%20800--132-Compliant-green.svg)](https://csrc.nist.gov/publications/detail/sp/800-132/final)
 
 > **🔐 Security Compliance**: This project is fully compliant with **NIST SP 800-132** standards for password-based key derivation, featuring AES-256-GCM encryption, PBKDF2 with 600k iterations, and 32-byte salts.
 
