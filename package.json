@@ -67,7 +67,6 @@
   "scripts": {
     "build": "tsup && npx tsc -p tsconfig.json --emitDeclarationOnly ",
     "watch": "tsup --watch",
-    "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
     "npm:pack": "npm run build && cd dist && npm pack",
     "npm:publish": "npm run build && npm publish ./dist --access public",
     "dev": "npm run generate-imports && node esbuild.config.mjs --watch-and-serve",
