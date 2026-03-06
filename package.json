@@ -1,23 +1,30 @@
 {
-  "name": "@biglogic/rgs",
-  "version": "3.8.4",
-  "license": "MIT",
+  "name": "argis",
+  "version": "3.9.0",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
-  "type": "module",
   "main": "./index.js",
+  "browser": "./index.cjs",
+  "type": "module",
   "types": "./index.d.ts",
-  "typings": "./types/*",
-  "homepage": "https://github.com/BigLogic-ca/rgs",
-  "engines": {
-    "node": ">=16.0.0"
-  },
+  "typing": "./types/*",
+  "homepage": "https://a51.gitbook.io/rgs",
+  "license": "MIT",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
     "provenance": true
   },
-  "files": [
-    "**/*"
+  "copyright": "Dario Passariello",
+  "author": "Dario Passariello",
+  "contributors": [
+    {
+      "name": "Dario Passariello",
+      "email": "dariopassarielloa@gmail.com"
+    },
+    {
+      "name": "Valeria Cala Scaglitta",
+      "email": "valeriacalascaglitta@gmail.com"
+    }
   ],
   "keywords": [
     "rgs",
@@ -33,57 +40,68 @@
     "react-globo-state",
     "argis"
   ],
-  "copyright": "Dario Passariello",
-  "author": "Dario Passariello <dariopassariello@gmail.com>",
-  "contributors": [
+  "funding": [
     {
-      "name": "Dario Passariello",
-      "email": "dariopassariello@gmail.com",
-      "url": "https://dario.passariello.ca/"
-    },
-    {
-      "name": "Valeria Cala Scaglitta",
-      "email": "valeriacalascaglitta@gmail.com"
+      "type": "patreon",
+      "url": "https://www.patreon.com/passariello"
     }
   ],
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/BigLogic-ca/rgs"
+  "engines": {
+    "node": ">=16.0.0"
   },
+  "files": [
+    "**/*"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BigLogic-ca/rgs.git"
+    "url": "git+https://github.com/a51-dev/BigLogic-ca/rgs.git"
   },
   "bugs": {
-    "url": "https://github.com/BigLogic-ca/rgs/issues"
+    "url": "https://github.com/a51-dev/BigLogic-ca/rgs/issues"
   },
   "support": {
     "name": "Dario Passariello",
-    "url": "https://github.com/passariello/",
+    "url": "https://dario.passariello.ca/",
     "email": "dariopassariello@gmail.com"
   },
   "scripts": {
-    "dev": "npm run build:watch",
-    "build": "node -e \"const fs=require('fs');if(fs.existsSync('./dist'))fs.rmSync('./dist',{recursive:true});\" && node ./esbuild.config.mjs && npx tsc -p tsconfig.json --emitDeclarationOnly",
-    "build:watch": "node ./esbuild.config.mjs --watch",
-    "build:extension": "cd vscode-extension && vsce package -o ../dist/rgs-extension.vsix",
+    "build": "tsup && npx tsc -p tsconfig.json --emitDeclarationOnly ",
+    "watch": "tsup --watch",
+    "npm:pack": "npm run build && cd dist && npm pack",
+    "npm:publish": "cd .dev/shell && sh publish.sh",
+    "dev": "npm run generate-imports && node esbuild.config.mjs --watch-and-serve",
+    "test": "cd tests && npm run test",
     "lint": "cd tests && npm run lint",
     "tsc": "cd tests && tsc --noEmit",
-    "test": "cd tests && npm test"
-  },
-  "dependencies": {
-    "immer": "11.1.4"
+    "generate-imports": "tsx core/generate-imports.ts"
   },
   "devDependencies": {
-    "@types/node": "^25.3.3",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "esbuild": "0.27.3",
-    "esbuild-node-externals": "1.20.1",
+    "@jest/globals": "^30.2.0",
+    "@types/node": "^25.3.5",
+    "@types/react": "19.2.14",
     "esbuild-plugin-copy": "2.1.1",
+    "esbuild-sass-plugin": "3.6.0",
+    "esbuild-scss-modules-plugin": "1.1.1",
+    "immer": "11.1.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "terser": "5.46.0",
+    "ts-node": "10.9.2",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.3"
+    "tsup": "8.5.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
   }
 }

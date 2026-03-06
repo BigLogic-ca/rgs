@@ -60,6 +60,9 @@
     "*OLD*",
     "tests/**/*",
     "examples/**/*",
-    "docs/**/*"
+    "docs/**/*",
+    "vscode-extension/**/*",
+    "tsup.config.ts",
+    "tsup.plugin.*.ts"
   ]
 }

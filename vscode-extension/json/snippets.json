@@ -1,0 +1,255 @@
+{
+  "createStore": {
+    "prefix": [
+      "rgs-store",
+      "createStore"
+    ],
+    "body": [
+      "import { createStore } from '@biglogic/rgs'",
+      "",
+      "interface ${1:State} {",
+      "  $0",
+      "}",
+      "",
+      "const store = createStore<${1:State}>({",
+      "  namespace: '${2:myApp}',",
+      "  version: ${3:1},",
+      "  persistByDefault: ${4:true},",
+      "  silent: ${5:false},",
+      "  $TMEND",
+      "})",
+      "",
+      "export default store"
+    ],
+    "description": "Create a new RGS store with full configuration",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "useStore-key": {
+    "prefix": [
+      "rgs-use",
+      "useStore"
+    ],
+    "body": "const [${1:value}, set${2:Value}] = useStore('${3:key}'${4:, store})",
+    "description": "Use store with key mode (returns value and setter)",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "useStore-selector": {
+    "prefix": [
+      "rgs-selector",
+      "useStore sel"
+    ],
+    "body": "const ${1:value} = useStore(state => state.${2:key}${3:, store})",
+    "description": "Use store with selector (read-only)",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-init": {
+    "prefix": [
+      "rgs-init",
+      "initState"
+    ],
+    "body": [
+      "import { initState } from '@biglogic/rgs'",
+      "",
+      "interface ${1:State} {",
+      "  $0",
+      "}",
+      "",
+      "const store = initState<${1:State}>({",
+      "  namespace: '${2:app}',",
+      "})"
+    ],
+    "description": "Initialize global RGS state",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-plugin": {
+    "prefix": [
+      "rgs-plugin",
+      "createPlugin"
+    ],
+    "body": [
+      "import { createTypedPlugin } from '@biglogic/rgs'",
+      "",
+      "export const ${1:myPlugin} = createTypedPlugin('$1', {",
+      "  ${2:method}: () => {",
+      "    $0",
+      "  },",
+      "})"
+    ],
+    "description": "Create a typed RGS plugin",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-access-rule": {
+    "prefix": [
+      "rgs-access",
+      "addAccessRule"
+    ],
+    "body": [
+      "store.addAccessRule(",
+      "  ${1/(.*)/'$1'/}, // pattern (string or regex)",
+      "  ['${2:read}', '${3:write}', '${4:delete}']",
+      ")"
+    ],
+    "description": "Add RBAC access rule to store",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-compute": {
+    "prefix": [
+      "rgs-computed",
+      "compute"
+    ],
+    "body": [
+      "store.compute('${1:computedKey}', (get) => {",
+      "  const ${2:value} = get${3:<${4:string}>}('${5:sourceKey}')",
+      "  return ${6:$2}",
+      "})"
+    ],
+    "description": "Create a computed value in store",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-watch": {
+    "prefix": [
+      "rgs-watch",
+      "watch"
+    ],
+    "body": [
+      "const unsubscribe = store.watch${1:<${2:string}>}('${3:key}', (value) => {",
+      "  $0",
+      "})",
+      "",
+      "// To stop watching: unsubscribe()"
+    ],
+    "description": "Watch for changes in a store key",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-transaction": {
+    "prefix": [
+      "rgs-transaction"
+    ],
+    "body": [
+      "store.transaction(() => {",
+      "  store.set('${1:key1}', ${2:value1})",
+      "  store.set('${3:key2}', ${4:value2})",
+      "  $0",
+      "})"
+    ],
+    "description": "Run multiple operations in a transaction",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-persist": {
+    "prefix": [
+      "rgs-persist",
+      "persist"
+    ],
+    "body": "store.set('${1:key}', ${2:value}, { persist: true${3:, encrypted: true}${4:, ttl: ${5:3600000}}})",
+    "description": "Set value with persistence options",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-middleware": {
+    "prefix": [
+      "rgs-middleware",
+      "use middleware"
+    ],
+    "body": [
+      "const ${1:myMiddleware}: Middleware = (key, value, meta) => {",
+      "  console.log(`[${1}] ${key}:`, value)`",
+      "  $0",
+      "}",
+      "",
+      "store.use(${1:myMiddleware})"
+    ],
+    "description": "Create and use a middleware",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-sync": {
+    "prefix": [
+      "rgs-sync",
+      "useSyncedState"
+    ],
+    "body": "const [${1:value}, set${2:Value}, syncState] = useSyncedState${3:<${4:string}>}('${5:key}'${6:, store})",
+    "description": "Use synced state with offline support",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-typed-get": {
+    "prefix": [
+      "rgs-get",
+      "typed get"
+    ],
+    "body": "store.get${1:<${2:string}>}('${3:key}')",
+    "description": "Get typed value from store",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-typed-set": {
+    "prefix": [
+      "rgs-set",
+      "typed set"
+    ],
+    "body": "store.set${1:<${2:string}>}('${3:key}', ${4:value})",
+    "description": "Set typed value in store",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact"
+  },
+  "rgs-imports": {
+    "prefix": [
+      "rgs-imports",
+      "import rgs"
+    ],
+    "body": [
+      "import {",
+      "  createStore,",
+      "  useStore,",
+      "  initState,",
+      "  destroyState,",
+      "  type IStore,",
+      "  type StoreConfig,",
+      "  type PersistOptions",
+      "} from '@biglogic/rgs'"
+    ],
+    "description": "Import all main RGS exports",
+    "scope": "typescript,typescriptreact"
+  },
+  "rgs-complete": {
+    "prefix": [
+      "rgs-complete",
+      "full example"
+    ],
+    "body": [
+      "import { createStore, useStore, type IStore, type StoreConfig } from '@biglogic/rgs'",
+      "",
+      "// 1. Define state interface",
+      "interface ${1:AppState} {",
+      "  ${2:count}: number",
+      "  ${3:user}: { name: string; email: string } | null",
+      "  ${4:loading}: boolean",
+      "}",
+      "",
+      "// 2. Create store with configuration",
+      "const store: IStore<${1:AppState}> = createStore<${1:AppState}>({",
+      "  namespace: '${5:myApp}',",
+      "  version: ${6:1},",
+      "  persistByDefault: ${7:true},",
+      "  silent: ${8:false},",
+      "  // Enterprise options:",
+      "  // encryptionKey: generateEncryptionKey(),",
+      "  // auditEnabled: true,",
+      "  // accessRules: [{ pattern: 'user:*', permissions: ['read', 'write'] }],",
+      "})",
+      "",
+      "// 3. Initialize (or use directly)",
+      "// initState<${1:AppState}>({ namespace: '${5:myApp}' })",
+      "",
+      "// 4. React component example:",
+      "// const ${9:Counter} = () => {",
+      "//   const [count, setCount] = useStore<number>('count', store)",
+      "//   return (",
+      "//     <div>",
+      "//       <p>Count: {count}</p>",
+      "//       <button onClick={() => setCount(count + 1)}>+</button>",
+      "//     </div>",
+      "//   )",
+      "// }",
+      "",
+      "export default store"
+    ],
+    "description": "Complete RGS store example with all features",
+    "scope": "typescript,typescriptreact"
+  }
+}

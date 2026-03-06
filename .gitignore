@@ -13,8 +13,8 @@ node_modules
 **/*old/*
 
 # custom
-*.backup
-*.obsidian
+*.backup/*
+*.obsidian/*
 *.njsproj
 *.cache
 *.output.txt
@@ -36,6 +36,8 @@ node_modules
 coverage
 .auth
 .log
+tsc_output*.txt
+eslint_error*.txt
 
 # production
 /build

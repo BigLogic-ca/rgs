@@ -122,4 +122,4 @@ store.set('largeData', bigObject); // Warns if > maxObjectSize
 2. Use `cloudSyncPlugin` to bridge the local state with your company's MongoDB Atlas or Firebase.
 3. Result? 5-star UX with full data durability and cross-device sync.
 
-**Next step:** [Ecosystem and Plugins: Extending the Power](05-plugins-and-extensibility.md)
+**Next step:** [Ecosystem and Plugins: Extending the Power](plugins-and-extensibility.md)

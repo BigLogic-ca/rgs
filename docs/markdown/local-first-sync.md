@@ -141,6 +141,6 @@ Your data survives browser refresh, works offline, and stays synchronized across
 
 ## Next Steps
 
-- Learn about [Security Architecture](09-security-architecture.md)
-- Explore [Plugin SDK](05-plugin-sdk.md)
-- Check [Migration Guide](08-migration-guide.md)
+- Learn about [Security Architecture](security-architecture.md)
+- Explore [Plugin SDK](plugin-sdk.md)
+- Check [Migration Guide](migration-guide.md)

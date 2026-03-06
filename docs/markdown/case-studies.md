@@ -66,4 +66,4 @@ Stop reinventing the wheel. Use RGS.
 
 ---
 
-**Next step:** [FAQ: For the Skeptics and the Curious](07-faq.md)
+**Next step:** [FAQ: For the Skeptics and the Curious](faq.md)

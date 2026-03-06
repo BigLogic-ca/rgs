@@ -74,13 +74,13 @@ export const isCryptoAvailable = typeof crypto !== 'undefined' &&
  * Derives an encryption key from a password using PBKDF2
  * @param password User password
  * @param salt Salt for key derivation (should be stored alongside encrypted data)
- * @param iterations Number of PBKDF2 iterations (recommended: 100000+)
+ * @param iterations Number of PBKDF2 iterations (recommended: 600000+ per NIST SP 800-132)
  * @returns Promise<EncryptionKey>
  */
 export const deriveKeyFromPassword = async (
   password: string,
   salt: Uint8Array,
-  iterations: number = 100000
+  iterations: number = 600000
 ): Promise<EncryptionKey> => {
   if (!isCryptoAvailable) throw new Error('Web Crypto API not available')
 
@@ -115,10 +115,10 @@ export const deriveKeyFromPassword = async (
 
 /**
  * Generates a random salt for key derivation
- * @param length Salt length in bytes (recommended: 16+)
+ * @param length Salt length in bytes (recommended: 32+ per NIST SP 800-132)
  * @returns Uint8Array salt
  */
-export const generateSalt = (length: number = 16): Uint8Array => {
+export const generateSalt = (length: number = 32): Uint8Array => {
   return crypto.getRandomValues(new Uint8Array(length))
 }
 
@@ -396,7 +396,7 @@ export const sanitizeValue = (value: unknown): unknown => {
  * @param key Key to validate
  * @returns boolean - True if valid
  */
-export const validateKey = (key: string): boolean => /^[a-zA-Z0-9_.-]+$/.test(key) && key.length <= 256
+export const validateKey = (key: string): boolean => /^([a-zA-Z0-9_.-][a-zA-Z0-9_.-]*)$/.test(key) && key.length <= 256 && key.length > 0
 
 // --- GDPR COMPLIANCE ---
 

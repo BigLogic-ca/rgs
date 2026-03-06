@@ -1,0 +1,232 @@
+{
+  "completions": [
+    {
+      "label": "createStore",
+      "kind": 2,
+      "insertText": "createStore${1|<S extends Record<string, unknown> = Record<string, unknown>>|}",
+      "insertTextFormat": 2,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## createStore<S>(config?)\n\nCreates an enterprise-grade state management store with full type safety.\n\n**Parameters:**\n- `config?`: StoreConfig<S> - Optional configuration for the store\n\n**Returns:** IStore<S>\n\n**Example:**\n```typescript\nimport { createStore } from '@biglogic/rgs'\n\nconst store = createStore<MyState>({\n  namespace: 'myApp',\n  version: 1,\n  persistByDefault: true\n})\n```"
+      },
+      "detail": "createStore<S>(config?: StoreConfig<S>): IStore<S>",
+      "priority": 100
+    },
+    {
+      "label": "initState",
+      "kind": 2,
+      "insertText": "initState${1|<S extends Record<string, unknown> = Record<string, unknown>>|}",
+      "insertTextFormat": 2,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## initState<S>(config?)\n\nInitialize a global store instance. Throws error if store already exists (prevents accidental overwrites).\n\n**Parameters:**\n- `config?`: StoreConfig<S> - Optional store configuration\n\n**Returns:** IStore<S>\n\n**Example:**\n```typescript\nimport { initState } from '@biglogic/rgs'\n\nconst store = initState<MyState>({ namespace: 'app' })\n```"
+      },
+      "detail": "initState<S>(config?: StoreConfig<S>): IStore<S>",
+      "priority": 95
+    },
+    {
+      "label": "useStore",
+      "kind": 2,
+      "insertText": "useStore${1|<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>|}",
+      "insertTextFormat": 2,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## useStore<T, S>(keyOrSelector, store?)\n\nReactive Hook for state management.\n\n**Two modes:**\n1. **String Key**: `useStore('count')` → Returns `[value, setter]`\n2. **Type-Safe Selector**: `useStore(state => state.count)` → Returns value (Read-only)\n\n**Parameters:**\n- `keyOrSelector`: string | ((state: S) => T) - Key name or selector function\n- `store?`: IStore<S> - Optional store instance\n\n**Returns:** \n- With key: `readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean]`\n- With selector: `T`\n\n**Example:**\n```typescript\n// Key mode\nconst [count, setCount] = useStore('count')\n\n// Selector mode (read-only)\nconst user = useStore(state => state.user)\n```"
+      },
+      "detail": "useStore<T, S>(keyOrSelector: string | ((state: S) => T), store?: IStore<S>): T | readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean]",
+      "priority": 90
+    },
+    {
+      "label": "useSyncedState",
+      "kind": 2,
+      "insertText": "useSyncedState${1|<T = unknown>|}",
+      "insertTextFormat": 2,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## useSyncedState<T>(key, store?)\n\nHook for synchronized state management with offline-by-default functionality and automatic sync.\n\n**Parameters:**\n- `key`: string - State key\n- `store?`: IStore<Record<string, unknown>> - Optional store instance\n\n**Returns:** `readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean, SyncState]`\n\n**SyncState contains:**\n- `isOnline`: boolean\n- `isSyncing`: boolean\n- `pendingChanges`: number\n- `conflicts`: number\n\n**Example:**\n```typescript\nconst [count, setCount, syncState] = useSyncedState('count')\n```"
+      },
+      "detail": "useSyncedState<T>(key: string, store?: IStore<Record<string, unknown>>): readonly [T | undefined, (val: T | StateUpdater<T>, options?: PersistOptions) => boolean, SyncState]",
+      "priority": 85
+    },
+    {
+      "label": "useSyncStatus",
+      "kind": 2,
+      "insertText": "useSyncStatus",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## useSyncStatus()\n\nHook to get global sync status across all sync engines.\n\n**Returns:** `SyncState`\n\n**Example:**\n```typescript\nconst status = useSyncStatus()\n// status.isOnline, status.isSyncing, status.pendingChanges\n```"
+      },
+      "detail": "useSyncStatus(): SyncState",
+      "priority": 80
+    },
+    {
+      "label": "useIsStoreReady",
+      "kind": 2,
+      "insertText": "useIsStoreReady",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## useIsStoreReady(store?)\n\nHook to check if the store has finished hydration.\n\n**Parameters:**\n- `store?`: IStore<Record<string, unknown>> - Optional store instance\n\n**Returns:** `boolean`\n\n**Example:**\n```typescript\nconst isReady = useIsStoreReady()\nif (isReady) {\n  // Store is ready\n}\n```"
+      },
+      "detail": "useIsStoreReady(store?: IStore<Record<string, unknown>>): boolean",
+      "priority": 75
+    },
+    {
+      "label": "getStore",
+      "kind": 2,
+      "insertText": "getStore",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## getStore()\n\nGet the current default store instance (for advanced use cases). Returns null if no store has been initialized.\n\n**Returns:** `IStore<Record<string, unknown>> | null`\n\n**Example:**\n```typescript\nimport { getStore } from '@biglogic/rgs'\n\nconst store = getStore()\n```"
+      },
+      "detail": "getStore(): IStore<Record<string, unknown>> | null",
+      "priority": 70
+    },
+    {
+      "label": "destroyState",
+      "kind": 2,
+      "insertText": "destroyState",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## destroyState()\n\nCleanup the global state. Safe to call multiple times.\n\n**Example:**\n```typescript\nimport { destroyState } from '@biglogic/rgs'\n\n// Call on app unmount\ndestroyState()\n```"
+      },
+      "detail": "destroyState(): void",
+      "priority": 65
+    },
+    {
+      "label": "triggerSync",
+      "kind": 2,
+      "insertText": "triggerSync",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## triggerSync(namespace?)\n\nTrigger manual sync for a specific namespace.\n\n**Parameters:**\n- `namespace?`: string - Optional namespace (uses default if not provided)\n\n**Returns:** `Promise<void>`\n\n**Example:**\n```typescript\nimport { triggerSync } from '@biglogic/rgs'\n\nawait triggerSync('myApp')\n```"
+      },
+      "detail": "triggerSync(namespace?: string): Promise<void>",
+      "priority": 60
+    },
+    {
+      "label": "initSync",
+      "kind": 2,
+      "insertText": "initSync",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## initSync(store, config)\n\nInitialize sync engine for a store.\n\n**Parameters:**\n- `store`: IStore<Record<string, unknown>> - The store to sync\n- `config`: SyncConfig - Sync configuration\n\n**Returns:** `SyncEngine<Record<string, unknown>>`\n\n**Example:**\n```typescript\nimport { initSync } from '@biglogic/rgs'\n\nconst engine = initSync(store, { url: 'https://api.example.com/sync' })\n```"
+      },
+      "detail": "initSync(store: IStore<Record<string, unknown>>, config: SyncConfig): SyncEngine<Record<string, unknown>>",
+      "priority": 55
+    },
+    {
+      "label": "destroySync",
+      "kind": 2,
+      "insertText": "destroySync",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## destroySync(namespace)\n\nDestroy sync engine for a namespace.\n\n**Parameters:**\n- `namespace`: string - Namespace to destroy sync for\n\n**Example:**\n```typescript\nimport { destroySync } from '@biglogic/rgs'\n\ndestroySync('myApp')\n```"
+      },
+      "detail": "destroySync(namespace: string): void",
+      "priority": 50
+    },
+    {
+      "label": "StoreConfig",
+      "kind": 6,
+      "insertText": "StoreConfig",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## StoreConfig<S>\n\nConfiguration options for creating a store.\n\n**Properties:**\n- `namespace?`: string - Unique namespace (default: 'gstate')\n- `version?`: number - Schema version for migrations\n- `silent?`: boolean - Suppress console warnings\n- `debounceTime?`: number - Milliseconds before flushing to disk\n- `storage?`: CustomStorage | Storage - Storage adapter\n- `migrate?`: (oldState, oldVersion) => S - Migration function\n- `persistByDefault?`: boolean - Persist all keys by default\n- `onError?`: (error, context) => void - Error handler\n- `maxObjectSize?`: number - Max object size in bytes\n- `maxTotalSize?`: number - Max total store size in bytes\n- `encryptionKey?`: EncryptionKey - AES-256-GCM key\n- `auditEnabled?`: boolean - Enable audit logging\n- `userId?`: string - User ID for audit logs\n- `validateInput?`: boolean - XSS prevention\n- `encoded?`: boolean - Base64 encode by default\n- `accessRules?`: AccessRule[] - RBAC rules\n- `immer?`: boolean - Enable Immer (default: true)\n- `sync?`: SyncConfig - Local-first sync config"
+      },
+      "detail": "interface StoreConfig<S extends Record<string, unknown>>",
+      "priority": 45
+    },
+    {
+      "label": "IStore",
+      "kind": 6,
+      "insertText": "IStore",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## IStore<S>\n\nMain store interface with full type safety.\n\n**Methods:**\n- `set<K>(key: K, value: S[K] | StateUpdater<S[K]>, options?): boolean`\n- `get<K>(key: K): S[K] | null`\n- `compute<T>(key: string, selector: ComputedSelector<T>): T`\n- `watch<K>(key: K, callback: WatcherCallback<S[K]>): () => void`\n- `remove(key): boolean`\n- `delete(key): boolean`\n- `deleteAll(): boolean`\n- `list(): Record<string, unknown>`\n- `use(middleware): void`\n- `transaction(fn): void`\n- `destroy(): void`\n- `getSnapshot(): S`\n- `whenReady(): Promise<void>`\n\n**Security Methods:**\n- `addAccessRule(pattern, permissions): void`\n- `hasPermission(key, action, userId?): boolean`\n- `recordConsent(userId, purpose, granted): ConsentRecord`\n- `hasConsent(userId, purpose): boolean`\n- `getConsents(userId): ConsentRecord[]`\n\n**Properties:**\n- `isReady: boolean`\n- `namespace: string`\n- `userId?: string`\n- `plugins: GStatePlugins`"
+      },
+      "detail": "interface IStore<S extends Record<string, unknown>>",
+      "priority": 44
+    },
+    {
+      "label": "PersistOptions",
+      "kind": 6,
+      "insertText": "PersistOptions",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## PersistOptions\n\nOptions for persisting state values.\n\n**Properties:**\n- `persist?`: boolean - Persist to storage\n- `encrypted?`: boolean - AES-256-GCM encryption\n- `encoded?`: boolean - Base64 encoding\n- `ttl?`: number - Time-to-live in milliseconds"
+      },
+      "detail": "interface PersistOptions",
+      "priority": 43
+    },
+    {
+      "label": "StateUpdater",
+      "kind": 6,
+      "insertText": "StateUpdater",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## StateUpdater<T>\n\nFunction to update state immutably (used with Immer).\n\n**Type:** `(draft: T) => void | T`\n\n**Example:**\n```typescript\n// Using Immer\nstore.set('user', (draft) => {\n  draft.name = 'New Name'\n})\n```"
+      },
+      "detail": "type StateUpdater<T> = (draft: T) => void | T",
+      "priority": 42
+    },
+    {
+      "label": "ComputedSelector",
+      "kind": 6,
+      "insertText": "ComputedSelector",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## ComputedSelector<T>\n\nSelector function for computed values.\n\n**Type:** `(get: <V>(key: string) => V | null) => T`\n\n**Example:**\n```typescript\nconst store = createStore<{firstName: string, lastName: string}>()\n\nstore.compute('fullName', (get) => {\n  const first = get<string>('firstName') || ''\n  const last = get<string>('lastName') || ''\n  return `${first} ${last}`\n})\n```"
+      },
+      "detail": "type ComputedSelector<T> = (get: <V>(key: string) => V | null) => T",
+      "priority": 41
+    },
+    {
+      "label": "IPlugin",
+      "kind": 6,
+      "insertText": "IPlugin",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## IPlugin<S>\n\nPlugin interface for extending store functionality.\n\n**Properties:**\n- `name`: string - Unique plugin name\n- `hooks`: Object with lifecycle hooks\n\n**Lifecycle Hooks:**\n- `onInit`\n- `onInstall`\n- `onSet`\n- `onGet`\n- `onRemove`\n- `onDestroy`\n- `onTransaction`\n- `onBeforeSet`\n- `onAfterSet`"
+      },
+      "detail": "interface IPlugin<S extends Record<string, unknown>>",
+      "priority": 40
+    },
+    {
+      "label": "gstate",
+      "kind": 6,
+      "insertText": "gstate",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## gstate\n\nAlias for the RGS state management library. Use this to create reactive stores with enterprise features:\n\n- **Reactivity**: Fine-grained updates with computed values\n- **Persistence**: Automatic state hydration from storage\n- **Security**: RBAC, encryption, audit logging\n- **Plugins**: Extensible architecture\n- **Sync**: Local-first synchronization\n\n**Example:**\n```typescript\nimport { createStore, useStore } from 'gstate'\n\nconst store = createStore({ namespace: 'app' })\nconst [value, setValue] = useStore('key')\n```"
+      },
+      "detail": "RGS State Management Library - Enterprise-grade reactive state",
+      "priority": 30
+    },
+    {
+      "label": "rgs",
+      "kind": 6,
+      "insertText": "rgs",
+      "insertTextFormat": 1,
+      "documentation": {
+        "kind": "markdown",
+        "value": "## rgs\n\nAlias for the RGS state management library (same as gstate).\n\n```typescript\nimport { createStore, useStore } from 'rgs'\n```"
+      },
+      "detail": "RGS State Management Library",
+      "priority": 29
+    }
+  ]
+}

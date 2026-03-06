@@ -12,11 +12,11 @@
     },
     {
       "name": "variable.gstate",
-      "match": "\\b(gstate)\\b"
+      "match": "\\b(gstate|gState)\\b"
     },
     {
       "name": "keyword",
-      "match": "\\b(gstate|useStore|createStore|initState)\\b"
+      "match": "\\b(useStore|createStore|initState)\\b"
     }
   ],
   "scopeName": "source.rgs"

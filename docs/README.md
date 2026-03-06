@@ -1,7 +1,5 @@
 # 🚀 ARGIS (RGS) - Reactive Global State
 
-<div align="center">
-
 > **"Atomic Precision. Immutable Safety. Zen Simplicity."**
 > The state management engine that **won't let you fail**.
 
@@ -10,12 +8,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19+-61DAFB.svg)](https://react.dev/)
+[![NIST SP 800-132 Compliant](https://img.shields.io/badge/NIST-SP%20800--132-Compliant-green.svg)](https://csrc.nist.gov/publications/detail/sp/800-132/final)
 
-</div>
+> **🔐 Security Compliance**: This project is fully compliant with **NIST SP 800-132** standards for password-based key derivation, featuring AES-256-GCM encryption, PBKDF2 with 600k iterations, and 32-byte salts.
 
 ---
 
-## ⚡ TL;DR - Why ARGIS (RGS) Will Change How You Code Forever
+## ⚡ TL;DR
+
+>Why ARGIS (RGS) Will Change How You Code Forever
 
 ```tsx
 // One line. Zero boilerplate. Enterprise-grade power.
@@ -437,11 +438,11 @@ graph TB
 
 ## 📚 Documentation
 
-- [Getting Started](docs/chapters/02-getting-started.md)
-- [Plugin SDK](docs/chapters/05-plugin-sdk.md)
-- [Security Architecture](docs/chapters/09-security-architecture.md)
-- [Migration Guide](docs/chapters/08-migration-guide.md)
-- [API Reference](docs/api.md)
+- [Getting Started](docs/markdown/getting-started.md)
+- [Plugin SDK](docs/markdown/plugin-sdk.md)
+- [Security Architecture](docs/markdown/security-architecture.md)
+- [Migration Guide](docs/markdown/migration-guide.md)
+- [API Reference](docs/markdown/api.md)
 
 ---
 
@@ -467,8 +468,6 @@ npm run test
 
 ---
 
-<div align="center">
-
 ## 🔥 Built for Those Who Demand **Excellence**
 
 [![Powered by Immer](https://img.shields.io/badge/Powered%20by-Immer-2ECC71.svg)](https://github.com/immerjs/immer)
@@ -479,5 +478,3 @@ npm run test
 **Made with ❤️ and a lot of caffè espresso!**
 
 [⬆ Back to top](#-argis-rgs---reactive-global-state)
-
-</div>

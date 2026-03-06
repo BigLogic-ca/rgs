@@ -66,4 +66,4 @@ Yes, and that's the point! You can have isolated micro-stores for every domain o
 
 ---
 
-**Next step:** [Persistence and Safety: Data Never Dies](04-persistence-and-safety.md)
+**Next step:** [Persistence and Safety: Data Never Dies](persistence-and-safety.md)
