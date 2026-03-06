@@ -101,7 +101,7 @@ describe('New Features', () => {
       localStorage.setItem('test-hydration_key', 'invalid json{')
 
       const onError = jest.fn()
-      const store = createStore({ namespace: 'test-hydration', onError })
+      createStore({ namespace: 'test-hydration', onError })
 
       expect(onError).toHaveBeenCalledTimes(1)
       expect(onError).toHaveBeenCalledWith(
