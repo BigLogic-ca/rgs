@@ -2,7 +2,7 @@
  * Stress Tests - Enterprise Level Performance
  * Tests with 10k+ keys to verify scalability
  */
-import { describe, test, expect, beforeEach } from '@jest/globals'
+import { describe, test, expect } from '@jest/globals'
 import { createStore, destroyState } from '../../../index'
 
 describe('Stress Tests - Enterprise Performance', () => {
