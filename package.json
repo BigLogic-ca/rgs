@@ -1,6 +1,6 @@
 {
   "name": "argis",
-  "version": "3.9.0",
+  "version": "3.9.1",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
   "main": "./index.js",
   "browser": "./index.cjs",
