@@ -55,10 +55,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a51-dev/BigLogic-ca/rgs.git"
+    "url": "git+https://github.com/BigLogic-ca/rgs.git"
   },
   "bugs": {
-    "url": "https://github.com/a51-dev/BigLogic-ca/rgs/issues"
+    "url": "https://github.com/BigLogic-ca/rgs/issues"
   },
   "support": {
     "name": "Dario Passariello",
