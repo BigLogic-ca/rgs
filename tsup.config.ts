@@ -8,7 +8,7 @@ export default defineConfig(
     plugins: [
       copyStatic
     ] as Options['plugins'],
-    globalName: pk.name,
+    globalName: pk.code,
     format: ['cjs', 'esm'],
     entry: ['index.ts', 'core/minimal.ts', 'core/advanced.ts'],
     platform: 'browser',
