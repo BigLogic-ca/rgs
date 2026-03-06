@@ -3,7 +3,7 @@
  * Tests with 10k+ keys to verify scalability
  */
 import { describe, test, expect } from '@jest/globals'
-import { createStore, destroyState } from '../../../index'
+import { createStore } from '../../../index'
 
 describe('Stress Tests - Enterprise Performance', () => {
 
