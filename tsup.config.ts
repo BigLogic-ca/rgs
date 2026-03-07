@@ -1,23 +1,15 @@
 import { defineConfig } from 'tsup'
 import { sassPlugin } from 'esbuild-sass-plugin'
 
+import { include, plug } from './tsup.setup'
+
 import copyStatic from './tsup.plugin.copyStatic'
-//! import injectCss from './tsup.plugin.injectCss'
-//! import types from './tsup.plugin.types'
+import injectCss from './tsup.plugin.injectCss'
+import types from './tsup.plugin.types'
 
 import pk from "./package.json"
 
-const include = [
-  { from: '.github/COPYRIGHT.md', to: 'COPYRIGHT.md' },
-  { from: '.github/LICENSE.md', to: 'LICENSE.md' },
-  { from: '.github/SECURITY.md', to: 'SECURITY.md' },
-  { from: '.github/FUNDING.yml', to: 'FUNDING.yml' },
-  { from: 'docs/README.md', to: 'README.md' },
-  { from: 'package.json', to: 'package.json' },
-  { from: 'types/', to: 'types/' },
-  //! { from: 'index.d.ts', to: 'index.d.ts' },
-  { from: 'docs/**/*', to: 'docs/' }
-]
+///
 
 export default defineConfig(
   {
@@ -42,14 +34,10 @@ export default defineConfig(
     clean: true,
     dts: false,
     external: [
-      // ...Object.keys(pk.dependencies),
       ...Object.keys(pk.devDependencies),
-      ...Object.keys(pk.peerDependencies),
-      ...Object.keys(pk.peerDependenciesMeta)
     ],
-    noExternal: [
-      "immer"
-    ],
+    //! noExternal: [],
+    //! inject: [],
     swc: {
       swcrc: true
     },
@@ -58,7 +46,11 @@ export default defineConfig(
     ],
     esbuildOptions(options) {
       options.legalComments = 'none'
-      // options.minify = true
+      //! options.minify = true
+      //! options.alias = {
+      //!   'react': require.resolve('react'),
+      //!   'react-dom': require.resolve('react-dom'),
+      //! }
     },
     terserOptions: {
       mangle: true,
@@ -79,9 +71,9 @@ export default defineConfig(
       '.css': 'css'
     },
     async onSuccess() {
-      await copyStatic(include)
-      // await injectCss()
-      // await types()
+      if (plug.copyStatic) await copyStatic(include)
+      if (plug.injectCss) await injectCss()
+      if (plug.types) await types()
       console.debug("Compilation: OK")
     }
   }
