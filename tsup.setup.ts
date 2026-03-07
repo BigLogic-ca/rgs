@@ -12,6 +12,6 @@ export const include = [
 
 export const plug = {
   copyStatic: true,
-  injectCss: true,
+  injectCss: false,
   types: false
 }
