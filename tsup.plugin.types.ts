@@ -23,16 +23,18 @@ const types = () => {
     }
   }
 
-  // Patch dist/types/index.d.ts to reference [_pk.code].d.ts
+  // Patch dist/index.d.ts to reference [_pk.code].d.ts
   // (tsc strips /// <reference> from .ts files when emitting .d.ts)
   const distIndexDts = './dist/index.d.ts'
-  if (_fs.existsSync(distIndexDts)) {
+  try {
     const content = _fs.readFileSync(distIndexDts, 'utf8')
     const ref = `/// <reference path="./${_pk.code}.d.ts" />\n`
     if (!content.startsWith(ref)) {
       _fs.writeFileSync(distIndexDts, ref + content, 'utf8')
       console.debug(`-----> Patched dist/index.d.ts with ${_pk.code}.d.ts reference.`)
     }
+  } catch {
+    // File doesn't exist or can't be read - skip patching
   }
 
   return
