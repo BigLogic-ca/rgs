@@ -81,7 +81,7 @@
     "@types/node": "^25.3.5",
     "@types/react": "19.2.14",
     "esbuild-plugin-copy": "2.1.1",
-    "esbuild-sass-plugin": "3.6.0",
+    "esbuild-sass-plugin": "3.7.0",
     "esbuild-scss-modules-plugin": "1.1.1",
     "immer": "11.1.4",
     "react": "^19.2.4",
