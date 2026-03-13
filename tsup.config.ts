@@ -20,7 +20,7 @@ export default defineConfig(
     globalName: pk.code,
     format: ['cjs', 'esm'],
     entry: ['index.ts'],
-    platform: "node",
+    platform: "browser",
     target: "es2024",
     outDir: 'dist',
     minify: 'terser',
@@ -34,7 +34,7 @@ export default defineConfig(
     clean: true,
     dts: false,
     external: [
-      ...Object.keys(pk.devDependencies),
+      ...Object.keys(pk.devDependencies ?? {}),
     ],
     //! noExternal: [],
     //! inject: [],
