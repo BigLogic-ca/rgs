@@ -312,7 +312,16 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
 
         const shouldPersist = options.persist ?? _persistByDefault
         if (shouldPersist) {
-          _diskQueue.set(key, { value: frozen, options: { ...options, persist: shouldPersist, encoded: options.encoded || config?.encoded } }); if (_diskTimer) clearTimeout(_diskTimer); _diskTimer = setTimeout(_flushDisk, _debounceTime)
+          _diskQueue.set(key, {
+            value: frozen,
+            options: {
+              ...options,
+              persist: shouldPersist,
+              encoded: options.encoded || config?.encoded,
+            },
+          })
+          if (_diskTimer) clearTimeout(_diskTimer)
+          _diskTimer = setTimeout(_flushDisk, _debounceTime)
         }
         _runHook('onSet', { key, value: frozen, store: instance, version: _versions.get(key) })
         _audit('set', key, true)
