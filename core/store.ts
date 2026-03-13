@@ -4,7 +4,7 @@ import * as Security from "./security"
 import * as Persistence from "./persistence"
 import * as Plugins from "./plugins"
 import { deepClone, isEqual } from './utils'
-import { SyncEngine } from './sync'
+import type { SyncState } from './sync'
 import { isProduction } from './env'
 
 import type {
@@ -456,15 +456,42 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     })
   } else { _isReady = true; _readyResolver!() }
 
-  // Initialize sync engine if configured
-  let _syncEngine: SyncEngine<S> | null = null
+  // Initialize sync engine if configured (lazy loaded for tree-shaking)
+  // Network code is ONLY loaded when user explicitly configures sync option
   if ((config as StoreConfig<S>)?.sync) {
-    _syncEngine = new SyncEngine(instance, (config as StoreConfig<S>).sync!)
-    // Register sync methods on the store
-    instance._registerMethod('sync', 'flush', () => _syncEngine?.flush())
-    instance._registerMethod('sync', 'getState', () => _syncEngine?.getState())
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    instance._registerMethod('sync', 'onStateChange', (cb: any) => _syncEngine?.onStateChange(cb))
+    // Store config reference for lazy loading
+    const syncConfig = (config as StoreConfig<S>).sync!
+
+    // Lazy load SyncEngine on first use - this ensures network code
+    // is NOT included in bundle unless sync is actually used
+    const loadEngine = async () => {
+      const { SyncEngine: SE } = await import('./sync')
+      return new SE(instance, syncConfig)
+    }
+
+    let enginePromise: ReturnType<typeof loadEngine> | null = null
+
+    // Pre-register sync methods that trigger lazy load on first call
+    instance._registerMethod('sync', 'flush', async () => {
+      if (!enginePromise) enginePromise = loadEngine()
+      const engine = await enginePromise
+      return engine.flush()
+    })
+    instance._registerMethod('sync', 'getState', async () => {
+      if (!enginePromise) enginePromise = loadEngine()
+      const engine = await enginePromise
+      return engine.getState()
+    })
+    instance._registerMethod('sync', 'onStateChange', async (cb: unknown) => {
+      if (!enginePromise) enginePromise = loadEngine()
+      const engine = await enginePromise
+      return engine.onStateChange(cb as (state: SyncState) => void)
+    })
+    instance._registerMethod('sync', 'forceSync', async () => {
+      if (!enginePromise) enginePromise = loadEngine()
+      const engine = await enginePromise
+      return engine.sync()
+    })
   }
 
   return instance
