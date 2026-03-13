@@ -2,7 +2,9 @@ import * as _fs from 'node:fs'
 import * as _path from 'node:path'
 
 // Custom plugin to copy static files and fix package.json
-const copyStatic = (paths: any) => {
+type CopyPath = { from: string; to: string }
+
+const copyStatic = (paths: CopyPath[]) => {
 
   const
     outdir = 'dist',
