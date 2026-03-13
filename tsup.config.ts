@@ -34,7 +34,7 @@ export default defineConfig(
     clean: true,
     dts: false,
     external: [
-      ...Object.keys(pk.devDependencies),
+      ...Object.keys(pk.devDependencies ?? {}),
     ],
     //! noExternal: [],
     //! inject: [],
