@@ -6,7 +6,6 @@ export const include = [
   { from: 'docs/README.md', to: 'README.md' },
   { from: 'package.json', to: 'package.json' },
   { from: 'types/', to: 'types/' },
-  //! { from: 'index.d.ts', to: 'index.d.ts' },
   { from: 'docs/**/*', to: 'docs/' }
 ]
 
