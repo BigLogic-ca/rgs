@@ -306,7 +306,8 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
 
         _totalSize = _totalSize - oldSize + finalSize
         _sizes.set(key, finalSize)
-        _store.set(key, frozen); _versions.set(key, (_versions.get(key) || 0) + 1)
+        _store.set(key, frozen)
+        _versions.set(key, (_versions.get(key) || 0) + 1)
 
         _snapshot = null // Invalidate snapshot
 
