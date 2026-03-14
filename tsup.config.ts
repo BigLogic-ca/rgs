@@ -17,7 +17,7 @@ export default defineConfig(
     //! minifyIdentifiers: true,
     //! minifySyntax: true,
     //! minify: true,
-    globalName: pk.code,
+    globalName: (pk as any).code ?? 'index',
     format: ['cjs', 'esm'],
     entry: ['index.ts'],
     platform: "browser",
@@ -34,7 +34,8 @@ export default defineConfig(
     clean: true,
     dts: false,
     external: [
-      ...Object.keys(pk.devDependencies ?? {}),
+      ...Object.keys(pk.dependencies ?? {}),
+      ...Object.keys(pk.peerDependencies ?? {}),
     ],
     //! noExternal: [],
     //! inject: [],
