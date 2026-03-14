@@ -8,12 +8,18 @@ const copyStatic = (paths: CopyPath[]) => {
 
   const
     outdir = 'dist',
-    patterns = [...paths]
+    patterns = [...paths],
+    pkgJsonDest = _path.resolve(outdir, 'package.json')
 
   patterns.forEach(({ from, to }) => {
     const
       src = _path.resolve(from),
       dest = _path.resolve(outdir, to)
+
+    // Skip package.json here; it is handled separately below.
+    if (dest === pkgJsonDest) {
+      return
+    }
 
     if (_fs.existsSync(src)) {
       const stat = _fs.statSync(src)
@@ -35,7 +41,7 @@ const copyStatic = (paths: CopyPath[]) => {
   // Copy and fix package.json with proper exports
   const
     src = _path.resolve('package.json'),
-    dest = _path.resolve(outdir, 'package.json')
+    dest = pkgJsonDest
 
   if (_fs.existsSync(src)) {
 

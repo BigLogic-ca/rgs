@@ -21,8 +21,13 @@ const charMap: Record<string, string> = {
   '\uF0DA': '\\uF0DA',
 }
 
+const unsafeCharsPattern = new RegExp(
+  `[${Object.keys(charMap).join('').replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&')}]`,
+  'g',
+)
+
 function escapeUnsafeChars(str: string): string {
-  return str.replace(/[</\\\b\f\n\r\t\0\u2028\u2029\u203A\uF0D7\uF0DA]/g, (x) => charMap[x] || x)
+  return str.replace(unsafeCharsPattern, (ch) => charMap[ch] ?? ch)
 }
 
 // Custom plugin to inject CSS into JS bundle

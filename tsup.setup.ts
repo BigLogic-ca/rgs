@@ -6,7 +6,7 @@ export const include = [
   { from: 'docs/README.md', to: 'README.md' },
   { from: 'package.json', to: 'package.json' },
   { from: 'types/', to: 'types/' },
-  { from: 'docs/**/*', to: 'docs/' }
+  { from: 'docs/', to: 'docs/' }
 ]
 
 export const plug = {

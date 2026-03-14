@@ -295,6 +295,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
           const error = new Error(`Object size (${finalSize} bytes) exceeds maxObjectSize (${_maxObjectSize} bytes)`)
           if (_onError) _onError(error, { operation: 'set', key })
           else if (!_silent) console.warn(`[gstate] ${error.message} for "${key}"`)
+          return false
         }
 
         if (_maxTotalSize > 0) {
@@ -303,6 +304,7 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
             const error = new Error(`Total store size (${est} bytes) exceeds limit (${_maxTotalSize} bytes)`)
             if (_onError) _onError(error, { operation: 'set' })
             else if (!_silent) console.warn(`[gstate] ${error.message}`)
+            return false
           }
         }
 
@@ -381,9 +383,17 @@ export const createStore = <S extends Record<string, unknown> = Record<string, u
     deleteAll: () => {
       Array.from(_store.keys()).forEach(k => instance.remove(k))
       if (_storage) {
-        const prefix = _namespace + "_"
-        for (let i = 0; i < (_storage.length || 0); i++) {
-          const k = _storage.key(i); if (k?.startsWith(prefix)) { _storage.removeItem(k); i-- }
+        const prefix = _getPrefix()
+        const keysToRemove: string[] = []
+        const length = _storage.length || 0
+        for (let i = 0; i < length; i++) {
+          const k = _storage.key(i)
+          if (k && k.startsWith(prefix)) {
+            keysToRemove.push(k)
+          }
+        }
+        for (const k of keysToRemove) {
+          _storage.removeItem(k)
         }
       }
       _totalSize = 0
