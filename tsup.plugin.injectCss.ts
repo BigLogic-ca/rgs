@@ -21,10 +21,6 @@ const charMap: Record<string, string> = {
   '\uF0DA': '\\uF0DA',
 }
 
-function escapeUnsafeChars(str: string): string {
-  return str.replace(/[</\\\b\f\n\r\t\0\u2028\u2029\u203A\uF0D7\uF0DA]/g, (x) => charMap[x] || x)
-}
-
 // Custom plugin to inject CSS into JS bundle
 const injectCss = () => {
 
@@ -51,7 +47,7 @@ const injectCss = () => {
       cjsContent = _fs.readFileSync(cjsPath, 'utf-8')
 
     // Inject CSS into JS
-    const injectCode = `;(()=>{const s=document.createElement("style");s.textContent=${escapeUnsafeChars(JSON.stringify(cssContent))};document.head.appendChild(s)})();`
+    const injectCode = `;(()=>{const s=document.createElement("style");s.textContent=${JSON.stringify(cssContent)};document.head.appendChild(s)})();`
 
     // For ESM - inject at the beginning
     const newJsContent = injectCode + jsContent
