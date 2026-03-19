@@ -406,7 +406,7 @@ export const runSaga = <S extends Record<string, unknown>>(
   const thunkStore = createThunkStore(store)
 
   // Start the saga
-  const promise = thunkStore.dispatch(saga as ThunkAction<unknown, S>)
+  thunkStore.dispatch(saga as ThunkAction<unknown, S>)
 
   // Return cancel function
   return () => {
