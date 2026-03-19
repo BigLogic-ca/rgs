@@ -115,7 +115,6 @@ export const createSSRStore = <S extends Record<string, unknown>>(
   }
 
   // If deferHydration is true, we need special handling
-  const needsDeferredHydration = deferHydration && isClientSide()
 
   /**
    * Manually trigger hydration on client
