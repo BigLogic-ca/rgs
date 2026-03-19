@@ -72,6 +72,48 @@ export {
 export { createAsyncStore } from "./core/async"
 
 // ============================================================================
+// SSR Support (Next.js, Remix)
+// ============================================================================
+
+export {
+  isServerSide,
+  isClientSide,
+  createSSRStore,
+  hydrateOnClient,
+  dehydrateStore,
+  rehydrateStore,
+  useHydrated,
+  useHydrationStatus,
+  useDeferredStore,
+  createNextStore,
+  getSSRInitialState,
+  initializeFromSSR
+} from "./core/ssr"
+
+export type { SSRStoreConfig } from "./core/ssr"
+
+// ============================================================================
+// Thunk Middleware (Async Actions)
+// ============================================================================
+
+export {
+  createThunkStore,
+  createActions,
+  createAsyncAction,
+  createAsyncActions,
+  createSaga,
+  runSaga,
+  call,
+  put,
+  select,
+  take,
+  all,
+  race
+} from "./core/thunk"
+
+export type { ThunkAction, ThunkDispatch, ThunkActionPayload, Effect } from "./core/thunk"
+
+// ============================================================================
 // Local-First Sync Engine
 // ============================================================================
 
