@@ -357,3 +357,36 @@ export const triggerSync = async (namespace?: string): Promise<void> => {
     await engine.flush()
   }
 }
+
+/**
+ * Hook to subscribe to any state changes and trigger re-render.
+ * Use this when you want to re-render on any store change without reading a specific key.
+ * @param store Optional store instance
+ * @returns boolean (always true, triggers re-render on any change)
+ */
+export function useStoreSubscribe<S extends Record<string, unknown> = Record<string, unknown>>(
+  store?: IStore<S>
+): readonly [boolean, () => void] {
+  const targetStore = useMemo(() =>
+    (store || _defaultStore) as IStore<S> | null,
+    [store]
+  )
+
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      return targetStore ? targetStore._subscribe(callback) : () => { }
+    },
+    [targetStore]
+  )
+
+  const getSnapshot = useCallback(() => true, [])
+  const getServerSnapshot = useCallback(() => true, [])
+
+  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+
+  const [, setForceRender] = useState(0)
+
+  const forceRender = useCallback(() => setForceRender(n => n + 1), [])
+
+  return [true, forceRender] as const
+}

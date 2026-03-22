@@ -44,7 +44,28 @@ export const gstate = <S extends Record<string, unknown>>(
   }
 
   // Magic function that returns a typed hook when called with a key
-  const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
+  // Also supports no-arg call for subscribing to ANY change (legacy compatibility)
+  // @ts-ignore - complex type overload
+  const magic = (key?: string) => {
+    // No key provided - return a subscription hook for legacy compatibility
+    if (key === undefined) {
+      // Return useStoreSubscribe for subscribing to any change
+      // We need to use the 'ghost' store pattern from useStore and subscribe to all changes
+      const storeRef = { current: store }
+      const subscribe = (callback: () => void) => storeRef.current._subscribe(callback)
+      const getSnapshot = () => true
+      const getServerSnapshot = () => true
+
+      // Use useSyncExternalStore to subscribe to any change
+      // This must be called inside a React component
+      // @ts-ignore - React hook
+      const { useSyncExternalStore } = require('react')
+      useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+      return [true, store.set.bind(store)] as const
+    }
+    // Key provided - return the typed hook
+    return baseUseStore(key, store)
+  }
 
   // Expose as global for debugging purposes ONLY in dev environments
   // We use multiple checks to catch common bundler environments (Vite, Webpack, etc.)
@@ -54,7 +75,9 @@ export const gstate = <S extends Record<string, unknown>>(
     (window as unknown as Record<string, unknown>).rgs = store
   }
 
-  return Object.assign(magic, store) as IStore<S> & (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | ((draft: S[K]) => S[K]), options?: unknown) => boolean])
+  // Return mixed type: callable with or without key
+  // @ts-ignore - complex type that works at runtime
+  return Object.assign(magic, store)
 }
 
 export { baseCreateStore as createStore }
@@ -66,7 +89,8 @@ export {
   getStore,
   destroyState,
   useStore as useGState,
-  useStore as useSimpleState
+  useStore as useSimpleState,
+  useStoreSubscribe
 } from "./core/hooks"
 
 export { createAsyncStore } from "./core/async"
