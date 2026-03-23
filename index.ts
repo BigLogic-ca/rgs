@@ -44,17 +44,17 @@ export const gstate = <S extends Record<string, unknown>>(
   }
 
   // Magic function that returns a typed hook when called with a key
-  const magic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
+  const callableMagic = <K extends keyof S>(key: K) => baseUseStore<S[K], S>(key as string, store)
 
   // Expose as global for debugging purposes ONLY in dev environments
-  // We use multiple checks to catch common bundler environments (Vite, Webpack, etc.)
   if (typeof window !== 'undefined' && isDevelopment()) {
-    (window as unknown as Record<string, unknown>).gstate = store;
-    (window as unknown as Record<string, unknown>).gState = store; // Backward compatibility
+    (window as unknown as Record<string, unknown>).gstate = callableMagic;
+    (window as unknown as Record<string, unknown>).gState = store;
     (window as unknown as Record<string, unknown>).rgs = store
   }
 
-  return Object.assign(magic, store) as IStore<S> & (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | ((draft: S[K]) => S[K]), options?: unknown) => boolean])
+  // Return callable magic merged with store
+  return Object.assign(callableMagic, store) as typeof callableMagic & IStore<S>
 }
 
 export { baseCreateStore as createStore }
@@ -127,7 +127,7 @@ export type {
   ConflictResolution
 } from "./core/sync"
 
-export { initSync, destroySync, useSyncedState, useSyncStatus, triggerSync } from "./core/hooks"
+export { initSync, destroySync, useSyncedState, useSyncStatus, triggerSync, useStoreSubscribe } from "./core/hooks"
 
 // ============================================================================
 // Plugins

@@ -7,62 +7,56 @@ Stop wasting time on boilerplate. Here is how you deploy the RGS Panzer in your 
 The engine is lightweight but armored.
 
 ```bash
-npm install rgs
+npm install @biglogic/rgs
 ```
 
-## 2. Initialization: The "Big Bang"
+## 2. Quick Start: The Zen Way (Recommended)
 
-In your main entry file (e.g., `main.tsx` or `App.tsx`), wake up the engine once.
+The simplest way to use RGS - one line creates both store and typed hook.
+
+```typescript
+import { gstate } from '@biglogic/rgs';
+
+// ONE line creates a typed store + hook
+const useCounter = gstate({ count: 0, name: 'John' })
+
+function Counter() {
+  // Get typed hook for specific keys
+  const [count, setCount] = useCounter('count')
+  const [name, setName] = useCounter('name')
+
+  return (
+    <div>
+      <p>Hello, {name}!</p>
+      <p>Count: {count}</p>
+      <button onClick={() =u003e setCount(count + 1)}>
+        +1
+      </button>
+    </div>
+  )
+}
+```
+
+Or use store methods directly:
+```typescript
+useCounter.set('count', 5)
+useCounter.get('count')
+```
+
+## 3. Classic Way (Global Store)
+
+If you prefer a global store approach:
 
 ```typescript
 import { initState, useStore } from '@biglogic/rgs';
 
-// Initialize with optional settings
+// Initialize once at app root
 initState({
   namespace: 'my-awesome-app',
-  persistence: true // Optional: Saves everything to localStorage automatically
+  persistence: true
 });
+
+// Use anywhere in your app
+const [count, setCount] = useStore('count')
+const [user, setUser] = useStore('user')
 ```
-
-## 3. Usage: Instant Reactions
-
-Use the `useStore` hook. No providers, no wrappers. Just raw, atomic power.
-
-```tsx
-import { useStore } from '@biglogic/rgs';
-
-function Counter() {
-  // If 'count' doesn't exist yet, it defaults to undefined. Easy.
-  const [count, setCount] = useStore<number>('count');
-
-  return (
-    <div className="card">
-      <h1>Power Level: {count ?? 0}</h1>
-      <button onClick={() => setCount((prev) => (prev || 0) + 1)}>
-        Boost Power 💥
-      </button>
-    </div>
-  );
-}
-```
-
-## 🧐 What just happened?
-
-- **Reactive Subscription**: `useStore('count')` tells React to watch the 'count' key. Surgical updates only.
-- **Global Scope**: `setCount` updates the value everywhere in the app, instantly.
-- **Resilient Nature**: If you access a key that hasn't been set yet, RGS returns `undefined` gracefully instead of throwing a tantrum.
-
-## 🚨 Pro Tip: Direct Store Access
-
-Need to access state outside of React components? Simple.
-
-```typescript
-import { getStore } from '@biglogic/rgs';
-
-const value = getStore()?.get('count');
-getStore()?.set('count', 9001);
-```
-
----
-
-**Next step:** [The Magnetar Way: One-Liner Power](the-magnetar-way.md)

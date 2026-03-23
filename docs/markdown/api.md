@@ -6,6 +6,38 @@ Complete API reference for RGS (Argis) - Reactive Global State.
 
 ## Core Functions
 
+### `gstate`
+
+Creates a reactive store with a built-in typed hook in one line.
+
+```typescript
+function gstate<S extends Record<string, unknown>>(
+  initialState: S,
+  configOrNamespace?: string | StoreConfig<S>
+): (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | StateUpdater<S[K]>, options?: PersistOptions) => boolean]) & IStore<S>
+```
+
+**Parameters:**
+- `initialState` - Initial state object
+- `configOrNamespace` - Optional namespace string or full StoreConfig
+
+**Returns:** A callable function that returns typed hooks when called with a key, plus the full store interface.
+
+**Example:**
+```typescript
+const useCounter = gstate({ count: 0, name: 'John' })
+
+// Get typed hook for specific key
+const [count, setCount] = useCounter('count')
+const [name, setName] = useCounter('name')
+
+// Or use store methods directly
+useCounter.set('count', 5)
+useCounter.get('count')
+```
+
+---
+
 ### `initState`
 
 Initializes a global store instance.

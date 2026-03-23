@@ -1,6 +1,5 @@
-import type { Config } from 'jest'
-
-const config: Config = {
+/** @type {import('jest').Config} */
+module.exports = {
   testEnvironment: 'jsdom',
   rootDir: '../../',
   displayName: 'CLIENT',
@@ -10,15 +9,7 @@ const config: Config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/jest/jest.setup.ts'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true,
-      tsconfig: {
-        jsx: 'react-jsx',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        module: 'ES2020'
-      }
-    }]
+    '^.+\\.tsx?$': '<rootDir>/tests/node_modules/ts-jest'
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
@@ -30,5 +21,3 @@ const config: Config = {
     '/node_modules/(?!(memorio|immer|dphelper.types)/)'
   ]
 }
-
-export default config

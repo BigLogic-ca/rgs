@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "cd .. && eslint --config tests/eslint/eslint.config.mjs .",
     "lint:fix": "cd .. && eslint --config tests/eslint/eslint.config.mjs . --fix",
-    "jest": "npx jest --config jest/jest.config.ts",
+    "jest": "npx jest --config jest/jest.config.cjs",
     "tsc": "cd .. && tsc -b tsconfig.json",
     "type-check": "cd .. && tsc --noEmit",
     "test": "npm run jest",
