@@ -13,10 +13,6 @@ import pk from "./package.json"
 
 export default defineConfig(
   {
-    //! minifyWhitespace: true,
-    //! minifyIdentifiers: true,
-    //! minifySyntax: true,
-    //! minify: true,
     globalName: (pk as any).code ?? 'index',
     format: ['cjs', 'esm'],
     entry: ['index.ts'],
@@ -33,12 +29,12 @@ export default defineConfig(
     bundle: true,
     clean: true,
     dts: false,
-    external: [
-      ...Object.keys(pk.dependencies ?? {}),
-      ...Object.keys(pk.peerDependencies ?? {}),
-    ],
-    //! noExternal: [],
-    //! inject: [],
+    // TODO -
+    // noExternal: [
+    //   // Force these to be bundled in so they find React at runtime
+    //   'react',
+    //   'react-dom'
+    // ],
     swc: {
       swcrc: true
     },
@@ -47,11 +43,6 @@ export default defineConfig(
     ],
     esbuildOptions(options) {
       options.legalComments = 'none'
-      //! options.minify = true
-      //! options.alias = {
-      //!   'react': require.resolve('react'),
-      //!   'react-dom': require.resolve('react-dom'),
-      //! }
     },
     terserOptions: {
       mangle: true,
