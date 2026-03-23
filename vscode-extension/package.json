@@ -38,7 +38,7 @@
     "biglogic"
   ],
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.110.0"
   },
   "categories": [
     "AI",
@@ -252,7 +252,7 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/vscode": "^1.110.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.9.3",
     "vsce": "^2.15.0"
   },
   "overrides": {
