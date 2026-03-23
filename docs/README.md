@@ -435,13 +435,69 @@ graph TB
 
 ---
 
+## ✨ VScode extension
+
+- [rgs.vsix](extension/rgs.vsix)
+
+RGS (Reactive Global State) is a powerful Visual Studio Code extension that provides comprehensive IntelliSense, diagnostics, and a State Explorer sidebar for the RGS state management library.
+
+### Key Features:
+- Intelligent IntelliSense - Full API autocomplete for createStore, initState, useStore, useSyncedState, and more
+- Hover Documentation - Inline documentation on hover for all RGS functions and types
+- Code Snippets - Pre-built templates for common patterns
+- Go to Definition - Navigate directly to store definitions
+
+### Real-Time Diagnostics
+
+Automatically detects issues in RGS code:
+
+- ⚠️ Warnings: Undefined values, missing namespaces
+- 💡 Hints: Type safety suggestions
+- 🔒 Security: Detection of dangerous key assignments
+
+### State Explorer Sidebar
+Four powerful views:
+
+1. Welcome - Quick access to extension features
+2. State Explorer - Visual tree of all stores in your project
+3. State Properties - Detailed view with types, defaults, and attributes (persisted, encrypted, readonly)
+4. Information - Documentation and help resources
+
+### Supported Languages
+
+TypeScript (.ts, .tsx)
+JavaScript (.js, .jsx)
+
+---
+
 ## 📚 Documentation
 
-- [Getting Started](docs/markdown/getting-started.md)
-- [Plugin SDK](docs/markdown/plugin-sdk.md)
-- [Security Architecture](docs/markdown/security-architecture.md)
-- [Migration Guide](docs/markdown/migration-guide.md)
-- [API Reference](docs/markdown/api.md)
+- [SKILL](SKILL.md)
+- [SUMMARY](SUMMARY.md)
+
+### Core Concepts
+
+- [Getting Started](markdown/getting-started.md)
+- [Philosophy](markdown/philosophy.md)
+- [The Magnetar Way](markdown/the-magnetar-way.md)
+
+### Features & Architecture
+
+- [Security Architecture](markdown/security-architecture.md)
+- [Persistence and Safety](markdown/persistence-and-safety.md)
+- [Local-First Sync](markdown/local-first-sync.md)
+- [Plugins and Extensibility](markdown/plugins-and-extensibility.md)
+
+### Development
+
+- [Plugin SDK](markdown/plugin-sdk.md)
+- [API Reference](markdown/api.md)
+- [Migration Guide](markdown/migration-guide.md)
+
+### Support
+
+- [FAQ](markdown/faq.md)
+- [Case Studies](markdown/case-studies.md)
 
 ---
 
