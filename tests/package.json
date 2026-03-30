@@ -37,7 +37,7 @@
     "memorio": "2.7.4",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
+    "typescript": "^5.9.0",
     "typescript-eslint": "^8.57.2"
   },
   "ts-node": {
