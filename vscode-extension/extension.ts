@@ -72,7 +72,7 @@ const completionsData: CompletionData[] = [
   {
     label: 'useSyncedState',
     kind: vscode.CompletionItemKind.Function,
-    insertText: new vscode.SnippetString('useSyncedState${1|<T = unknown>|}'),
+    insertText: new vscode.SnippetString('useSyncedState${1:<T = unknown>}'),
     documentation: createMarkdownString('## useSyncedState<T>(key, store?)\n\nHook for synchronized state with offline support.'),
     detail: 'useSyncedState<T>(key: string, store?: IStore): readonly [...]',
     priority: 85,
