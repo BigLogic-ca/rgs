@@ -777,10 +777,56 @@ class WorkspaceAnalyzer {
 
     const searchRange = content.substring(storeStartIndex, storeStartIndex + 3000)
 
-    const stateMatch = searchRange.match(/state:\s*\{([^}]+)\}/s)
-    if (!stateMatch || !stateMatch[1]) return properties
+    // Find the "state" object in a brace-balanced way to support nested objects/arrays.
+    const stateKeyIndex = searchRange.search(/state\s*:/)
+    if (stateKeyIndex === -1) return properties
 
-    const stateContent = stateMatch[1]
+    // Find the first opening brace after "state:"
+    const braceStart = searchRange.indexOf('{', stateKeyIndex)
+    if (braceStart === -1) return properties
+
+    let depth = 0
+    let inString: '"' | "'" | '`' | null = null
+    let escaped = false
+    let braceEnd = -1
+
+    for (let i = braceStart; i < searchRange.length; i++) {
+      const ch = searchRange[i]
+
+      if (inString) {
+        if (escaped) {
+          escaped = false
+          continue
+        }
+        if (ch === '\\') {
+          escaped = true
+          continue
+        }
+        if (ch === inString) {
+          inString = null
+        }
+        continue
+      }
+
+      if (ch === '"' || ch === "'" || ch === '`') {
+        inString = ch
+        continue
+      }
+
+      if (ch === '{') {
+        depth++
+      } else if (ch === '}') {
+        depth--
+        if (depth === 0) {
+          braceEnd = i
+          break
+        }
+      }
+    }
+
+    if (braceEnd === -1) return properties
+
+    const stateContent = searchRange.substring(braceStart + 1, braceEnd)
     const lines = stateContent.split('\n')
 
     for (const line of lines) {
