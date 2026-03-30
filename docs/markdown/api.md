@@ -14,7 +14,12 @@ Creates a reactive store with a built-in typed hook in one line.
 function gstate<S extends Record<string, unknown>>(
   initialState: S,
   configOrNamespace?: string | StoreConfig<S>
-): (<K extends keyof S>(key: K) => readonly [S[K] | undefined, (val: S[K] | StateUpdater<S[K]>, options?: PersistOptions) => boolean]) & IStore<S>
+): (<K extends keyof S>(
+  key: K
+) => readonly [
+  S[K] | undefined,
+  (val: S[K] | StateUpdater<S[K]>, options?: PersistOptions) => boolean
+]) & IStore<S>
 ```
 
 **Parameters:**
