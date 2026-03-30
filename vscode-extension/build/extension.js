@@ -36,8 +36,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-const path = __importStar(require("path"));
-const fs = __importStar(require("fs"));
+const path = __importStar(require("node:path"));
+const fs = __importStar(require("node:fs"));
 function getConfig() {
     const config = vscode.workspace.getConfiguration('rgs');
     return {

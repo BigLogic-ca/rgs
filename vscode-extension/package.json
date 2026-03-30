@@ -6,7 +6,7 @@
   "copiright": "Dario Passariello",
   "version": "2.1.1",
   "license": "MIT",
-  "publisher": "Biglogic.ca",
+  "publisher": "biglogic",
   "author": {
     "name": "Dario Passariello",
     "email": "dariopassariello@gmail.com",
@@ -14,7 +14,7 @@
   },
   "contributors": [
     {
-      "name": "BigLogic.ca",
+      "name": "bigLogic",
       "url": "https://biglogic.ca"
     }
   ],
@@ -252,7 +252,7 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "@types/vscode": "^1.110.0",
-    "typescript": "^5.9.3",
+    "typescript": "^5.7.3",
     "vsce": "^2.15.0"
   },
   "overrides": {
