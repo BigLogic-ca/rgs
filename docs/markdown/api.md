@@ -115,6 +115,61 @@ function getStore(): IStore<Record<string, unknown>> | null
 
 ---
 
+### `getStoreByNamespace`
+
+Retrieves a store by its namespace.
+
+```typescript
+function getStoreByNamespace(namespace: string): IStore<Record<string, unknown>> | null
+```
+
+**Returns:** The `IStore` for the given namespace or `null`.
+
+---
+
+### `registerStore`
+
+Registers a store in the global registry for HMR cleanup. Used internally by `gstate()`.
+
+```typescript
+function registerStore(namespace: string, store: IStore<Record<string, unknown>>): void
+```
+
+---
+
+### `unregisterStore`
+
+Unregisters a store from the global registry.
+
+```typescript
+function unregisterStore(namespace: string): void
+```
+
+---
+
+### `destroyState`
+
+Destroys a store by namespace. Safe to call multiple times.
+
+```typescript
+function destroyState(namespace?: string): void
+```
+
+**Parameters:**
+- `namespace` - Optional namespace to destroy. If not provided, destroys the default store.
+
+---
+
+### `destroyAllStores`
+
+Destroys all registered stores. Useful for HMR, testing, and micro-frontend teardown.
+
+```typescript
+function destroyAllStores(): void
+```
+
+---
+
 ## Store Interface (`IStore`)
 
 ### State Operations
@@ -416,3 +471,123 @@ interface AccessRule {
 | `onRemove` | Called when a value is removed |
 | `onDestroy` | Called when store is destroyed |
 | `onTransaction` | Called during a transaction |
+
+---
+
+## SSR Hooks
+
+### `useHydrated`
+
+Returns `true` when the app is hydrated on the client.
+
+```typescript
+function useHydrated(): boolean
+```
+
+### `useHydrationStatus`
+
+Returns detailed hydration status.
+
+```typescript
+function useHydrationStatus(): { isHydrated: boolean; isHydrating: boolean }
+```
+
+### `useDeferredStore`
+
+Returns a store proxy that returns defaults until hydrated.
+
+```typescript
+function useDeferredStore<S>(store: IStore<S> & { isHydrated?: () => boolean }): IStore<S>
+```
+
+### `createSSRStore`
+
+Creates an SSR-safe store with hydration methods.
+
+```typescript
+function createSSRStore<S>(config?: SSRStoreConfig<S>): IStore<S> & {
+  hydrate: () => Promise<void>
+  getSerializedState: () => string | null
+  isHydrated: () => boolean
+}
+```
+
+### `createNextStore`
+
+Creates a Next.js App Router compatible store.
+
+```typescript
+function createNextStore<S>(config?: SSRStoreConfig<S>)
+```
+
+---
+
+## Sync API
+
+### `initSync`
+
+Initializes the sync engine for a store.
+
+```typescript
+function initSync(
+  store: IStore<Record<string, unknown>>,
+  config: SyncConfig
+): SyncEngine<Record<string, unknown>>
+```
+
+### `destroySync`
+
+Destroys the sync engine for a namespace.
+
+```typescript
+function destroySync(namespace: string): void
+```
+
+### `useSyncedState`
+
+Hook for offline-first synchronized state.
+
+```typescript
+function useSyncedState<T>(
+  key: string,
+  store?: IStore<Record<string, unknown>>
+): readonly [
+  T | undefined,
+  (val: T | StateUpdater<T>, options?: PersistOptions) => boolean,
+  SyncState
+]
+```
+
+### `useSyncStatus`
+
+Hook for global sync status.
+
+```typescript
+function useSyncStatus(): SyncState
+```
+
+### `triggerSync`
+
+Manually triggers sync for a namespace.
+
+```typescript
+function triggerSync(namespace?: string): Promise<void>
+```
+
+---
+
+## Changelog (v3.9.20)
+
+### New APIs
+- `registerStore()` / `unregisterStore()` - Store registry management
+- `getStoreByNamespace()` - Get store by namespace
+- `destroyAllStores()` - Destroy all registered stores
+- `destroyState(namespace?)` - Destroy store by namespace
+
+### Improvements
+- `gstate()` now auto-registers stores for HMR cleanup
+- `isEqual()` now supports Date, Map, Set, RegExp, TypedArray, ArrayBuffer
+- `getServerSnapshot()` uses safe Proxy for SSR selectors
+- `initState()` warnings only shown in development mode
+- `useSyncedState()` warns if `initSync()` not called
+- `safeBtoa()` / `safeAtob()` for SSR Node.js compatibility
