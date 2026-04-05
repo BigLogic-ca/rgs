@@ -73,7 +73,7 @@ const completionsData = [
     {
         label: 'useStore',
         kind: vscode.CompletionItemKind.Function,
-        insertText: new vscode.SnippetString('useStore${1|<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>|}'),
+        insertText: new vscode.SnippetString('useStore${1:<T = unknown, S extends Record<string, unknown> = Record<string, unknown>>}'),
         documentation: createMarkdownString('## useStore<T, S>(keyOrSelector, store?)\n\nReactive Hook for state management.'),
         detail: 'useStore<T, S>(keyOrSelector: string | ((state: S) => T), store?: IStore<S>): T | [...]',
         priority: 90,
@@ -81,7 +81,7 @@ const completionsData = [
     {
         label: 'useSyncedState',
         kind: vscode.CompletionItemKind.Function,
-        insertText: new vscode.SnippetString('useSyncedState${1|<T = unknown>|}'),
+        insertText: new vscode.SnippetString('useSyncedState${1:<T = unknown>}'),
         documentation: createMarkdownString('## useSyncedState<T>(key, store?)\n\nHook for synchronized state with offline support.'),
         detail: 'useSyncedState<T>(key: string, store?: IStore): readonly [...]',
         priority: 85,
@@ -576,10 +576,52 @@ class WorkspaceAnalyzer {
     extractStateProperties(content, storeStartIndex, filePath) {
         const properties = [];
         const searchRange = content.substring(storeStartIndex, storeStartIndex + 3000);
-        const stateMatch = searchRange.match(/state:\s*\{([^}]+)\}/s);
-        if (!stateMatch || !stateMatch[1])
+        // Find the "state" object in a brace-balanced way to support nested objects/arrays.
+        const stateKeyIndex = searchRange.search(/state\s*:/);
+        if (stateKeyIndex === -1)
             return properties;
-        const stateContent = stateMatch[1];
+        // Find the first opening brace after "state:"
+        const braceStart = searchRange.indexOf('{', stateKeyIndex);
+        if (braceStart === -1)
+            return properties;
+        let depth = 0;
+        let inString = null;
+        let escaped = false;
+        let braceEnd = -1;
+        for (let i = braceStart; i < searchRange.length; i++) {
+            const ch = searchRange[i];
+            if (inString) {
+                if (escaped) {
+                    escaped = false;
+                    continue;
+                }
+                if (ch === '\\') {
+                    escaped = true;
+                    continue;
+                }
+                if (ch === inString) {
+                    inString = null;
+                }
+                continue;
+            }
+            if (ch === '"' || ch === "'" || ch === '`') {
+                inString = ch;
+                continue;
+            }
+            if (ch === '{') {
+                depth++;
+            }
+            else if (ch === '}') {
+                depth--;
+                if (depth === 0) {
+                    braceEnd = i;
+                    break;
+                }
+            }
+        }
+        if (braceEnd === -1)
+            return properties;
+        const stateContent = searchRange.substring(braceStart + 1, braceEnd);
         const lines = stateContent.split('\n');
         for (const line of lines) {
             const propMatch = line.match(/^\s*(\w+)\s*:\s*(.+?),?\s*$/);
