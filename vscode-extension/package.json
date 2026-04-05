@@ -250,7 +250,7 @@
     "package": "vsce package -o rgs.vsix"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "@types/vscode": "^1.110.0",
     "typescript": "^6.0.2",
     "vsce": "^2.15.0"
