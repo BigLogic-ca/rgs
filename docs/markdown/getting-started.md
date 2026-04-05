@@ -53,10 +53,41 @@ import { initState, useStore } from '@biglogic/rgs';
 // Initialize once at app root
 initState({
   namespace: 'my-awesome-app',
-  persistence: true
+  persistByDefault: true
 });
 
 // Use anywhere in your app
 const [count, setCount] = useStore('count')
 const [user, setUser] = useStore('user')
+```
+
+## 4. Multi-Store Pattern (Recommended for Large Apps)
+
+For micro-frontends or large applications, use separate namespaces:
+
+```typescript
+import { gstate } from '@biglogic/rgs';
+
+// Cart store
+export const useCart = gstate({ items: [] }, { namespace: 'cart' })
+
+// User store
+export const useUser = gstate({ profile: null }, { namespace: 'user' })
+
+// Theme store
+export const useTheme = gstate({ mode: 'light' }, { namespace: 'theme' })
+```
+
+## 5. Cleanup (HMR / Testing)
+
+For Hot Module Replacement or test cleanup:
+
+```typescript
+import { destroyState, destroyAllStores } from '@biglogic/rgs';
+
+// Destroy specific store
+destroyState('cart')
+
+// Destroy all stores (useful for HMR)
+destroyAllStores()
 ```
