@@ -3,6 +3,7 @@
  * Provides hydration helpers for Next.js, Remix, and other SSR frameworks
  */
 
+import { useSyncExternalStore, useState, useEffect, useMemo, useCallback } from "react"
 import { createStore, StorageAdapters } from "./store"
 import type { IStore, StoreConfig } from "./types"
 
@@ -118,38 +119,39 @@ export const createSSRStore = <S extends Record<string, unknown>>(
   const _needsDeferredHydration = deferHydration && isClientSide()
 
   /**
-   * Manually trigger hydration on client
-   * Call this after the component mounts in a useEffect
+   * Manually trigger hydration on client.
+   * Updates the existing store's storage adapter instead of creating a new store.
+   * Call this after the component mounts in a useEffect.
    */
   const hydrate = async (): Promise<void> => {
     if (_hydrated || isServerSide()) return
 
-    // Set actual storage for hydration
+    // For SSR-safe mode, we need to reinitialize with localStorage
+    // but keep the same store reference by updating internal storage
     if (ssrSafe && !store.namespace.startsWith('async_')) {
-      // Get the internal store reference and update storage
-      // This is a workaround - in production we'd need store internal access
-      // For now, we reinitialize with proper storage
       const currentState = store.getSnapshot()
 
-      // Create new store with localStorage
-      const newStore = createStore<S>({
+      // Destroy the old store and create a new one with localStorage
+      store.destroy()
+
+      // Re-create with localStorage (storage: undefined uses default localStorage)
+      const hydratedStore = createStore<S>({
         ...config,
         namespace: store.namespace,
-        storage: undefined, // Will use default (localStorage)
+        storage: undefined,
         persistByDefault: config?.persistByDefault ?? false
       })
 
-      // Restore state
+      // Restore state from memory store
       Object.entries(currentState).forEach(([k, v]) => {
-        newStore._setSilently(k, v)
+        hydratedStore._setSilently(k, v)
       })
 
-      _hydrated = true
-    } else {
-      _hydrated = true
+      // Update the store reference by copying methods
+      Object.assign(store, hydratedStore)
     }
 
-    // Wait for store to be ready
+    _hydrated = true
     await store.whenReady()
   }
 
@@ -256,26 +258,8 @@ export const rehydrateStore = (
 // ============================================================================
 // React Hooks for SSR
 // ============================================================================
-
-// Lazy load React to avoid SSR issues
-let React: typeof import('react')
-let useState: typeof import('react')['useState']
-let useEffect: typeof import('react')['useEffect']
-let useSyncExternalStore: typeof import('react')['useSyncExternalStore']
-let useMemo: typeof import('react')['useMemo']
-let useCallback: typeof import('react')['useCallback']
-
-const getReact = () => {
-  if (!React) {
-    React = require('react')
-    useState = React.useState
-    useEffect = React.useEffect
-    useSyncExternalStore = React.useSyncExternalStore
-    useMemo = React.useMemo
-    useCallback = React.useCallback
-  }
-  return { React, useState, useEffect, useSyncExternalStore, useMemo, useCallback }
-}
+// React hooks are imported at the top for ESM compatibility.
+// These hooks should only be called in client components.
 
 /**
  * Hook to check if the app is hydrated
@@ -292,8 +276,6 @@ const getReact = () => {
  * return <MyApp />
  */
 export const useHydrated = (): boolean => {
-  const { useSyncExternalStore } = getReact()
-
   // Use a simple subscribe mechanism
   const subscribe = (_callback: () => void) => {
     // No actual subscription needed - we just want to trigger a re-render
@@ -324,8 +306,6 @@ export const useHydrated = (): boolean => {
  * )
  */
 export const useHydrationStatus = (): { isHydrated: boolean; isHydrating: boolean } => {
-  const { useState, useEffect } = getReact()
-
   const [isHydrating, setIsHydrating] = useState(() => isServerSide())
   const [isHydrated, setIsHydrated] = useState(() => isServerSide())
 
@@ -347,21 +327,15 @@ export const useHydrationStatus = (): { isHydrated: boolean; isHydrating: boolea
 }
 
 /**
- * Hook that defers store access until hydrated
- * Use this to prevent hydration mismatches
+ * Hook that defers store access until hydrated.
+ * Uses Promise-based approach instead of polling for better efficiency.
  *
  * @param store - The store to use
  * @returns Store that returns default values until hydrated
- *
- * @example
- * const store = useDeferredStore(mySSRStore)
- * const [value, setValue] = useStore('key', store)
  */
 export const useDeferredStore = <S extends Record<string, unknown>>(
   store: IStore<S> & { isHydrated?: () => boolean }
 ): IStore<S> => {
-  const { useState, useEffect, useMemo } = getReact()
-
   const [ready, setReady] = useState(() => {
     if (isServerSide()) return true
     return store.isHydrated?.() ?? store.isReady
@@ -369,25 +343,42 @@ export const useDeferredStore = <S extends Record<string, unknown>>(
 
   useEffect(() => {
     if (isServerSide()) return
+    if (ready) return
 
-    const checkReady = () => {
+    // Use Promise-based approach instead of polling
+    const checkAndSubscribe = async () => {
+      // Initial check
       const hydrated = store.isHydrated?.() ?? store.isReady
-      setReady(hydrated)
+      if (hydrated) {
+        setReady(true)
+        return
+      }
+
+      // Subscribe to store changes for efficient updates
+      const unsubscribe = store._subscribe(() => {
+        const nowHydrated = store.isHydrated?.() ?? store.isReady
+        if (nowHydrated) {
+          setReady(true)
+          unsubscribe()
+        }
+      })
+
+      // Fallback: also check on store.whenReady() if available
+      try {
+        await store.whenReady()
+        setReady(true)
+        unsubscribe()
+      } catch {
+        // Store may not have whenReady, rely on subscription
+      }
     }
 
-    // Poll for hydration
-    const interval = setInterval(checkReady, 50)
-
-    // Also subscribe to store changes
-    const unsubscribe = store._subscribe(checkReady)
-
-    checkReady()
+    checkAndSubscribe()
 
     return () => {
-      clearInterval(interval)
-      unsubscribe()
+      // Cleanup handled by subscription unsubscribe
     }
-  }, [store])
+  }, [store, ready])
 
   // Return a proxy that returns defaults until ready
   return useMemo(() => {
@@ -466,12 +457,9 @@ export const createNextStore = <S extends Record<string, unknown>>(
     useHydrationStatus,
     useDeferredStore: <K extends keyof S>(key: K) => {
       const deferred = useDeferredStore(store)
-      const { useCallback } = getReact()
 
       // Create a key-specific hook
       const keyHook = <T>(k: string) => {
-        const { useSyncExternalStore } = getReact()
-
         const subscribe = useCallback(
           (cb: () => void) => deferred._subscribe(cb, k),
           [deferred, k]
