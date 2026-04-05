@@ -65,6 +65,7 @@ export const deepClone = <T>(obj: T): T => {
 
 /**
  * Compares two values for deep equality.
+ * Handles Date, RegExp, Map, Set, Array, and plain objects.
  * @param a - First value
  * @param b - Second value
  * @returns True if values are equal
@@ -72,12 +73,54 @@ export const deepClone = <T>(obj: T): T => {
 export const isEqual = (a: unknown, b: unknown): boolean => {
   if (a === b) return true
   if (a === null || b === null) return a === b
+  if (typeof a !== typeof b) return false
+
+  // Handle Date
+  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime()
+
+  // Handle RegExp
+  if (a instanceof RegExp && b instanceof RegExp) return a.source === b.source && a.flags === b.flags
+
+  // Handle Map
+  if (a instanceof Map && b instanceof Map) {
+    if (a.size !== b.size) return false
+    for (const [k, v] of a) {
+      if (!b.has(k) || !isEqual(v, b.get(k))) return false
+    }
+    return true
+  }
+
+  // Handle Set
+  if (a instanceof Set && b instanceof Set) {
+    if (a.size !== b.size) return false
+    for (const v of a) {
+      if (![...b].some(bv => isEqual(v, bv))) return false
+    }
+    return true
+  }
+
+  // Handle ArrayBuffer
+  if (a instanceof ArrayBuffer && b instanceof ArrayBuffer) return a.byteLength === b.byteLength
+
+  // Handle TypedArrays
+  if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+    const ta = a as unknown as { length: number;[i: number]: unknown }
+    const tb = b as unknown as { length: number;[i: number]: unknown }
+    if (ta.length !== tb.length) return false
+    for (let i = 0; i < ta.length; i++) {
+      if (ta[i] !== tb[i]) return false
+    }
+    return true
+  }
+
   if (typeof a !== 'object' || typeof b !== 'object') return a === b
+
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false
     for (let i = 0; i < a.length; i++) if (!isEqual(a[i], b[i])) return false
     return true
   }
+
   const keysA = Object.keys(a as object)
   const keysB = Object.keys(b as object)
   if (keysA.length !== keysB.length) return false
