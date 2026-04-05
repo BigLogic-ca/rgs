@@ -9,7 +9,18 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFilesAfterEnv: ['<rootDir>/tests/jest/jest.setup.ts'],
   transform: {
-    '^.+\\.tsx?$': '<rootDir>/tests/node_modules/ts-jest'
+    '^.+\\.tsx?$': ['<rootDir>/tests/node_modules/ts-jest', {
+      useESM: true,
+      tsconfig: {
+        rootDir: '<rootDir>',
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        module: 'ES2020',
+        moduleResolution: 'node',
+        ignoreDeprecations: '6.0'
+      }
+    }]
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
