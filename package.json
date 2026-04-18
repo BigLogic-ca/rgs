@@ -66,10 +66,10 @@
     "email": "dariopassariello@gmail.com"
   },
   "scripts": {
-    "build": "tsup && npx tsc -p tsconfig.json --emitDeclarationOnly && npm run build:extension",
-    "build:extension": "cd vscode-extension && vsce package -o ../docs/extension/rgs.vsix",
+    "build": "tsup && npx tsc -p tsconfig.json --emitDeclarationOnly ",
+    "build:extension": "cd vscode-extension && npx vsce package -o ../docs/extension/rgs.vsix",
     "watch": "tsup --watch",
-    "npm:pack": "npm run build && cd dist && npm pack",
+    "npm:pack": "npm run build && npm run build:extension && cd dist && npm pack",
     "npm:publish": "npm run build && npm publish ./dist --access public",
     "dev": "npm run generate-imports && node esbuild.config.mjs --watch-and-serve",
     "test": "cd tests && npm run test",
