@@ -6,8 +6,8 @@ on:
    - "v*"
  workflow_dispatch:
 
-# Trusted Publisher setup for npm
-# Requires: id-token: write + package configured in npmjs.com
+  # Trusted Publisher setup for npm
+  # Requires: id-token: write + package configured in npmjs.com
 permissions:
  id-token: write # Required for OIDC
  contents: write
@@ -72,6 +72,7 @@ jobs:
      with:
       body: ${{ steps.changelog.outputs.body }}
       draft: false
-      prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+      prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name,
+       'beta') || contains(github.ref_name, 'rc') }}
      env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
