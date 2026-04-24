@@ -1,10 +1,10 @@
-# 🌌 Chapter 3: The Magnetar Way - Peak Simplicity
+# The Magnetar Way - Peak Simplicity
 
 If you are a fan of "Clean Code" or just hate writing imports, the **Magnetar** method is your new best friend.
 
 It's a single function that creates the store and the hook simultaneously. **Zero config, 100% typed.**
 
-## 🛠️ The "Master" Example
+## The "Master" Example
 
 Let's create a User Profile module.
 
@@ -17,27 +17,30 @@ export const useUser = gstate({
   name: 'Guest',
   isLogged: false,
   preferences: { theme: 'dark', lang: 'en' }
-}, 'user_module'); // Auto-persists to localStorage (excludes sensitive fields)
+}, 'user_module');
 
 // Or use an object config for more control:
 export const useUserNoPersist = gstate({
   name: 'Guest',
   isLogged: false
-}, { namespace: 'user_module', autoPersist: false }); // No persistence
+}, { namespace: 'user_module', autoPersist: false });
 
 // 2. Use it anywhere
 function ProfileHeader() {
+  // Get typed hook for specific keys
   const [name, setName] = useUser('name');
   // Note: 'setName' is already typed! It only accepts strings.
-
+  
   return <h1>Hello, {name}!</h1>;
 }
 ```
 
-## 💎 Why Magnetar Rocks
+## Why Magnetar Rocks
 
 1. **Inferred Types**: No need to define `<string>`. TypeScript looks at the initial value you passed to `gstate` and figures it out.
+
 2. **Auto-Persistence**: When you pass a string namespace, RGS automatically persists to localStorage (excluding sensitive fields like tokens, passwords, secrets).
+
 3. **Security**: Sensitive fields (containing 'token', 'password', 'secret', 'key') are automatically excluded from persistence.
 
 ```typescript
@@ -49,7 +52,7 @@ useUser.set('isLogged', true);
 useUser.compute('fullName', ['firstName', 'lastName'], (s) => `${s.firstName} ${s.lastName}`);
 ```
 
-## 🚜 Production Strategy: "The Store Folder"
+## Production Strategy: "The Store Folder"
 
 Don't scatter stores everywhere. Create a `src/stores` folder and put your Magnetar files there:
 
@@ -57,13 +60,14 @@ Don't scatter stores everywhere. Create a `src/stores` folder and put your Magne
 - `cart.ts`
 - `settings.ts`
 
-Then import them whenever needed. It’s clean, fast, and professional.
+Then import them whenever needed. It's clean, fast, and professional.
 
-## 🧠 Reflection for the Senior Dev
+## Reflection for the Senior Dev
 
 *"Wait, does Magnetar create a new store every time?"*
-Yes, and that's the point! You can have isolated micro-stores for every domain of your app, while still keeping the ability to make them talk to each other. It’s the evolution of the "Atomic State" concept.
+
+Yes, and that's the point! You can have isolated micro-stores for every domain of your app, while still keeping the ability to make them talk to each other. It's the evolution of the "Atomic State" concept.
 
 ---
 
-**Next step:** [Persistence and Safety: Data Never Dies](persistence-and-safety.md)
+**Next step:** [Persistence and Safety: Data Never Dies](../guide/advanced-usage.md)

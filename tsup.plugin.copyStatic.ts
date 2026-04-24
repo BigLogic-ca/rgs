@@ -49,7 +49,7 @@ const copyStatic = (paths: CopyPath[]) => {
 
     // Update for multi-format output
     pkg.main = './index.cjs'
-    pkg.module = './index.js'
+    pkg.module = './index.mjs'
     pkg.types = './index.d.ts'
 
     // Remove type: module to allow both CJS and ESM
@@ -58,21 +58,18 @@ const copyStatic = (paths: CopyPath[]) => {
     // Add exports for different formats
     pkg.exports = {
       '.': {
-        'import': './index.js',
-        'require': './index.cjs',
-        'types': './index.d.ts'
+        'types': './index.d.ts',
+        'import': './index.mjs',
+        'require': './index.cjs'
       },
       './types/*': './types/*'
     }
-
-    // Keep typings
-    pkg.typings = './index.d.ts'
 
     // Remove scripts and devDependencies from dist
     delete pkg.scripts
     delete pkg.devDependencies
     delete pkg.optionalDependencies
-    delete pkg.peerDependencies
+    // Keep peerDependencies for proper dependency resolution
 
     _fs.writeFileSync(dest, JSON.stringify(pkg, null, 2))
     console.debug('Copied: package.json -> package.json (fixed exports)')

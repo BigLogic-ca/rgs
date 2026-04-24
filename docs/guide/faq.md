@@ -1,6 +1,6 @@
-# ❓ Chapter 7: FAQ - Architectural Insights
+# FAQ - Architectural Insights
 
-This section provides technical context for the design decisions behind RGS (Argis) - Reactive Global State.
+Technical context for design decisions behind RGS (Argis) - Reactive Global State.
 
 ## 1. "Why integrate Security and GDPR into the State layer?"
 
@@ -40,14 +40,16 @@ Key fixes (like security isolation per-store, Immer optional loading) come from 
 
 ---
 
-## 🛑 Best Practices: Maximizing Reliability
+## Best Practices: Maximizing Reliability
 
 1. **State Granularity**: Use RGS for global, persistent, or secured data. For transient UI state (like toggle transitions), standard `useState` is more appropriate.
+
 2. **Namespace Management**: Always define a unique namespace for your store to prevent data collisions in shared domain environments.
+
 3. **Rule Validation**: Ensure your RBAC rules are tested against your expected key patterns to maintain a robust security posture.
 
 ---
 
-## 👋 Conclusion
+## Conclusion
 
 RGS is designed for teams that prioritize long-term maintainability and system stability. By handling the complexities of security and persistence at the architectural level, we allow developers to focus on building features with confidence.

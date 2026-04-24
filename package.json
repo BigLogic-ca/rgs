@@ -1,15 +1,22 @@
 {
   "name": "@biglogic/rgs",
   "code": "argis",
-  "version": "3.9.30",
+  "version": "3.9.40",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
-  "main": "./index.js",
-  "browser": "./index.cjs",
-  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.mjs",
   "types": "./index.d.ts",
-  "typing": "./types/*",
-  "homepage": "https://a51.gitbook.io/rgs",
+  "sideEffects": false,
+  "homepage": "https://github.com/BigLogic-ca/rgs/blob/main/docs/SUMMARY.md",
   "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    },
+    "./types/*": "./types/*"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
@@ -51,7 +58,11 @@
     "node": ">=16.0.0"
   },
   "files": [
-    "**/*"
+    "dist/",
+    "types/",
+    "docs/",
+    "*.md",
+    "package.json"
   ],
   "repository": {
     "type": "git",
@@ -88,7 +99,7 @@
     "immer": "11.1.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "terser": "5.46.1",
+    "terser": "5.46.2",
     "ts-node": "10.9.2",
     "tslib": "^2.8.1",
     "tsup": "8.5.1",

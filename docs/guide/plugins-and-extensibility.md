@@ -1,4 +1,4 @@
-# 🔌 Chapter 5: Ecosystem and Plugins - Extend Without Limits
+# Ecosystem and Plugins - Extend Without Limits
 
 RGS comes with a powerful plugin ecosystem that lets you extend functionality without modifying the core.
 
