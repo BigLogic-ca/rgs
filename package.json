@@ -3,13 +3,20 @@
   "code": "argis",
   "version": "3.9.40",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
-  "main": "./index.js",
-  "browser": "./index.cjs",
-  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.mjs",
   "types": "./index.d.ts",
-  "typing": "./types/*",
+  "sideEffects": false,
   "homepage": "https://github.com/BigLogic-ca/rgs",
   "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    },
+    "./types/*": "./types/*"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
@@ -51,7 +58,11 @@
     "node": ">=16.0.0"
   },
   "files": [
-    "**/*"
+    "dist/",
+    "types/",
+    "docs/",
+    "*.md",
+    "package.json"
   ],
   "repository": {
     "type": "git",
