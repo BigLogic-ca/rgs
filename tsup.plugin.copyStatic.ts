@@ -47,8 +47,8 @@ const copyStatic = (paths: CopyPath[]) => {
 
     const pkg = JSON.parse(_fs.readFileSync(src, 'utf-8'))
 
-    // Update for multi-format output
-    pkg.main = './index.cjs'
+  // Update for multi-format output
+  pkg.main = './index.js'
     pkg.module = './index.mjs'
     pkg.types = './index.d.ts'
 

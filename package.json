@@ -1,9 +1,9 @@
 {
   "name": "@biglogic/rgs",
   "code": "argis",
-  "version": "3.9.40",
+  "version": "3.9.45",
   "description": "Argis (RGS) - Reactive Global State: A react state everywhere made easy",
-  "main": "./index.cjs",
+  "main": "./index.js",
   "module": "./index.mjs",
   "types": "./index.d.ts",
   "sideEffects": false,
@@ -58,11 +58,7 @@
     "node": ">=16.0.0"
   },
   "files": [
-    "dist/",
-    "types/",
-    "docs/",
-    "*.md",
-    "package.json"
+    "**/*"
   ],
   "repository": {
     "type": "git",
