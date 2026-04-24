@@ -15,6 +15,7 @@ dcignore
 deflist
 dpchart
 dphelper
+ecommerce
 endlocal
 eslint-doc-generatorrc
 eslitrc
