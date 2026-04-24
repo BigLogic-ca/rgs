@@ -8,47 +8,68 @@ This documentation is written for everyone: from **easy setup** for those who ju
 
 ## 🗺️ Summary
 
-- **[The Philosophy: Panzer vs. Bicycle](markdown/philosophy.md)**
+- **[Introduction](guide/introduction.md)**
   - Reliability and Security as First-Class Citizens.
   - The "Ironclad" Core: Simplicity meets Power.
 
-- **[Quick Start: 30-Second Setup](markdown/getting-started.md)**
+- **[Installation](guide/installation.md)**
+  - Prerequisites and setup instructions.
+
+- **[Quick Start: 30-Second Setup](guide/quick-start.md)**
   - Deploying the RGS Panzer in your React project.
 
-- **[The Magnetar Way: One-Liner Power](markdown/the-magnetar-way.md)**
+- **[The Magnetar Way: One-Liner Power](guide/the-magnetar-way.md)**
   - Creating stores and hooks simultaneously. Types included.
 
-- **[Persistence and Safety](markdown/persistence-and-safety.md)**
+- **[Core Concepts](guide/core-concepts.md)**
+  - Store initialization, reactive state, and namespaces.
+
+- **[API Reference](guide/api-reference.md)**
+  - Complete hooks and store functions reference.
+
+- **[Advanced Usage](guide/advanced-usage.md)**
   - Never lose user data again (without localStorage headaches).
   - Native immutability with Immer (Stellar Engine).
+  - Transactions, plugins, and persistence.
 
-- **[Ecosystem and Plugins](markdown/plugins-and-extensibility.md)**
+- **[Local-First Sync Engine](guide/local-first-sync.md)**
+  - Offline-by-default with automatic background sync.
+  - Conflict resolution strategies (last-write-wins, merge, etc.).
+  - IndexedDB and Cloud Sync plugins.
+
+- **[Ecosystem and Plugins](guide/plugins-and-extensibility.md)**
   - DevTools, Cross-Tab Sync, Analytics, and Typed Plugins.
 
-- **[Plugin SDK: Build Your Own Extensions](markdown/plugin-sdk.md)**
+- **[Plugin SDK: Build Your Own Extensions](guide/plugin-sdk.md)**
   - Create custom plugins with lifecycle hooks.
   - Register methods via `store.plugins`.
   - Full API reference and examples.
 
-- **[Case Studies: Real World Strategies](markdown/case-studies.md)**
+- **[Security Features](guide/security-features.md)**
+  - Advanced XSS prevention and deep cloning reliability.
+  - AES-256-GCM, RBAC, Audit Logging, and GDPR.
+
+- **[Case Studies: Real World Strategies](guide/case-studies.md)**
   - **E-commerce**: Cart isolation and atomic updates.
   - **Dashboards**: Multi-store strategies and complex flows.
 
-- **[Architectural Insights (FAQ)](markdown/faq.md)**
+- **[Architectural Insights (FAQ)](guide/faq.md)**
   - Honest answers on security, performance, and Proxies.
 
-- **[Migration Guide](markdown/migration-guide.md)**
-  - Upgrading to latest version (Enterprise Isolation)
-  - Upgrading to previous version (`secure` → `encoded`)
+- **[Testing](guide/testing.md)**
+  - Unit, integration, and stress testing strategies.
 
-- **[Security Architecture & Hardening](markdown/security-architecture.md)**
-  - Advanced XSS prevention and deep cloning reliability.
-  - AES-256-GCM and RBAC.
+- **[Performance](guide/performance.md)**
+  - Optimization tips and benchmarks.
 
-- **[Local-First Sync Engine](markdown/local-first-sync.md)**
-  - Offline-by-default with automatic background sync.
-  - Conflict resolution strategies (last-write-wins, merge, etc.).
-  - `useSyncedState` hook for React components.
+- **[Best Practices](guide/best-practices.md)**
+  - Code organization and development guidelines.
+
+- **[Migration Guide](guide/migration-guide.md)**
+  - Upgrading from Redux, Context API, and useState.
+
+- **[Troubleshooting](guide/troubleshooting.md)**
+  - Common issues and solutions.
 
 ---
 
