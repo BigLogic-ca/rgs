@@ -92,7 +92,7 @@
     "esbuild-plugin-copy": "2.1.1",
     "esbuild-sass-plugin": "3.7.0",
     "esbuild-scss-modules-plugin": "1.1.1",
-    "immer": "11.1.4",
+    "immer": "11.1.6",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "terser": "5.46.2",
