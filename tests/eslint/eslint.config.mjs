@@ -24,7 +24,6 @@ export default tseslint.config(
       globals: {
         ...globals.node,
         ...globals.browser,
-        a51: "readonly",
         state: "readonly",
         store: "readonly",
         cache: "readonly",
