@@ -13,63 +13,63 @@ concurrency:
 jobs:
  # Secrets scan disabled - no license for secret scanner
 
- # lint:
- #  name: Lint
- #  runs-on: ubuntu-latest
- #  steps:
- #   - name: Checkout repository
- #     uses: actions/checkout@v6
- #
- #   - name: Setup Node.js
- #     uses: actions/setup-node@v6
- #     with:
- #      node-version: "20"
- #      cache: "npm"
- #
- #   - name: Install dependencies
- #     run: npm ci
- #
- #   - name: Install test dependencies
- #     working-directory: ./tests
- #     run: npm ci
- #
- #   - name: Run ESLint
- #     run: npm run lint
- #
- #   - name: Run TypeScript check
- #     run: npm run tsc
+ lint:
+  name: Lint
+  runs-on: ubuntu-latest
+  steps:
+   - name: Checkout repository
+     uses: actions/checkout@v6
 
- # test:
- #  name: Test
- #  runs-on: ubuntu-latest
- #  steps:
- #   - name: Checkout repository
- #     uses: actions/checkout@v6
+   - name: Setup Node.js
+     uses: actions/setup-node@v6
+     with:
+      node-version: "20"
+      cache: "npm"
 
- #   - name: Setup Node.js
- #     uses: actions/setup-node@v6
- #     with:
- #      node-version: "20"
- #      cache: "npm"
+   - name: Install dependencies
+     run: npm ci
 
- #   - name: Install dependencies
- #     run: npm ci
+   - name: Install test dependencies
+     working-directory: ./tests
+     run: npm ci
 
- #   - name: Install test dependencies
- #     working-directory: ./tests
- #     run: npm ci
+   - name: Run ESLint
+     run: npm run lint
 
- #   - name: Run tests
- #     working-directory: ./tests
- #     run: npm test
+   - name: Run TypeScript check
+     run: npm run tsc
 
- #   - name: Upload coverage
- #     uses: actions/upload-artifact@v7
- #     if: always()
- #     with:
- #      name: coverage
- #      path: tests/coverage
- #      retention-days: 7
+ test:
+  name: Test
+  runs-on: ubuntu-latest
+  steps:
+   - name: Checkout repository
+     uses: actions/checkout@v6
+
+   - name: Setup Node.js
+     uses: actions/setup-node@v6
+     with:
+      node-version: "20"
+      cache: "npm"
+
+   - name: Install dependencies
+     run: npm ci
+
+   - name: Install test dependencies
+     working-directory: ./tests
+     run: npm ci
+
+   - name: Run tests
+     working-directory: ./tests
+     run: npm test
+
+   - name: Upload coverage
+     uses: actions/upload-artifact@v7
+     if: always()
+     with:
+      name: coverage
+      path: tests/coverage
+      retention-days: 7
 
  build:
   name: Build
