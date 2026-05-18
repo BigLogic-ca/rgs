@@ -1,8 +1,0 @@
-{
-  "reject": [
-    "@eslint/js",
-    "eslint",
-    "eslint-plugin-react-hooks",
-    "globals"
-  ]
-}

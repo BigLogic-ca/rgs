@@ -44,7 +44,7 @@ if (hasPermission(rules, 'admin_settings', 'write', userId)) {
 **Solution:**
 ```typescript
 // Increase limit or remove it
-initState(state, { 
+initState(state, {
   maxObjectSize: 0 // 0 = no limit
   // Or set higher limit
   // maxObjectSize: 10 * 1024 * 1024 // 10MB
@@ -63,7 +63,7 @@ const App = () => {
   useEffect(() => {
     initState(initialState)
   }, [])
-  
+
   return <MyComponents />
 }
 ```
@@ -184,8 +184,8 @@ import { useStore, setState } from '@biglogic/rgs'
 
 ### Resources
 
-- **Documentation:** https://github.com/BigLogic-ca/rgs/docs
-- **Issues:** https://github.com/BigLogic-ca/rgs/issues
+- **Documentation:** https://github.com/picla-net/picla.npm.rgs/docs
+- **Issues:** https://github.com/picla-net/picla.npm.rgs/issues
 - **Email:** dariopassariello@gmail.com
 
 ### Before Reporting Issues

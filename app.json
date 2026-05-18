@@ -4,27 +4,27 @@
     "code": "rgs",
     "host": {
       "dev": "http://localhost",
-      "prod": "https://biglogic.ca/rgs"
+      "prod": "https://npm.picla.net/rgs"
     },
     "socket": {
       "url": {
         "tst": "http://localhost:5000/",
         "dev": "http://localhost:5000/",
-        "pro": "wss://ws.a51.dev/"
+        "pro": "wss://ws.biglogic.ca/"
       }
     },
     "events": {
       "url": {
         "tst": "http://localhost:5002/",
         "dev": "http://localhost:5002/",
-        "pro": "wss://ws.a51.dev/"
+        "pro": "wss://ws.biglogic.ca/"
       }
     },
     "proxy": {
       "api": {
         "tst": "http://localhost:5003/",
         "dev": "http://localhost:5003/",
-        "pro": "https://api.a51.dev/"
+        "pro": "https://api.biglogic.ca/"
       }
     },
     "url": {

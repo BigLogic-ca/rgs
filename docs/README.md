@@ -494,7 +494,7 @@ Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTIN
 
 ```bash
 # Clone and setup
-git clone https://github.com/BigLogic-ca/rgs.git
+git clone https://github.com/picla-net/picla.npm.rgs.git
 cd rgs
 npm install
 

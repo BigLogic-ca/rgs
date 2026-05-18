@@ -211,15 +211,17 @@ export function useStore<T = unknown, S extends Record<string, unknown> = Record
   const key = !isSelector ? (keyOrSelector as string) : null
   const selector = isSelector ? (keyOrSelector as (state: S) => T) : null
 
-  // Warn once if no store initialized (key mode only)
-  const warnedRef = useRef(false)
-  if (hasNoStore && !isSelector && !isProduction() && !warnedRef.current) {
-    warnedRef.current = true
-    console.warn(
-      `[gstate] useStore('${key}') called without initialized store. ` +
-      `Call initState() first or pass a store instance.`
-    )
-  }
+   // Warn once if no store initialized (key mode only)
+   const warnedRef = useRef(false)
+   useEffect(() => {
+     if (!warnedRef.current && hasNoStore && !isSelector && !isProduction()) {
+       warnedRef.current = true
+       console.warn(
+         `[gstate] useStore('${key}') called without initialized store. ` +
+         `Call initState() first or pass a store instance.`
+       )
+     }
+   }, [hasNoStore, isSelector, isProduction(), key])
 
   // 1. Subscribe
   const subscribe = useCallback(

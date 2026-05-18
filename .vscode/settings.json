@@ -54,15 +54,17 @@
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true,
   ///
-  "javascript.format.semicolons": "remove",
-  "typescript.format.semicolons": "remove",
-  "typescript.referencesCodeLens.enabled": true,
-  "typescript.suggestionActions.enabled": false,
+  "js/ts.format.semicolons": "remove",
+  "js/ts.preferences.quoteStyle": "single",
+  "js/ts.referencesCodeLens.enabled": true,
+  "js/ts.suggestionActions.enabled": false,
+  "js/ts.tsc.autoDetect": "watch",
   ///
   "workbench.editor.limit.excludeDirty": true,
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.perEditorGroup": true,
   "workbench.editor.limit.value": 10,
+  "workbench.colorTheme": "Dark Modern",
   "workbench.colorCustomizations": {
     "editorBracketHighlight.foreground1": "#ffffff",
     "editorBracketHighlight.foreground2": "#d8d0a4",
@@ -76,7 +78,6 @@
     "javascript": "html"
   },
   ///
-  "javascript.suggestionActions.enabled": false,
   "explorer.compactFolders": false,
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   ///

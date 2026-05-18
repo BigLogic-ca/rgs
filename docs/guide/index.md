@@ -37,8 +37,8 @@ Welcome to the comprehensive enterprise guide for Argis (RGS) - a reactive globa
 
 ## Support and Community
 
-- **Documentation:** https://github.com/BigLogic-ca/rgs/docs
-- **Issues:** https://github.com/BigLogic-ca/rgs/issues
+- **Documentation:** https://github.com/picla-net/picla.npm.rgs/docs
+- **Issues:** https://github.com/picla-net/picla.npm.rgs/issues
 - **Email:** dariopassariello@gmail.com
 - **Patreon:** https://www.patreon.com/passariello
 
@@ -48,6 +48,6 @@ MIT License - see [LICENSE.md](../LICENSE.md) for details.
 
 ---
 
-*Document version: 3.9.40*  
-*Last updated: 2026-04-23*  
-*For enterprise support, contact BigLogic Canada.*
+*Document version: 3.9.40*
+*Last updated: 2026-04-23*
+*For enterprise support, contact BigLogic Inc Canada.*

@@ -6,7 +6,7 @@ Thank you for your interest in contributing!
 
 ```bash
 # Clone the repository
-git clone https://github.com/@biglogic/rgs.git
+git clone https://github.com/picla-net/picla.npm.rgs.git
 cd rgs
 
 # Install dependencies
